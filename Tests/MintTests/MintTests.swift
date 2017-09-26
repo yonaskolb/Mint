@@ -9,7 +9,6 @@ class MintTests: XCTestCase {
         XCTAssertEqual("Hello", "Hello")
     }
 
-
     static var allTests = [
         ("testExample", testExample),
     ]
