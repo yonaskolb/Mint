@@ -1,12 +1,12 @@
 import XCTest
-@testable import Mint
+@testable import MintKit
 
 class MintTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        XCTAssertEqual(Mint().text, "Hello, World!")
+        XCTAssertEqual("Hello", "Hello")
     }
 
 

@@ -8,8 +8,8 @@ let package = Package(
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
-            name: "Mint",
-            targets: ["Mint"]),
+            name: "MintKit",
+            targets: ["MintKit"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -20,7 +20,10 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Mint",
-            dependencies: []),
+            dependencies: ["MintKit"]),
+        .target(
+                name: "MintKit",
+                dependencies: []),
         .testTarget(
             name: "MintTests",
             dependencies: ["Mint"]),

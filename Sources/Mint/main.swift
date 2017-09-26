@@ -1,1 +1,3 @@
-print("Hello, world!")
+import MintKit
+
+MintKit.run()
