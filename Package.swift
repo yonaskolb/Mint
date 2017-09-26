@@ -14,6 +14,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/JohnSundell/files.git", from: "1.12.0"),
+        .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "1.2.0"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.6.1"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "2.1.0"),
     ],
