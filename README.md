@@ -1,9 +1,21 @@
-# Spearmint 🌱
+# Mint 🌱
 
 A dependency manager that installs and runs Swift command line tool packages.
 
-## Why is it called Spearmint?
-Swift Packager Manager Tools -> SPMT -> Spearmint! 🌱😄
+```
+$ mint run yonaskolb/xcodegen 1.2.0 xcodegen
+```
+
+Mint is designed to be used with command line tools that use the Swift Package Manager.
+
+- ✅ run tools **without build files** like homebrew formulas
+- ✅ builds are **cached** globally by version
+- ✅ easily run a specific **version** of a tool
+- ✅ use **different versions** of a tool side by side
+
+
+## Why is it called Mint?
+Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 
 ## Installing
 Make sure Xcode 9 is installed first.
@@ -25,7 +37,7 @@ $ brew install mint
 
 ### Swift Package Manager
 
-**Use CI tool**
+**Use CLI**
 
 ```
 $ git clone https://github.com/yonaskolb/mint.git
