@@ -3,7 +3,7 @@
 A dependency manager that installs and runs Swift command line tool packages.
 
 ```
-$ mint run yonaskolb/xcodegen 1.2.0 xcodegen
+$ mint run realm/swiftlint 0.22.0
 ```
 
 Mint is designed to be used with command line tools that use the Swift Package Manager.
@@ -13,6 +13,7 @@ Mint is designed to be used with command line tools that use the Swift Package M
 - ✅ easily run a specific **version** of a tool
 - ✅ use **different versions** of a tool side by side
 
+Builds are installed to and run from `/usr/local/mint`
 
 ## Why is it called Mint?
 Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
@@ -76,24 +77,17 @@ Use "mint [command] --help" for more information about a command.
 - **Run**: Runs a package. This will install if first if it doesn't exist
 - **Update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update.
 
-These 3 commands use the same flags. They must all be followed by a repo name.
-This can be a shorthand for a github repo `install realm/SwiftLint` or a fully qualified git path `install https://github.com/realm/SwiftLint.git`.
+These commands all have 1 to 3 arguments:
 
-##### Repo
-In the case of `run` you can also just pass the name of the repo if it is already installed `run swiftlint`. This will do a lookup of all installed packages.
-
-#### Version
-By default the version that is used is the latest git tag (or master if no tags exist). You can pass a specific version with the version flag (-v, --version) eg. `--version 1.2.0`
-
-#### Name
-By default the tool name will be the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). If there are any packages that have a different executable name when build you can specify it with `--name`
-
-#### Arguments
-To pass in arguments to the final tool on `run` you need to use `--args="any arguments"`
+- **repo (required)**: This can be a shorthand for a github repo `install realm/SwiftLint` or a fully qualified git path `install https://github.com/realm/SwiftLint.git`. In the case of `run` you can also just pass the name of the repo if it is already installed `run swiftlint`. This will do a lookup of all installed packages.
+- **version (optional)**: The git version of the packge. It is usually a tag but can also be a branch. If this is left out the version will default to the latest tag, or if there are no tags then master.
+- **command (optional)**: The command to install or run. This defaults to the the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). In the case of `run` you can also pass any arguments to the command but make sure the whole thing is surrounded by quotes eg `mint run realm/swiftlint 0.22.0 "swiftlint --path source"`
 
 #### Examples
 ```
-$ mint install yonaskolb/xcodegen 1.2.0 --args="--spec my_spec.yml"
+$ mint install yonaskolb/xcodegen 1.2.0 "xcodegen --spec my_spec.yml"
+$ mint install yonaskolb/xcodegen 1.2.0 xcodegen
+$ mint install yonaskolb/xcodegen 1.2.0
 $ mint install yonaskolb/xcodegen
 $ mint run xcodegen
 ```

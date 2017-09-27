@@ -22,52 +22,86 @@ func catchError(closure: () throws -> ()) {
     }
 }
 
+enum CommandError: Error, CustomStringConvertible {
+    case repoRequired
+    case commandNotParsed
+    case tooManyArguments
+
+    var description: String {
+        switch self {
+        case .repoRequired:
+            return "Repo required"
+        case .commandNotParsed:
+            return "Version and command couldn't be automatically parsed. Please pass \"\" for version"
+        case .tooManyArguments:
+            return "Too many arguments. Make sure command is surrounded in quotes"
+        }
+    }
+}
+
+func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: String, command: String) {
+    guard let repo = args.first else { throw CommandError.repoRequired }
+    var version: String = ""
+    let command: String
+    let extractedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!.lowercased()
+
+    switch args.count {
+    case 3:
+        version = args[1]
+        command = args[2]
+    case 2:
+        let argument = args[1]
+        let string = argument.components(separatedBy: " ").first!
+        if string == extractedCommand {
+            // string is a command
+            command = argument
+            version = ""
+        } else if string.contains(".") || string == "master" {
+            // string is version
+            version = string
+            command = extractedCommand
+        } else {
+            throw CommandError.commandNotParsed
+        }
+    case 1:
+        command = extractedCommand
+    default:
+        throw CommandError.tooManyArguments
+    }
+    return (repo: repo, version: version, command: command)
+}
+
 let command = Command(usage: "mint")
 command.run = { _, _  in
     print(command.helpMessage)
 }
 
-let repoHelp = "You must pass a repo either in the shorthand for of a github repo \"githubName/repo\", or a fully qualified .git path.\nAn optional version can be passed, otherwise the newest tag or master will be used"
-let versionFlag = Flag(shortName: "v", longName: "version", type: String.self, description: "The version to use. Usually this is a tag, but can also be a branch. If left out will use the latest tag or master")
+let commandHelp = """
+This command takes between 1 and 3 arguments: repo, version and command.
 
-let nameFlag = Flag(shortName: "n", longName: "name", type: String.self, description: "The command to run")
+- You must pass a repo either in the shorthand for of a github repo \"githubName/repo\", or a fully qualified .git path.
+- An optional version can be passed, otherwise the newest tag or master will be used.
+- An optional command qualifies the command name, otherwise this will be assumed to the be the end of the repo name.
+"""
 
-let argsFlag = Flag(shortName: "a", longName: "args", type: String.self, description: "the arguments to pass to the command being run")
-
-let runCommand = Command(usage: "run repo (version)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(repoHelp)", flags: [nameFlag, argsFlag], example: "mint run realm/swiftlint 0.22.0") { flags, args in
-    guard let repo = args.first else {
-        print("repo required".red)
-        return
-    }
-    let version = args.count >= 2 ? args[1] : ""
-    let name = flags.getString(name: "name")
-    let arguments = flags.getString(name: "args")
+let runCommand = Command(usage: "run repo (version) (command)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", example: "mint run realm/swiftlint 0.22.0") { flags, args in
     catchError {
-        try Mint.run(repo: repo, version: version, name: name, arguments: arguments)
+        let options = try getOptions(flags: flags, args: args)
+        try Mint.run(repo: options.repo, version: options.version, command: options.command)
     }
 }
 
-let installCommand = Command(usage: "install repo (version)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(repoHelp)", flags: [nameFlag], example: "mint install realm/swiftlint 0.22.0") { flags, args in
-    guard let repo = args.first else {
-        print("repo required".red)
-        return
-    }
-    let version = args.count >= 2 ? args[1] : ""
-    let name = flags.getString(name: "name")
+let installCommand = Command(usage: "install repo (version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", example: "mint install realm/swiftlint 0.22.0") { flags, args in
     catchError {
-        try Mint.install(repo: repo, version: version, name: name, force: false)
+        let options = try getOptions(flags: flags, args: args)
+        try Mint.install(repo: options.repo, version: options.version, command: options.command, force: false)
     }
 }
 
-let updateCommand = Command(usage: "update repo (version)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(repoHelp)", flags: [nameFlag], example: "mint install realm/swiftlint 0.22.0") { flags, args in
-    guard let repo = args.first else {
-        print("repo required".red)
-        return
-    }
-    let version = args.count >= 2 ? args[1] : ""
-    let name = flags.getString(name: "name")
+let updateCommand = Command(usage: "update repo (version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", example: "mint install realm/swiftlint 0.22.0") { flags, args in
     catchError {
-        try Mint.install(repo: repo, version: version, name: name, force: true)
+        let options = try getOptions(flags: flags, args: args)
+        try Mint.install(repo: options.repo, version: options.version, command: options.command, force: true)
     }
 }
 
@@ -76,7 +110,7 @@ let bootstrapCommand = Command(usage: "bootstrap") { flags, args in
 }
 command.add(subCommand: runCommand)
 command.add(subCommand: installCommand)
-//command.add(subCommand: bootstrapCommand)
+command.add(subCommand: updateCommand)
 
 command.execute()
 

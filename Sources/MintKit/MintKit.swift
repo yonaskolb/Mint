@@ -47,8 +47,10 @@ public struct Mint {
         try Mint.writeMetadata(metadata)
     }
 
-    public static func run(repo: String, version: String, name: String?, arguments: String?) throws {
-        let name = name ?? repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+    public static func run(repo: String, version: String, command: String) throws {
+        let commandComponents = command.components(separatedBy: " ")
+        let name = commandComponents.first!
+        let arguments = commandComponents.count > 1 ? Array(commandComponents.suffix(from: 1)) : []
         var git = repo
         if !git.contains("/") {
             // name find repo
@@ -63,16 +65,16 @@ public struct Mint {
         try run(package, arguments: arguments)
     }
 
-    public static func run(_ package: Package, arguments: String?) throws {
+    public static func run(_ package: Package, arguments: [String]) throws {
         try install(package, force: false)
         print("🌱  Running \(package.commandVersion)...")
 
-        let output = try shellOut(to: package.commandPath.string, arguments: arguments.flatMap{ [$0] } ?? [])
+        let output = try shellOut(to: package.commandPath.string, arguments: arguments)
         print(output)
     }
 
-    public static func install(repo: String, version: String, name: String?, force: Bool) throws {
-        let name = name ?? repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+    public static func install(repo: String, version: String, command: String, force: Bool) throws {
+        let name = command.components(separatedBy: " ").first!
         let package = Package(repo: repo, version: version, name: name)
         try install(package, force: force)
     }
@@ -122,7 +124,7 @@ public struct Mint {
         try? package.installPath.delete()
         try package.installPath.mkpath()
         print("🌱  Building \(package.name). This may take a few minutes...")
-        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
+//        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
         try shellOut(to: "swift build -c release", at: package.checkoutPath.string)
 
         print("🌱  Installing \(package.name)...")
