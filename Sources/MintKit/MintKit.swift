@@ -6,101 +6,130 @@ import Rainbow
 public enum MintError: Error, CustomStringConvertible {
     case packageNotFound(String)
     case repoNotFound(String)
+    case invalidCommand(String)
+    case invalidRepo(String)
 
     public var description: String {
         switch self {
-        case .packageNotFound(let package): return "Package not found \(package)"
-        case .repoNotFound(let repo): return "Git repo not found \(repo)"
+        case .packageNotFound(let package): return "\(package.quoted) package not found "
+        case .repoNotFound(let repo): return "Git repo not found at \(repo.quoted)"
+        case .invalidCommand(let command): return "Couldn't find command \(command)"
+        case .invalidRepo(let repo): return "Invalid repo \(repo.quoted)"
         }
     }
 }
 
+struct MintMetadata: Codable {
+    var packages: [String: String]
+}
+
 public struct Mint {
 
-    static let path: Path = "/usr/local/Mint"
+    static let path: Path = "/usr/local/mint"
+    static let metadataPath = path + "metadata.json"
 
-    public static func execute(_ arguments: [String] = CommandLine.arguments) throws {
-        guard arguments.count > 1 else {
-            print("valid commands are run and install")
-            return
-        }
-        var arguments = arguments
-        _ = arguments[0]
-        let command = arguments[1]
-        arguments = Array(arguments[2...])
-
-        if command == "run" {
-            try run(arguments)
-        } else if command == "install" {
-            try install(arguments)
-        } else {
-            print("valid commands are run and install")
-        }
+    static func writeMetadata(_ metadata: MintMetadata) throws {
+        let data = try JSONEncoder().encode(metadata)
+        try Mint.metadataPath.write(data)
     }
 
-    public static func run(_ arguments: [String]) throws {
-        guard arguments.count >= 3 else {
-            print("must provide git, version and name")
-            return
+    static func readMetadata() throws -> MintMetadata  {
+        guard Mint.metadataPath.exists else {
+            return MintMetadata(packages: [:])
         }
-        let git = arguments[0]
-        let version = arguments[1]
-        let name = arguments[2]
-        let arguments = Array(arguments[3...])
-        let package = Package(name: name, git: git, version: version)
+        let data: Data = try Mint.metadataPath.read()
+        return try JSONDecoder().decode(MintMetadata.self, from: data)
+    }
+
+    static func addPackage(git: String, path: Path) throws  {
+        var metadata = try readMetadata()
+        metadata.packages[git] = path.lastComponent
+        try Mint.writeMetadata(metadata)
+    }
+
+    public static func run(repo: String, version: String, name: String?, arguments: String?) throws {
+        let name = name ?? repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        var git = repo
+        if !git.contains("/") {
+            // name find repo
+            let metadata = try Mint.readMetadata()
+            if let map = metadata.packages.first(where: { $0.key.lowercased().contains(git.lowercased())}) {
+                git = map.key
+            } else {
+                throw MintError.packageNotFound(git)
+            }
+        }
+        let package = Package(repo: git, version: version, name: name)
         try run(package, arguments: arguments)
     }
 
-    public static func install(_ arguments: [String]) throws {
-        guard arguments.count >= 3 else {
-            print("must provide git, version and name")
-            return
-        }
-        let git = arguments[0]
-        let version = arguments[1]
-        let name = arguments[2]
-        let package = Package(name: name, git: git, version: version)
-        try install(package)
-    }
+    public static func run(_ package: Package, arguments: String?) throws {
+        try install(package, force: false)
+        print("🌱  Running \(package.commandVersion)...")
 
-    public static func run(_ package: Package, arguments: [String]) throws {
-        if !package.commandPath.exists {
-            try install(package)
-        }
-        print("🌱  Running \(package.versionName)...".green)
-        let output = try shellOut(to: package.commandPath.string, arguments: arguments)
+        let output = try shellOut(to: package.commandPath.string, arguments: arguments.flatMap{ [$0] } ?? [])
         print(output)
     }
 
-    public static func install(_ package: Package) throws {
+    public static func install(repo: String, version: String, name: String?, force: Bool) throws {
+        let name = name ?? repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        let package = Package(repo: repo, version: version, name: name)
+        try install(package, force: force)
+    }
 
+    public static func install(_ package: Package, force: Bool = false) throws {
+
+        if !package.repo.contains("/") {
+            throw MintError.invalidRepo(package.repo)
+        }
         try package.path.mkpath()
 
-        guard !package.commandPath.exists || package.version == "master"  else {
-            print("🌱  \(package.versionName) already installed".green)
+        if !force && package.commandPath.exists && !package.version.isEmpty {
+            print("🌱  \(package.commandVersion) already installed".green)
             return
         }
 
-        if package.checkoutPath.exists {
-            print("🌱  Checking out \(package.versionName)...".green)
-            try shellOut(to: "git fetch", at: package.checkoutPath.string)
-            try shellOut(to: "git checkout \(package.version)", at: package.checkoutPath.string)
-        } else {
-            print("🌱  Cloning \(package.git.absoluteString)...".green)
+        if !package.checkoutPath.exists {
+            print("🌱  Cloning \(package.git)...")
             do {
                 try shellOut(to: "git clone \(package.git) \(package.checkoutPath.lastComponent)", at: package.path.string)
             } catch {
-                throw MintError.repoNotFound(package.git.absoluteString)
+                throw MintError.repoNotFound(package.git)
             }
         }
 
-        try package.versionPath.mkpath()
-        print("🌱  Building \(package.name)...".green)
+        try shellOut(to: "git fetch --tags", at: package.checkoutPath.string)
+
+        if package.version.isEmpty {
+            let tag = try shellOut(to: "git describe --abbrev=0 --tags", at: package.checkoutPath.string)
+            if !tag.isEmpty {
+                package.version = tag
+                print("🌱  Using latest tag \(tag.quoted)")
+            } else {
+                package.version = "master"
+                print("🌱  Using branch \(package.version.quoted)")
+            }
+        }
+
+        if !force && package.commandPath.exists {
+            print("🌱  \(package.commandVersion) already installed".green)
+            return
+        }
+
+        print("🌱  Checking out \(package.gitVersion)...")
+        try shellOut(to: "git checkout \(package.version)", at: package.checkoutPath.string)
+
+        try? package.installPath.delete()
+        try package.installPath.mkpath()
+        print("🌱  Building \(package.name). This may take a few minutes...")
         try shellOut(to: "swift package clean", at: package.checkoutPath.string)
         try shellOut(to: "swift build -c release", at: package.checkoutPath.string)
 
-        print("🌱  Installing \(package.name)...".green)
+        print("🌱  Installing \(package.name)...")
         let toolFile = package.checkoutPath + ".build/Release/\(package.name)"
+        if !toolFile.exists {
+            throw MintError.invalidCommand(package.name)
+        }
         try toolFile.copy(package.commandPath)
 
         let resourcesFile = package.checkoutPath + "Package.resources"
@@ -109,66 +138,30 @@ public struct Mint {
             let resources = resourcesString.components(separatedBy: "\n")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
-            print("🌱  Copying resources for \(package.name)...".green)
+            print("🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ...")
             for resource in resources {
                 let resourcePath = package.checkoutPath + resource
                 if resourcePath.exists {
-                    print("copy \(resource)")
-                    try resourcePath.copy(package.versionPath + resource)
+                    try resourcePath.copy(package.installPath + resource)
                 } else {
                     print("resource \(resource) doesn't exist".yellow)
                 }
             }
         }
 
-        print("🌱  Installed \(package.versionName)".green)
+        try Mint.addPackage(git: package.git, path: package.path)
+        print("🌱  Installed \(package.commandVersion)".green)
     }
 
-    static func gitURLFromString(_ string: String) -> URL {
+    static func gitURLFromString(_ string: String) -> String {
         if let url = URL(string: string), url.scheme != nil {
-            return url
+            return url.absoluteString
         } else {
             if string.contains("github.com") {
-                return URL(string: "https://\(string).git")!
+                return "https://\(string).git"
             } else {
-                return URL(string: "https://github.com/\(string).git")!
+                return "https://github.com/\(string).git"
             }
         }
     }
-}
-
-public struct Package {
-    public var name: String
-    public var git: URL
-    public var version: String
-
-    public init(name: String, git: String, version: String?) {
-        self.name = name
-        self.git = Mint.gitURLFromString(git)
-        if let url = URL(string: git), url.scheme != nil {
-            self.git = url
-        } else {
-            if git.contains("github.com") {
-                self.git = URL(string: "https://\(git).git")!
-            } else {
-                self.git = URL(string: "https://github.com/\(git).git")!
-            }
-        }
-        self.version = version ?? "master"
-    }
-
-    public var versionName: String {
-        return "\(name) \(version)"
-    }
-
-    var path: Path {
-        return Mint.path + git.absoluteString
-            .replacingOccurrences(of: git.scheme! + "://", with: "")
-            .replacingOccurrences(of: "/", with: "-")
-            .replacingOccurrences(of: ".git", with: "")
-    }
-
-    var checkoutPath: Path { return path + "checkout" }
-    var versionPath: Path { return path + "build" + version }
-    var commandPath: Path { return versionPath + name }
 }

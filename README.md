@@ -57,30 +57,46 @@ And then import wherever needed: `import MintKit`
 
 ## Usage
 
-Mint has 2 commands, `run` and `install`.
-
-#### Install
-This will checkout, build and copy a specific build by git tag
-
-#### Run
-Run will run a certain tool from the package. If it's not installed, it will install it first
-
-#### Options
-
-Each command is followed by git path, version and tool name. Anything after that in `run` will be passed to the command line tool. 
-
-Git path can take the form:
-
-- `yonaskolb/xcodegen` (github repo name)
-- `github.com/yonaskolb/xcodegen` (github repo)
-- `http://github.com/yonaskolb/xcodegen.git` (any full git path)
-
-The first 2 examples would be transformed into the last
+Run `mint` to see usage instructions.
 
 ```
-$ mint run yonaskolb/xcodegen 1.2.0 xcodegen
+$ mint
+Usage:
+  mint [command]
+
+Available Commands:
+  install  Install a package
+  run      Run a package
+  update   Update a package
+  
+Use "mint [command] --help" for more information about a command.
 ```
 
+- **Install**: Installs a package. If it is already installed this won't do anything
+- **Run**: Runs a package. This will install if first if it doesn't exist
+- **Update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update.
+
+These 3 commands use the same flags. They must all be followed by a repo name.
+This can be a shorthand for a github repo `install realm/SwiftLint` or a fully qualified git path `install https://github.com/realm/SwiftLint.git`.
+
+##### Repo
+In the case of `run` you can also just pass the name of the repo if it is already installed `run swiftlint`. This will do a lookup of all installed packages.
+
+#### Version
+By default the version that is used is the latest git tag (or master if no tags exist). You can pass a specific version with the version flag (-v, --version) eg. `--version 1.2.0`
+
+#### Name
+By default the tool name will be the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). If there are any packages that have a different executable name when build you can specify it with `--name`
+
+#### Arguments
+To pass in arguments to the final tool on `run` you need to use `--args="any arguments"`
+
+#### Examples
+```
+$ mint install yonaskolb/xcodegen 1.2.0 --args="--spec my_spec.yml"
+$ mint install yonaskolb/xcodegen
+$ mint run xcodegen
+```
 
 ## Package.resources
 As the Swift Packager doesn't yet have a way of specifying resources directories, Mint looks for a custom `Package.resources` file in the repo. This is a plain text file that lists the resources directories on different lines:

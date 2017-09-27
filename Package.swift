@@ -16,6 +16,7 @@ let package = Package(
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.8.0"),
         .package(url: "https://github.com/JohnSundell/ShellOut.git", from: "1.2.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "2.1.0"),
+        .package(url: "https://github.com/nsomar/Guaka.git", from: "0.1.3"),
         ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -25,6 +26,7 @@ let package = Package(
             dependencies: [
                 "MintKit",
                 "Rainbow",
+                "Guaka",
                 ]),
         .target(
             name: "MintKit",
