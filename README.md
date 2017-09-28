@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/travis/yonaskolb/Mint/master.svg?style=flat)](https://travis-ci.org/yonaskolb/Mint)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/yonaskolb/Mint/blob/master/LICENSE)
 
-A dependency manager that installs and runs Swift command line tool packages.
+A package manager that installs and runs Swift command line tool packages.
 
 ```sh
 $ mint run realm/swiftlint 0.22.0
