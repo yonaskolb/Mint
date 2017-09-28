@@ -1,5 +1,10 @@
 # Mint 🌱
 
+[![SPM](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
+[![Git Version](https://img.shields.io/github/release/yonaskolb/mint.svg)](https://github.com/yonaskolb/mint/releases)
+[![Build Status](https://img.shields.io/travis/yonaskolb/mint/master.svg?style=flat)](https://travis-ci.org/yonaskolb/mint)
+[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/yonaskolb/mint/blob/master/LICENSE)
+
 A dependency manager that installs and runs Swift command line tool packages.
 
 ```sh
