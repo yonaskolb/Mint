@@ -2,7 +2,7 @@
 
 A dependency manager that installs and runs Swift command line tool packages.
 
-```bash
+```sh
 $ mint run realm/swiftlint 0.22.0
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
@@ -25,14 +25,14 @@ Make sure Xcode 9 is installed first.
 
 ### Homebrew
 
-```bash
+```sh
 $ brew tap yonaskolb/mint https://github.com/yonaskolb/mint.git
 $ brew install mint
 ```
 
 ### Make
 
-```bash
+```sh
 $ git clone https://github.com/yonaskolb/mint.git
 $ cd mint
 $ make
@@ -42,7 +42,7 @@ $ make
 
 **Use CLI**
 
-```bash
+```sh
 $ git clone https://github.com/yonaskolb/mint.git
 $ cd mint
 $ ./build/release/mint
@@ -52,7 +52,7 @@ $ ./build/release/mint
 
 Add the following to your Package.swift file's dependencies:
 
-```bash
+```swift
 .package(url: "https://github.com/yonaskolb/mint.git", from: "0.1.0"),
 ```
 
@@ -86,7 +86,7 @@ These commands all have 1 to 3 arguments:
 - **command (optional)**: The command to install or run. This defaults to the the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). In the case of `run` you can also pass any arguments to the command but make sure the whole thing is surrounded by quotes eg `mint run realm/swiftlint 0.22.0 "swiftlint --path source"`
 
 #### Examples
-```bash
+```sh
 $ mint install yonaskolb/xcodegen 1.2.0 "xcodegen --spec spec.yml" # pass some arguments
 $ mint install yonaskolb/xcodegen 1.2.0 # use version 1.2.0
 $ mint install yonaskolb/xcodegen # use newest tag
@@ -97,8 +97,8 @@ $ mint run xcodegen # use newest tag and find xcodegen in installed tools
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to your `Installing` section in the readme:
 
-> ###[Mint](https://github.com/yonaskolb/mint) 🌱
-> ```bash
+> ### [Mint](https://github.com/yonaskolb/mint) 🌱
+> ```sh
 > $ mint run github-name/repo-name
 > ```
 
