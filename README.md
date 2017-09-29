@@ -121,3 +121,14 @@ MyFiles
 MyOtherFiles
 ```
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
+
+
+## A list of popular Mint compatible tools 🌱
+Just run `mint run` and the following:
+
+- [realm/SwiftLint](https://github.com/realm/SwiftLint)
+- [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+
+Feel free to add your own!
