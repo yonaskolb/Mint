@@ -12,15 +12,18 @@ $ mint run realm/swiftlint 0.22.0
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
 
-Mint is designed to be used with Swift command line tools that build with the Swift Package Manager.
+Mint is designed to be used with Swift command line tools that build with the Swift Package Manager. It makes installing, running and distributing these tools much easier.
 
-- ✅ run tools **without build files** like homebrew formulas
 - ✅ builds are **cached** globally by version
 - ✅ easily run a specific **version** of a tool
 - ✅ use **different versions** of a tool side by side
 - ✅ easily run the **latest** version of a tool
+- ✅ distribute your own tools **without recipes and formulas**
 
-Builds are installed to and run from `/usr/local/mint`
+Homebrew is a popular method of distributing Swift executables, but that requires creating a formula and then maintaining that formula. Running specific versions of homebrew installations can also be tricky as only one global version is installed at any one time. Mint installs your tool via SPM and lets you run multiple versions of that tool, which are globally installed and cached on demand.
+
+If your Swift executable package builds with SPM, then it can be run with Mint! See [Support](#support) for details.
+
 
 ## Why is it called Mint?
 Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
