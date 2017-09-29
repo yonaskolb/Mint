@@ -132,5 +132,6 @@ Just run `mint run` and the following:
 - [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
 - [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
 - [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- [danger/danger](https://github.com/danger/danger)
 
 Feel free to add your own!
