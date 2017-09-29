@@ -105,10 +105,12 @@ $ mint run xcodegen # use newest tag and find xcodegen in installed tools
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to your `Installing` section in the readme:
 
-> ### [Mint](https://github.com/yonaskolb/mint) 🌱
-> ```sh
-> $ mint run github-name/repo-name
-> ```
+````
+### [Mint](https://github.com/yonaskolb/mint)
+```
+$ mint run github_name/repo_name
+```
+````
 
 ### Executable
 If your executable name is different from your repo name then you will need to append the name to the above command
