@@ -31,6 +31,8 @@ Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 ## Installing
 Make sure Xcode 9 is installed first.
 
+> WARNING: May have issues on High Sierra
+
 ### Homebrew
 
 ```sh
