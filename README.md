@@ -31,15 +31,6 @@ Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 ## Installing
 Make sure Xcode 9 is installed first.
 
-### ⚠️ High Sierra
-If you are running High Sierra your permissions to `/usr/local` may have changed and you will need to run the following commands before installing Mint:
-
-```sh
-$ sudo mkdir /usr/local/mint
-$ sudo chown -R $(whoami) /usr/local/mint
-```
-This is required so Mint can write to the `/usr/local/mint` directory to download and cache your builds
-
 ### Homebrew
 
 ```sh
@@ -88,7 +79,7 @@ Available Commands:
   install  Install a package
   run      Run a package
   update   Update a package
-  
+
 Use "mint [command] --help" for more information about a command.
 ```
 
@@ -108,7 +99,7 @@ $ mint install yonaskolb/xcodegen 1.2.0 "xcodegen --spec spec.yml" # pass some a
 $ mint install yonaskolb/xcodegen 1.2.0 # use version 1.2.0
 $ mint install yonaskolb/xcodegen # use newest tag
 $ mint run yonaskolb/xcodegen 1.2.0 # run 1.2.0
-$ mint run xcodegen # use newest tag and find xcodegen in installed tools 
+$ mint run xcodegen # use newest tag and find xcodegen in installed tools
 ```
 
 ## Support

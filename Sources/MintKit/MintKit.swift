@@ -25,7 +25,7 @@ struct MintMetadata: Codable {
 
 public struct Mint {
 
-    static let path: Path = "/usr/local/mint"
+    static let path: Path = "/usr/local/lib/mint"
     static let metadataPath = path + "metadata.json"
 
     static func writeMetadata(_ metadata: MintMetadata) throws {
