@@ -15,8 +15,10 @@ func catchError(closure: () throws -> ()) {
             if !error.output.isEmpty {
                 print(error.output)
             }
+        } else if let error = error as? MintError {
+            print("🌱  Error: \(error.description)".red)
         } else {
-            print("🌱  Error: \(error)".red)
+            print("🌱  Error: \(error.localizedDescription)".red)
         }
         exit(1)
     }
