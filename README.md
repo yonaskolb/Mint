@@ -31,7 +31,14 @@ Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 ## Installing
 Make sure Xcode 9 is installed first.
 
-> WARNING: May have issues on High Sierra
+### ⚠️ High Sierra
+If you are running High Sierra your permissions to `/usr/local` may have changed and you will need to run the following commands before installing Mint:
+
+```sh
+$ sudo mkdir /usr/local/mint
+$ sudo chown -R $(whoami) /usr/local/mint
+```
+This is required so Mint can write to the `/usr/local/mint` directory to download and cache your builds
 
 ### Homebrew
 
