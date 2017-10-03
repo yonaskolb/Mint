@@ -103,11 +103,13 @@ public struct Mint {
         try shellOut(to: "git fetch --tags", at: package.checkoutPath.string)
 
         if package.version.isEmpty {
-            let tag = try shellOut(to: "git describe --abbrev=0 --tags", at: package.checkoutPath.string)
-            if !tag.isEmpty {
+            do {
+                // This will exit with a non-zero status code when there are no tags
+                let tag = try shellOut(to: "git describe --abbrev=0 --tags", at:  package.checkoutPath.string)
+
                 package.version = tag
                 print("🌱  Using latest tag \(tag.quoted)")
-            } else {
+            }  catch {
                 package.version = "master"
                 print("🌱  Using branch \(package.version.quoted)")
             }
