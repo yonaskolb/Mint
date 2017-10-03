@@ -27,6 +27,7 @@ If your Swift executable package builds with SPM, then it can be run with Mint! 
 
 ## Why is it called Mint?
 Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
+> Mint: a place where something is produced or manufactured
 
 ## Installing
 Make sure Xcode 9 is installed first.
