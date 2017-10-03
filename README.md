@@ -126,12 +126,11 @@ If this file is found in you repo, then all those directories will be copied int
 
 
 ## A list of popular Mint compatible tools 🌱
-Just run `mint run` and the following:
+Just run `mint run` or `mint install` and the following:
 
 - [realm/SwiftLint](https://github.com/realm/SwiftLint)
 - [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
 - [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
 - [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
-- [danger/danger](https://github.com/danger/danger)
 
 Feel free to add your own!
