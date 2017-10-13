@@ -2,6 +2,12 @@
 
 ## Master
 
+## 0.5.0
+
+- BREAKING: Changed version from the second argument to an @ suffix on the repo
+
+[Commits](https://github.com/yonaskolb/XcodeGen/compare/0.4.1...0.5.0)
+
 ## 0.4.1
 
 - Fixed installing a package without tags when version isn't specified #7 by @orta
