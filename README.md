@@ -35,15 +35,15 @@ Make sure Xcode 9 is installed first.
 ### Homebrew
 
 ```sh
-$ brew tap yonaskolb/mint https://github.com/yonaskolb/mint.git
+$ brew tap yonaskolb/Mint https://github.com/yonaskolb/Mint.git
 $ brew install mint
 ```
 
 ### Make
 
 ```sh
-$ git clone https://github.com/yonaskolb/mint.git
-$ cd mint
+$ git clone https://github.com/yonaskolb/Mint.git
+$ cd Mint
 $ make
 ```
 
@@ -52,10 +52,9 @@ $ make
 **Use CLI**
 
 ```sh
-$ git clone https://github.com/yonaskolb/mint.git
-$ cd mint
-$ swift build --configuration release
-$ ./build/release/mint
+$ git clone https://github.com/yonaskolb/Mint.git
+$ cd Mint
+$ swift run mint
 ```
 
 **Use as dependency**
@@ -63,7 +62,7 @@ $ ./build/release/mint
 Add the following to your Package.swift file's dependencies:
 
 ```swift
-.package(url: "https://github.com/yonaskolb/mint.git", from: "0.1.0"),
+.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.1.0"),
 ```
 
 And then import wherever needed: `import MintKit`
