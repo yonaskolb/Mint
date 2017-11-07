@@ -54,6 +54,7 @@ $ make
 ```sh
 $ git clone https://github.com/yonaskolb/mint.git
 $ cd mint
+$ swift build --configuration release
 $ ./build/release/mint
 ```
 
