@@ -7,6 +7,9 @@ let package = Package(
     name: "Mint",
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
+        .executable(
+            name: "mint",
+            targets: ["Mint"]),
         .library(
             name: "MintKit",
             targets: ["MintKit"]),
@@ -37,6 +40,6 @@ let package = Package(
                 ]),
         .testTarget(
             name: "MintTests",
-            dependencies: ["Mint"]),
+            dependencies: ["MintKit"]),
         ]
 )

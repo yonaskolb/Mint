@@ -130,7 +130,7 @@ public struct Mint {
         try shellOut(to: "swift build -c release", at: package.checkoutPath.string)
 
         print("🌱  Installing \(package.name)...")
-        let toolFile = package.checkoutPath + ".build/Release/\(package.name)"
+        let toolFile = package.checkoutPath + ".build/release/\(package.name)"
         if !toolFile.exists {
             throw MintError.invalidCommand(package.name)
         }

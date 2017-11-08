@@ -63,7 +63,7 @@ func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: 
     case 2:
         command = args[1]
     case 1:
-        command = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!.lowercased()
+        command = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
     default:
         throw CommandError.tooManyArguments
     }

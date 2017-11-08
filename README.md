@@ -8,7 +8,7 @@
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/swiftlint@0.22.0
+$ mint run realm/SwiftLint@0.22.0 swiftlint
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
 
@@ -35,15 +35,15 @@ Make sure Xcode 9 is installed first.
 ### Homebrew
 
 ```sh
-$ brew tap yonaskolb/mint https://github.com/yonaskolb/mint.git
+$ brew tap yonaskolb/Mint https://github.com/yonaskolb/Mint.git
 $ brew install mint
 ```
 
 ### Make
 
 ```sh
-$ git clone https://github.com/yonaskolb/mint.git
-$ cd mint
+$ git clone https://github.com/yonaskolb/Mint.git
+$ cd Mint
 $ make
 ```
 
@@ -52,9 +52,9 @@ $ make
 **Use CLI**
 
 ```sh
-$ git clone https://github.com/yonaskolb/mint.git
-$ cd mint
-$ ./build/release/mint
+$ git clone https://github.com/yonaskolb/Mint.git
+$ cd Mint
+$ swift run mint
 ```
 
 **Use as dependency**
@@ -62,7 +62,7 @@ $ ./build/release/mint
 Add the following to your Package.swift file's dependencies:
 
 ```swift
-.package(url: "https://github.com/yonaskolb/mint.git", from: "0.1.0"),
+.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.1.0"),
 ```
 
 And then import wherever needed: `import MintKit`
@@ -96,11 +96,11 @@ These commands all have 1 or 2 arguments:
 
 #### Examples
 ```sh
-$ mint install yonaskolb/xcodegen@1.2.4 "xcodegen --spec spec.yml" # pass some arguments
-$ mint install yonaskolb/xcodegen@1.2.4 # use version 1.2.4
-$ mint install yonaskolb/xcodegen # use newest tag
-$ mint run yonaskolb/xcodegen@1.2.4 # run 1.2.4
-$ mint run xcodegen # use newest tag and find xcodegen in installed tools
+$ mint install yonaskolb/XcodeGen@1.2.4 "XcodeGen --spec spec.yml" # pass some arguments
+$ mint install yonaskolb/XcodeGen@1.2.4 # use version 1.2.4
+$ mint install yonaskolb/XcodeGen # use newest tag
+$ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
+$ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
 
 ## Support
@@ -127,11 +127,11 @@ If this file is found in you repo, then all those directories will be copied int
 
 
 ## A list of popular Mint compatible tools 🌱
-Just run `mint run` or `mint install` and the following:
+Just run `mint run` or `mint install` with the following:
 
-- [realm/SwiftLint](https://github.com/realm/SwiftLint)
-- [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- $ mint run [realm/SwiftLint](https://github.com/realm/SwiftLint) swiftlint
+- $ mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- $ mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- $ mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
 
 Feel free to add your own!
