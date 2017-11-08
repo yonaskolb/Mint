@@ -8,7 +8,7 @@
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/swiftlint@0.22.0
+$ mint run realm/SwiftLint@0.22.0 swiftlint
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
 
@@ -96,11 +96,11 @@ These commands all have 1 or 2 arguments:
 
 #### Examples
 ```sh
-$ mint install yonaskolb/xcodegen@1.2.4 "xcodegen --spec spec.yml" # pass some arguments
-$ mint install yonaskolb/xcodegen@1.2.4 # use version 1.2.4
-$ mint install yonaskolb/xcodegen # use newest tag
-$ mint run yonaskolb/xcodegen@1.2.4 # run 1.2.4
-$ mint run xcodegen # use newest tag and find xcodegen in installed tools
+$ mint install yonaskolb/XcodeGen@1.2.4 "XcodeGen --spec spec.yml" # pass some arguments
+$ mint install yonaskolb/XcodeGen@1.2.4 # use version 1.2.4
+$ mint install yonaskolb/XcodeGen # use newest tag
+$ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
+$ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
 
 ## Support
@@ -127,11 +127,11 @@ If this file is found in you repo, then all those directories will be copied int
 
 
 ## A list of popular Mint compatible tools 🌱
-Just run `mint run` or `mint install` and the following:
+Just run `mint run` or `mint install` with the following:
 
-- [realm/SwiftLint](https://github.com/realm/SwiftLint)
-- [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- $ mint run [realm/SwiftLint](https://github.com/realm/SwiftLint) swiftlint
+- $ mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- $ mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- $ mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
 
 Feel free to add your own!
