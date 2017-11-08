@@ -2,6 +2,8 @@
 
 ## Master
 
+- Mint is now compatible with case‐sensitive file systems.
+
 ## 0.5.0
 
 - BREAKING: Changed version from the second argument to an @ suffix on the repo
