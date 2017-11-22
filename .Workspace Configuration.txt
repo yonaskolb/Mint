@@ -1,0 +1,26 @@
+Project Type: Executable
+
+Module Name: MintKit
+
+Manage Xcode: True
+Primary Xcode Target: MintKit
+
+Manage Continuous Integration: True
+
+([_Workaround: Several dependencies trigger compiler warnings._])
+Prohibit Compiler Warnings: False
+
+([_Workaround: These triggered when Workspace was first applied, so @SDGGiesbrecht deactivated them. @yonaskolb should decide which rules to enforce over the long term._])
+[_Begin Disable Proofreading Rules_]
+Colon Spacing
+Syntax Colouring
+colon
+function_body_length
+large_tuple
+line_length
+opening_brace
+statement_position
+trailing_comma
+unused_closure_parameter
+void_return
+[_End_]

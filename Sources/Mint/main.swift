@@ -112,4 +112,3 @@ command.add(subCommand: installCommand)
 command.add(subCommand: updateCommand)
 
 command.execute()
-
