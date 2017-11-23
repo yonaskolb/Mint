@@ -1,4 +1,5 @@
 Project Type: Executable
+Support Linux: False
 
 Module Name: MintKit
 
