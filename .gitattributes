@@ -9,12 +9,6 @@
 # https://github.com/SDGGiesbrecht/Workspace/blob/master/Documentation/Git.md
 # !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!!
 
-.DS_Store
-/.build
-/Packages
-/Validate\ (macOS).command
-/Validate\ (Linux).sh
-/.Test\ Zone
-/*.xcodeproj
+/Refresh?Workspace* linguist-vendored=true
 
 # [_End Workspace Section]

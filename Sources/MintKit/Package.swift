@@ -41,6 +41,7 @@ public class Package {
     var checkoutPath: Path { return path + "checkout" }
     var installPath: Path { return path + "build" + version }
     var commandPath: Path { return installPath + name }
-    var metadataPath: Path { return path + "metadata.json" }
+    // [_Workaround: This property was completely unused and unreachable. Why was it here?_]
+    // var metadataPath: Path { return path + "metadata.json" }
 
 }

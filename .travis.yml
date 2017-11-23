@@ -1,7 +1,32 @@
-os:
-  - osx
-language: swift
-osx_image: xcode9
-script:
-  - swift build
-  - swift test
+
+
+# !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!!
+# This file is managed by Workspace.
+# Manual changes will not persist.
+# For more information, see:
+# https://github.com/SDGGiesbrecht/Workspace/blob/master/Documentation/Continuous Integration.md
+# !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!! !!!!!!!
+
+language: generic
+matrix:
+  include:
+    - os: osx
+      env:
+        - JOB="macOS"
+      osx_image: xcode9
+      script:
+        - "bash ./Refresh\\ \\(macOS\\).command"
+        - "bash ./Validate\\ \\(macOS\\).command"
+    - os: osx
+      env:
+        - JOB="Misc."
+      osx_image: xcode9
+      script:
+        - "brew update"
+        - "brew outdated swiftlint || brew upgrade swiftlint"
+        - "bash ./Refresh\\ \\(macOS\\).command"
+        - "bash ./Validate\\ \\(macOS\\).command"
+
+cache:
+  directories:
+  - $HOME/.Workspace
