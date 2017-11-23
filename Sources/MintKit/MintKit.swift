@@ -3,7 +3,7 @@ import PathKit
 import Foundation
 import Rainbow
 
-public enum MintError: Error, CustomStringConvertible {
+public enum MintError: Error, CustomStringConvertible, Equatable {
     case packageNotFound(String)
     case repoNotFound(String)
     case invalidCommand(String)
@@ -17,6 +17,10 @@ public enum MintError: Error, CustomStringConvertible {
         case .invalidRepo(let repo): return "Invalid repo \(repo.quoted)"
         }
     }
+
+    public static func == (lhs: MintError, rhs: MintError) -> Bool {
+        return lhs.description == rhs.description
+    }
 }
 
 struct MintMetadata: Codable {
@@ -25,7 +29,14 @@ struct MintMetadata: Codable {
 
 public struct Mint {
 
-    static let path: Path = "/usr/local/lib/mint"
+    static let path: Path = {
+        var result: String = "/usr/local/lib/mint"
+        if _isDebugAssertConfiguration() {
+            // Prevents testing and development (debug) from interfering with files belonging to the system install (release).
+            result += ".debug"
+        }
+        return Path(result)
+    }()
     static let metadataPath = path + "metadata.json"
 
     static func writeMetadata(_ metadata: MintMetadata) throws {
@@ -115,7 +126,7 @@ public struct Mint {
             }
         }
 
-        if !force && package.commandPath.exists {
+        if !force && package.commandPath.exists { // [_Exempt from Code Coverage_] False positive in Xcode 9.1.
             print("🌱  \(package.commandVersion) already installed".green)
             return
         }
