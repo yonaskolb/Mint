@@ -54,7 +54,7 @@ public struct Mint {
             return
         }
 
-        let packages: [String] = try packagesPath.children().map { packagePath in
+        let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
             let versions = try (packagePath + "build").children().sorted()
             let packageName = packagePath.lastComponent.split(separator: "_").last!
             var package = "  \(packageName)"
