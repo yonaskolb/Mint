@@ -104,7 +104,6 @@ public struct Mint {
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
         }
-        try package.path.mkpath()
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
