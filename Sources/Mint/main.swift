@@ -6,7 +6,7 @@ import Guaka
 
 let version = "0.6.0"
 
-func catchError(closure: () throws -> ()) {
+func catchError(closure: () throws -> Void) {
     do {
         try closure()
     } catch {
@@ -35,7 +35,7 @@ enum CommandError: Error, CustomStringConvertible {
         switch self {
         case .repoRequired:
             return "Repo required"
-        case .invalidRepo(let repo):
+        case let .invalidRepo(repo):
             return "The repo was invalid: \(repo)"
         case .tooManyArguments:
             return "Too many arguments. Make sure command is surrounded in quotes"
@@ -75,7 +75,7 @@ func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: 
 let versionFlag = Flag(longName: "version", value: false, description: "Prints the version")
 
 let command = Command(usage: "mint", flags: [versionFlag])
-command.run = { flags, _  in
+command.run = { flags, _ in
     if let hasVersion = flags.getBool(name: "version"), hasVersion {
         print(version)
         return
@@ -118,13 +118,12 @@ let listCommand = Command(usage: "list", shortMessage: "List packages", longMess
     }
 }
 
-let bootstrapCommand = Command(usage: "bootstrap") { flags, args in
-
+let bootstrapCommand = Command(usage: "bootstrap") { _, _ in
 }
+
 command.add(subCommand: runCommand)
 command.add(subCommand: installCommand)
 command.add(subCommand: updateCommand)
 command.add(subCommand: listCommand)
 
 command.execute()
-

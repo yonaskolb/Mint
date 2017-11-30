@@ -11,10 +11,10 @@ public enum MintError: Error, CustomStringConvertible {
 
     public var description: String {
         switch self {
-        case .packageNotFound(let package): return "\(package.quoted) package not found "
-        case .repoNotFound(let repo): return "Git repo not found at \(repo.quoted)"
-        case .invalidCommand(let command): return "Couldn't find command \(command)"
-        case .invalidRepo(let repo): return "Invalid repo \(repo.quoted)"
+        case let .packageNotFound(package): return "\(package.quoted) package not found "
+        case let .repoNotFound(repo): return "Git repo not found at \(repo.quoted)"
+        case let .invalidCommand(command): return "Couldn't find command \(command)"
+        case let .invalidRepo(repo): return "Invalid repo \(repo.quoted)"
         }
     }
 }
@@ -34,7 +34,7 @@ public struct Mint {
         try Mint.metadataPath.write(data)
     }
 
-    static func readMetadata() throws -> MintMetadata  {
+    static func readMetadata() throws -> MintMetadata {
         guard Mint.metadataPath.exists else {
             return MintMetadata(packages: [:])
         }
@@ -42,7 +42,7 @@ public struct Mint {
         return try JSONDecoder().decode(MintMetadata.self, from: data)
     }
 
-    static func addPackage(git: String, path: Path) throws  {
+    static func addPackage(git: String, path: Path) throws {
         var metadata = try readMetadata()
         metadata.packages[git] = path.lastComponent
         try Mint.writeMetadata(metadata)
@@ -75,7 +75,7 @@ public struct Mint {
         if !git.contains("/") {
             // name find repo
             let metadata = try Mint.readMetadata()
-            if let map = metadata.packages.first(where: { $0.key.lowercased().contains(git.lowercased())}) {
+            if let map = metadata.packages.first(where: { $0.key.lowercased().contains(git.lowercased()) }) {
                 git = map.key
             } else {
                 throw MintError.packageNotFound(git)
@@ -107,7 +107,7 @@ public struct Mint {
         try package.path.mkpath()
 
         if package.version.isEmpty {
-             // we don't have a specific version, let's get the latest tag
+            // we don't have a specific version, let's get the latest tag
             let tags = try shellOut(to: "git ls-remote --tags \(package.git)")
             if tags.isEmpty {
                 package.version = "master"
@@ -140,7 +140,7 @@ public struct Mint {
         try? package.installPath.delete()
         try package.installPath.mkpath()
         print("🌱  Building \(package.name). This may take a few minutes...")
-//        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
+        //        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
         try shellOut(to: "swift build -c release", at: packageCheckoutPath.string)
 
         print("🌱  Installing \(package.name)...")

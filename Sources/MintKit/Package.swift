@@ -1,10 +1,3 @@
-//
-//  Package.swift
-//  MintKit
-//
-//  Created by Yonas Kolb on 27/9/17.
-//
-
 import Foundation
 import PathKit
 
@@ -45,5 +38,4 @@ public class Package {
     var installPath: Path { return path + "build" + version }
     var commandPath: Path { return installPath + name }
     var metadataPath: Path { return path + "metadata.json" }
-
 }
