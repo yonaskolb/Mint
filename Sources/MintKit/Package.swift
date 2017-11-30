@@ -32,13 +32,16 @@ public class Package {
     }
 
     var path: Path {
-        return Mint.path + "packages" + git
+        return Mint.path + "packages" + repoPath
+    }
+
+    var repoPath: String {
+        return git
             .components(separatedBy: "://").last!
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: ".git", with: "")
     }
 
-    var checkoutPath: Path { return path + "checkout" }
     var installPath: Path { return path + "build" + version }
     var commandPath: Path { return installPath + name }
     var metadataPath: Path { return path + "metadata.json" }

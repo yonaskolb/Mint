@@ -91,21 +91,25 @@ public struct Mint {
             return
         }
 
-        if !package.checkoutPath.exists {
-            print("🌱  Cloning \(package.git)...")
-            do {
-                try shellOut(to: "git clone \(package.git) \(package.checkoutPath.lastComponent)", at: package.path.string)
-            } catch {
-                throw MintError.repoNotFound(package.git)
-            }
+        let checkoutPath = Path.temporary + "mint"
+        let packageCheckoutPath = checkoutPath + package.repoPath
+
+        try checkoutPath.mkpath()
+
+        try? packageCheckoutPath.delete()
+        print("🌱  Cloning \(package.git)...")
+        do {
+            try shellOut(to: "git clone \(package.git) \(package.repoPath)", at: checkoutPath.string)
+        } catch {
+            throw MintError.repoNotFound(package.git)
         }
 
-        try shellOut(to: "git fetch --tags", at: package.checkoutPath.string)
-
         if package.version.isEmpty {
+            // we don't have a specific version, let's get the latest tag
+
             do {
                 // This will exit with a non-zero status code when there are no tags
-                let tag = try shellOut(to: "git describe --abbrev=0 --tags", at:  package.checkoutPath.string)
+                let tag = try shellOut(to: "git describe --abbrev=0 --tags", at:  packageCheckoutPath.string)
 
                 package.version = tag
                 print("🌱  Using latest tag \(tag.quoted)")
@@ -120,23 +124,23 @@ public struct Mint {
             return
         }
 
-        print("🌱  Checking out \(package.gitVersion)...")
-        try shellOut(to: "git checkout \(package.version)", at: package.checkoutPath.string)
+        print("🌱  Checking out \(package.commandVersion)...")
+        try shellOut(to: "git checkout \(package.version)", at: packageCheckoutPath.string)
 
         try? package.installPath.delete()
         try package.installPath.mkpath()
         print("🌱  Building \(package.name). This may take a few minutes...")
 //        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
-        try shellOut(to: "swift build -c release", at: package.checkoutPath.string)
+        try shellOut(to: "swift build -c release", at: packageCheckoutPath.string)
 
         print("🌱  Installing \(package.name)...")
-        let toolFile = package.checkoutPath + ".build/release/\(package.name)"
+        let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
         if !toolFile.exists {
             throw MintError.invalidCommand(package.name)
         }
         try toolFile.copy(package.commandPath)
 
-        let resourcesFile = package.checkoutPath + "Package.resources"
+        let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
             let resourcesString: String = try resourcesFile.read()
             let resources = resourcesString.components(separatedBy: "\n")
@@ -144,7 +148,7 @@ public struct Mint {
                 .filter { !$0.isEmpty }
             print("🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ...")
             for resource in resources {
-                let resourcePath = package.checkoutPath + resource
+                let resourcePath = packageCheckoutPath + resource
                 if resourcePath.exists {
                     try resourcePath.copy(package.installPath + resource)
                 } else {
@@ -155,6 +159,8 @@ public struct Mint {
 
         try Mint.addPackage(git: package.git, path: package.path)
         print("🌱  Installed \(package.commandVersion)".green)
+
+        try? packageCheckoutPath.delete()
     }
 
     static func gitURLFromString(_ string: String) -> String {
