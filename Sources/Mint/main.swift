@@ -83,21 +83,21 @@ This command takes allows you to specify a repo, a version and an executable com
 - The second argument qualifies the command name, otherwise this will be assumed to the be the end of the repo name.
 """
 
-let runCommand = Command(usage: "run repo (version) (command)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", example: "mint run realm/swiftlint 0.22.0") { flags, args in
+let runCommand = Command(usage: "run repo (version) (command)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", example: "mint run realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
         try Mint.run(repo: options.repo, version: options.version, command: options.command)
     }
 }
 
-let installCommand = Command(usage: "install repo (version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", example: "mint install realm/swiftlint 0.22.0") { flags, args in
+let installCommand = Command(usage: "install repo (version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
         try Mint.install(repo: options.repo, version: options.version, command: options.command, force: false)
     }
 }
 
-let updateCommand = Command(usage: "update repo (version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", example: "mint install realm/swiftlint 0.22.0") { flags, args in
+let updateCommand = Command(usage: "update repo (version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
         try Mint.install(repo: options.repo, version: options.version, command: options.command, force: true)
