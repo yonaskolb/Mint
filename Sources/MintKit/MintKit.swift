@@ -106,7 +106,20 @@ public struct Mint {
         }
         try package.path.mkpath()
 
-        if !force && package.commandPath.exists && !package.version.isEmpty {
+        if package.version.isEmpty {
+             // we don't have a specific version, let's get the latest tag
+            let tags = try shellOut(to: "git ls-remote --tags \(package.git)")
+            if tags.isEmpty {
+                package.version = "master"
+                print("🌱  Using \(package.name) \(package.version.quoted)")
+            } else {
+                let latestTag = String(tags.split(separator: "\n").last!.split(separator: "\t").last!.split(separator: "/").last!)
+                package.version = latestTag
+                print("🌱  Using latest tag \(latestTag.quoted)")
+            }
+        }
+
+        if !force && package.commandPath.exists {
             print("🌱  \(package.commandVersion) already installed".green)
             return
         }
@@ -117,35 +130,12 @@ public struct Mint {
         try checkoutPath.mkpath()
 
         try? packageCheckoutPath.delete()
-        print("🌱  Cloning \(package.git)...")
+        print("🌱  Cloning \(package.git) \(package.version.quoted)...")
         do {
-            try shellOut(to: "git clone \(package.git) \(package.repoPath)", at: checkoutPath.string)
+            try shellOut(to: "git clone --depth 1 -b \(package.version) \(package.git) \(package.repoPath)", at: checkoutPath.string)
         } catch {
             throw MintError.repoNotFound(package.git)
         }
-
-        if package.version.isEmpty {
-            // we don't have a specific version, let's get the latest tag
-
-            do {
-                // This will exit with a non-zero status code when there are no tags
-                let tag = try shellOut(to: "git describe --abbrev=0 --tags", at:  packageCheckoutPath.string)
-
-                package.version = tag
-                print("🌱  Using latest tag \(tag.quoted)")
-            }  catch {
-                package.version = "master"
-                print("🌱  Using branch \(package.version.quoted)")
-            }
-        }
-
-        if !force && package.commandPath.exists {
-            print("🌱  \(package.commandVersion) already installed".green)
-            return
-        }
-
-        print("🌱  Checking out \(package.commandVersion)...")
-        try shellOut(to: "git checkout \(package.version)", at: packageCheckoutPath.string)
 
         try? package.installPath.delete()
         try package.installPath.mkpath()

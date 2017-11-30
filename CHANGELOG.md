@@ -2,7 +2,17 @@
 
 ## Master
 
-- Mint is now compatible with case‐sensitive file systems.
+## 0.6.0
+
+- Fixed issues on case‐sensitive file systems #19 @SDGGiesbrecht
+- Fixed updating branches and packages without checked in `Package.resolved` files #24
+- Package repos are now checked out fresh on each install #24
+- If not passing a version, tags are now fetched remotely #24
+- Clones are now shallow #28
+- Added `mint list` command for listing all installed package versions #25
+- Added `mint --version` #27
+
+[Commits](https://github.com/yonaskolb/XcodeGen/compare/0.5.0...0.6.0)
 
 ## 0.5.0
 
