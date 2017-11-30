@@ -4,6 +4,8 @@ import Foundation
 import ShellOut
 import Guaka
 
+let version = "0.6.0"
+
 func catchError(closure: () throws -> ()) {
     do {
         try closure()
@@ -70,8 +72,14 @@ func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: 
     return (repo: repo, version: version, command: command)
 }
 
-let command = Command(usage: "mint")
-command.run = { _, _  in
+let versionFlag = Flag(longName: "version", value: false, description: "Prints the version")
+
+let command = Command(usage: "mint", flags: [versionFlag])
+command.run = { flags, _  in
+    if let hasVersion = flags.getBool(name: "version"), hasVersion {
+        print(version)
+        return
+    }
     print(command.helpMessage)
 }
 
