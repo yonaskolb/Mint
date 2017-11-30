@@ -80,6 +80,7 @@ Available Commands:
   install  Install a package
   run      Run a package
   update   Update a package
+  list     List all installed packages
 
 Use "mint [command] --help" for more information about a command.
 ```

@@ -104,12 +104,19 @@ let updateCommand = Command(usage: "update repo (version) (command)", shortMessa
     }
 }
 
+let listCommand = Command(usage: "list", shortMessage: "List packages", longMessage: "This lists all the currently installed packages", example: "mint list") { _, _ in
+    catchError {
+        try Mint.listPackages()
+    }
+}
+
 let bootstrapCommand = Command(usage: "bootstrap") { flags, args in
 
 }
 command.add(subCommand: runCommand)
 command.add(subCommand: installCommand)
 command.add(subCommand: updateCommand)
+command.add(subCommand: listCommand)
 
 command.execute()
 

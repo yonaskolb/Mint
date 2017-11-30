@@ -32,7 +32,7 @@ public class Package {
     }
 
     var path: Path {
-        return Mint.path + "packages" + repoPath
+        return Mint.packagesPath + repoPath
     }
 
     var repoPath: String {

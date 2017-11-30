@@ -25,8 +25,9 @@ struct MintMetadata: Codable {
 
 public struct Mint {
 
-    static let path: Path = "/usr/local/lib/mint"
-    static let metadataPath = path + "metadata.json"
+    static let mintPath: Path = "/usr/local/lib/mint"
+    static let packagesPath: Path = mintPath + "packages"
+    static let metadataPath = mintPath + "metadata.json"
 
     static func writeMetadata(_ metadata: MintMetadata) throws {
         let data = try JSONEncoder().encode(metadata)
@@ -45,6 +46,25 @@ public struct Mint {
         var metadata = try readMetadata()
         metadata.packages[git] = path.lastComponent
         try Mint.writeMetadata(metadata)
+    }
+
+    public static func listPackages() throws {
+        guard packagesPath.exists else {
+            print("No mint packages installed")
+            return
+        }
+
+        let packages: [String] = try packagesPath.children().map { packagePath in
+            let versions = try (packagePath + "build").children().sorted()
+            let packageName = packagePath.lastComponent.split(separator: "_").last!
+            var package = "  \(packageName)"
+            for version in versions {
+                package += "\n    - \(version.lastComponent)"
+            }
+            return package
+        }
+
+        print("Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))")
     }
 
     public static func run(repo: String, version: String, command: String) throws {
