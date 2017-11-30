@@ -7,6 +7,8 @@
 - Fixed issues on case‐sensitive file systems #19 @SDGGiesbrecht
 - Fixed updating branches and packages without checked in `Package.resolved` files #24
 - Package repos are now checked out fresh on each install #24
+- If not passing a version, tags are now fetched remotely #24
+- Clones are now shallow #28
 - Added `mint list` command for listing all installed package versions #25
 - Added `mint --version` #27
 
