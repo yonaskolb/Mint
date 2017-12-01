@@ -2,6 +2,7 @@ import ShellOut
 import PathKit
 import Foundation
 import Rainbow
+import Utility
 
 public enum MintError: Error, CustomStringConvertible {
     case packageNotFound(String)
@@ -107,15 +108,20 @@ public struct Mint {
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
-            let tags = try shellOut(to: "git ls-remote --tags \(package.git)")
-            if tags.isEmpty {
+            let tagReferences = try shellOut(to: "git ls-remote --tags --refs \(package.git)")
+            if tagReferences.isEmpty {
                 package.version = "master"
-                print("🌱  Using \(package.name) \(package.version.quoted)")
             } else {
-                let latestTag = String(tags.split(separator: "\n").last!.split(separator: "\t").last!.split(separator: "/").last!)
-                package.version = latestTag
-                print("🌱  Using latest tag \(latestTag.quoted)")
+                let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
+                let versions = Git.convertTagsToVersionMap(tags)
+                if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
+                    package.version = tag
+                } else {
+                    package.version = "master"
+                }
             }
+
+            print("🌱  Using \(package.name) \(package.version.quoted)")
         }
 
         if !force && package.commandPath.exists {
