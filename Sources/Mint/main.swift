@@ -4,7 +4,7 @@ import Foundation
 import ShellOut
 import Guaka
 
-let version = "0.6.0"
+let version = "0.6.1"
 
 func catchError(closure: () throws -> Void) {
     do {

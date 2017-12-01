@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.6.1
+
+- Fixed calculation of latest version #30
+- Integrated SwiftPM for versioning, more integrations will follow #30
+
+[Commits](https://github.com/yonaskolb/XcodeGen/compare/0.6.0...0.6.1)
+
 ## 0.6.0
 
 - Fixed issues on case‐sensitive file systems #19 @SDGGiesbrecht

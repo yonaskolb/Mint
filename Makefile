@@ -1,5 +1,5 @@
 TOOL_NAME = mint
-VERSION = 0.6.0
+VERSION = 0.6.1
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(TOOL_NAME)
