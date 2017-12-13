@@ -134,5 +134,6 @@ Just run `mint run` or `mint install` with the following:
 - $ mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
 - $ mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
 - $ mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- $ mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
 
 Feel free to add your own!
