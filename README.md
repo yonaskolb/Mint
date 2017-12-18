@@ -136,5 +136,6 @@ Just run `mint run` or `mint install` with the following:
 - $ mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
 - $ mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
 - $ mint run [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
+- $ mint run [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
 
 Feel free to add your own!
