@@ -108,6 +108,7 @@ public struct Mint {
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
+            print("🌱  Finding latest version of \(package.name)")
             let tagOutput = main.run(bash: "git ls-remote --tags --refs \(package.git)")
 
             if let error = tagOutput.error {
