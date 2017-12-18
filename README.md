@@ -128,14 +128,13 @@ If this file is found in you repo, then all those directories will be copied int
 
 
 ## A list of popular Mint compatible tools 🌱
-Just run `mint run` or `mint install` with the following:
 
-- $ mint run [realm/SwiftLint](https://github.com/realm/SwiftLint) swiftlint
-- $ mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- $ mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- $ mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
-- $ mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
-- $ mint run [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
-- $ mint run [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
+- mint run [realm/SwiftLint](https://github.com/realm/SwiftLint)
+- mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
+- mint run [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
+- mint run [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
 
 Feel free to add your own!
