@@ -16,9 +16,9 @@ func catchError(closure: () throws -> Void) {
             case .returnedErrorCode(let command, _): main.stderror.print("\(command.quoted) failed")
             }
         } else if let error = error as? MintError {
-            print("🌱  Error: \(error.description)".red)
+            print("🌱  \(error.description)".red)
         } else {
-            print("🌱  Error: \(error.localizedDescription)".red)
+            print("🌱  \(error.localizedDescription)".red)
         }
         exit(1)
     }
