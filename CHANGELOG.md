@@ -2,6 +2,12 @@
 
 ## Master
 
+- added streaming of run command output #36
+- added `--verbose` flag for cloning and building output #36
+- add `MINT` and `RESOURCE_PATH` envs #36
+- fixed ANSI color issue #36
+- replaced ShellOut with SwiftShell #36
+
 ## 0.6.1
 
 - Fixed calculation of latest version #30
