@@ -1,4 +1,4 @@
-import ShellOut
+import SwiftShell
 import PathKit
 import Foundation
 import Rainbow
@@ -68,7 +68,7 @@ public struct Mint {
         print("Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))")
     }
 
-    public static func run(repo: String, version: String, command: String) throws {
+    public static func run(repo: String, version: String, command: String, verbose: Bool) throws {
         let commandComponents = command.components(separatedBy: " ")
         let name = commandComponents.first!
         let arguments = commandComponents.count > 1 ? Array(commandComponents.suffix(from: 1)) : []
@@ -83,24 +83,27 @@ public struct Mint {
             }
         }
         let package = Package(repo: git, version: version, name: name)
-        try run(package, arguments: arguments)
+        try run(package, arguments: arguments, verbose: verbose)
     }
 
-    public static func run(_ package: Package, arguments: [String]) throws {
-        try install(package, force: false)
+    public static func run(_ package: Package, arguments: [String], verbose: Bool) throws {
+        try install(package, force: false, verbose: verbose)
         print("🌱  Running \(package.commandVersion)...")
 
-        let output = try shellOut(to: package.commandPath.string, arguments: arguments)
-        print(output)
+        var context = CustomContext(main)
+        context.env["MINT"] = "YES"
+        context.env["RESOURCE_PATH"] = ""
+        
+        try context.runAndPrint(package.commandPath.string, arguments)
     }
 
-    public static func install(repo: String, version: String, command: String, force: Bool) throws {
+    public static func install(repo: String, version: String, command: String, force: Bool, verbose: Bool) throws {
         let name = command.components(separatedBy: " ").first!
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, force: force)
+        try install(package, force: force, verbose: verbose)
     }
 
-    public static func install(_ package: Package, force: Bool = false) throws {
+    public static func install(_ package: Package, force: Bool = false, verbose: Bool) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
@@ -108,7 +111,13 @@ public struct Mint {
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
-            let tagReferences = try shellOut(to: "git ls-remote --tags --refs \(package.git)")
+            print("🌱  Finding latest version of \(package.name)")
+            let tagOutput = main.run(bash: "git ls-remote --tags --refs \(package.git)")
+
+            if let error = tagOutput.error {
+                throw error
+            }
+            let tagReferences = tagOutput.stdout
             if tagReferences.isEmpty {
                 package.version = "master"
             } else {
@@ -137,7 +146,7 @@ public struct Mint {
         try? packageCheckoutPath.delete()
         print("🌱  Cloning \(package.git) \(package.version.quoted)...")
         do {
-            try shellOut(to: "git clone --depth 1 -b \(package.version) \(package.git) \(package.repoPath)", at: checkoutPath.string)
+            try runCommand("git clone --depth 1 -b \(package.version) \(package.git) \(package.repoPath)", at: checkoutPath, verbose: verbose)
         } catch {
             throw MintError.repoNotFound(package.git)
         }
@@ -145,8 +154,7 @@ public struct Mint {
         try? package.installPath.delete()
         try package.installPath.mkpath()
         print("🌱  Building \(package.name). This may take a few minutes...")
-        //        try shellOut(to: "swift package clean", at: package.checkoutPath.string)
-        try shellOut(to: "swift build -c release", at: packageCheckoutPath.string)
+        try runCommand("swift build -c release", at: packageCheckoutPath, verbose: verbose)
 
         print("🌱  Installing \(package.name)...")
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
@@ -186,6 +194,19 @@ public struct Mint {
                 return "https://\(string).git"
             } else {
                 return "https://github.com/\(string).git"
+            }
+        }
+    }
+
+    private static func runCommand(_ command: String, at: Path, verbose: Bool) throws {
+        var context = CustomContext(main)
+        context.currentdirectory = at.string
+        if verbose {
+            try context.runAndPrint(bash: command)
+        } else {
+            let output = context.run(bash: command)
+            if let error = output.error {
+                throw error
             }
         }
     }
