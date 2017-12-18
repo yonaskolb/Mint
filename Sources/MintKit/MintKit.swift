@@ -93,7 +93,7 @@ public struct Mint {
         var context = CustomContext(main)
         context.env["MINT"] = "YES"
         context.env["RESOURCE_PATH"] = ""
-        
+
         try context.runAndPrint(package.commandPath.string, arguments)
     }
 
@@ -114,8 +114,8 @@ public struct Mint {
             print("🌱  Finding latest version of \(package.name)")
             let tagOutput = main.run(bash: "git ls-remote --tags --refs \(package.git)")
 
-            if let error = tagOutput.error {
-                throw error
+            if !tagOutput.succeeded {
+                throw MintError.repoNotFound(package.git)
             }
             let tagReferences = tagOutput.stdout
             if tagReferences.isEmpty {

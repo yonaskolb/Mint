@@ -13,7 +13,7 @@ func catchError(closure: () throws -> Void) {
         if let error = error as? SwiftShell.CommandError {
             switch error {
             case .inAccessibleExecutable(let path): main.stderror.print("Couldn't run command \(path)")
-            case .returnedErrorCode: break
+            case .returnedErrorCode(let command, _): main.stderror.print("\(command.quoted) failed")
             }
         } else if let error = error as? MintError {
             print("🌱  Error: \(error.description)".red)
