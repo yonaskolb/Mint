@@ -91,6 +91,9 @@ public struct Mint {
         print("🌱  Running \(package.commandVersion)...")
 
         var context = CustomContext(main)
+        context.env["MINT"] = "YES"
+        context.env["RESOURCE_PATH"] = ""
+        
         try context.runAndPrint(package.commandPath.string, arguments)
     }
 
