@@ -10,7 +10,9 @@ func catchError(closure: () throws -> Void) {
     do {
         try closure()
     } catch {
-        if let error = error as? SwiftShell.CommandError {
+        if let error = error as? CommandError {
+            print("🌱  \(error.description)".red)
+        } else if let error = error as? SwiftShell.CommandError {
             switch error {
             case .inAccessibleExecutable(let path): main.stderror.print("Couldn't run command \(path)")
             case .returnedErrorCode(let command, _): main.stderror.print("\(command.quoted) failed")
