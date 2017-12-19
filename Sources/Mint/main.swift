@@ -6,6 +6,8 @@ import Guaka
 
 let version = "0.6.1"
 
+let mint = Mint(path: "/usr/local/lib/mint")
+
 func catchError(closure: () throws -> Void) {
     do {
         try closure()
@@ -95,27 +97,27 @@ This command takes allows you to specify a repo, a version and an executable com
 let runCommand = Command(usage: "run repo (version) (command)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", flags: [verboseFlag], example: "mint run realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
-        try Mint.run(repo: options.repo, version: options.version, command: options.command, verbose: options.verbose)
+        try mint.run(repo: options.repo, version: options.version, command: options.command, verbose: options.verbose)
     }
 }
 
 let installCommand = Command(usage: "install repo (version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", flags: [verboseFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
-        try Mint.install(repo: options.repo, version: options.version, command: options.command, force: false, verbose: options.verbose)
+        try mint.install(repo: options.repo, version: options.version, command: options.command, force: false, verbose: options.verbose)
     }
 }
 
 let updateCommand = Command(usage: "update repo (version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", flags: [verboseFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
-        try Mint.install(repo: options.repo, version: options.version, command: options.command, force: true, verbose: options.verbose)
+        try mint.install(repo: options.repo, version: options.version, command: options.command, force: true, verbose: options.verbose)
     }
 }
 
 let listCommand = Command(usage: "list", shortMessage: "List packages", longMessage: "This lists all the currently installed packages", example: "mint list") { _, _ in
     catchError {
-        try Mint.listPackages()
+        try mint.listPackages()
     }
 }
 
