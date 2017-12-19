@@ -19,7 +19,7 @@ struct PackagePath {
         self.package = package
     }
 
-    var gitPath: String { return gitURLFromString(package.repo) }
+    var gitPath: String { return PackagePath.gitURLFromString(package.repo) }
 
     var repoPath: String {
         return gitPath
@@ -33,12 +33,14 @@ struct PackagePath {
     var commandPath: Path { return installPath + package.name }
     
 
-    private func gitURLFromString(_ string: String) -> String {
+    static func gitURLFromString(_ string: String) -> String {
         if let url = URL(string: string), url.scheme != nil {
             return url.absoluteString
         } else {
             if string.contains("github.com") {
                 return "https://\(string).git"
+            } else if string.contains(".") {
+                return "https://\(string)"
             } else {
                 return "https://github.com/\(string).git"
             }
