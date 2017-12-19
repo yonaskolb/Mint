@@ -113,6 +113,8 @@ Simply pass `--global` to `mint install` or `mint update` and that version will 
 
 Note that a mint install path will be added to your `$PATH`, and that only one global version can be installed at a time. If you need to run a specific older version use `mint run`.
 
+Note also, that after you install a global version you must launch a new shell to get access the package.
+
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to your `Installing` section in the readme:
 

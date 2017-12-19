@@ -223,6 +223,7 @@ public struct Mint {
         let exportCommand = "export PATH=\"\(installsPath):$PATH\""
 
         // add $PATH to current shell
+        // FIXME: this doesn't seem to work
         main.run(bash: exportCommand)
 
         // add $PATH to common files
