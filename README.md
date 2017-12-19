@@ -105,7 +105,7 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
 
 ## Support
-If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to your `Installing` section in the readme:
+If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
 
 ````
 ### [Mint](https://github.com/yonaskolb/mint)
