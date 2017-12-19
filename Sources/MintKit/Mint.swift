@@ -242,6 +242,7 @@ public struct Mint {
                 if !existingString.contains(exportSection) {
                     let newString = "\(existingString)\n\n\(exportSection)"
                     try file.write(newString)
+                    print("🌱  Added mint install $PATH to \(file.string)")
                 }
             }
         }
