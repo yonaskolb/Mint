@@ -6,6 +6,8 @@ import Utility
 
 public struct Mint {
 
+    public static let version = "0.6.1"
+
     let path: Path
 
     var packagesPath: Path {
@@ -43,10 +45,11 @@ public struct Mint {
         try writeMetadata(metadata)
     }
 
-    public func listPackages() throws {
+    @discardableResult
+    public func listPackages() throws -> [String] {
         guard packagesPath.exists else {
             print("No mint packages installed")
-            return
+            return []
         }
 
         let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
@@ -60,9 +63,11 @@ public struct Mint {
         }
 
         print("Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))")
+        return packages
     }
 
-    public func run(repo: String, version: String, command: String, verbose: Bool) throws {
+    @discardableResult
+    public func run(repo: String, version: String, command: String, verbose: Bool = false) throws -> Package {
         let commandComponents = command.components(separatedBy: " ")
         let name = commandComponents.first!
         let arguments = commandComponents.count > 1 ? Array(commandComponents.suffix(from: 1)) : []
@@ -78,6 +83,7 @@ public struct Mint {
         }
         let package = Package(repo: git, version: version, name: name)
         try run(package, arguments: arguments, verbose: verbose)
+        return package
     }
 
     public func run(_ package: Package, arguments: [String], verbose: Bool) throws {
@@ -92,10 +98,12 @@ public struct Mint {
         try context.runAndPrint(packagePath.commandPath.string, arguments)
     }
 
-    public func install(repo: String, version: String, command: String, force: Bool, verbose: Bool) throws {
+    @discardableResult
+    public func install(repo: String, version: String, command: String, force: Bool, verbose: Bool = false) throws -> Package {
         let name = command.components(separatedBy: " ").first!
         let package = Package(repo: repo, version: version, name: name)
         try install(package, force: force, verbose: verbose)
+        return package
     }
 
     public func install(_ package: Package, force: Bool = false, verbose: Bool) throws {

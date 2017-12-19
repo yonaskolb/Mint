@@ -4,8 +4,6 @@ import Foundation
 import SwiftShell
 import Guaka
 
-let version = "0.6.1"
-
 let mint = Mint(path: "/usr/local/lib/mint")
 
 func catchError(closure: () throws -> Void) {
@@ -80,7 +78,7 @@ let verboseFlag = Flag(longName: "verbose", value: false, description: "Show ins
 let command = Command(usage: "mint", flags: [versionFlag])
 command.run = { flags, _ in
     if let hasVersion = flags.getBool(name: "version"), hasVersion {
-        print(version)
+        print(Mint.version)
         return
     }
     print(command.helpMessage)

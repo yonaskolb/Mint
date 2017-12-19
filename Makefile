@@ -33,7 +33,7 @@ update_brew:
 	git commit -m "Update brew to $(VERSION)"
 
 release: format_code
-	sed -i '' 's|\(let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/Mint/main.swift
+	sed -i '' 's|\(static let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintKit/Mint.swift
 
 	git add .
 	git commit -m "Update to $(VERSION)"
