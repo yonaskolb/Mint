@@ -7,6 +7,7 @@
 - add `MINT` and `RESOURCE_PATH` envs #36
 - fixed ANSI color issue #36
 - replaced ShellOut with SwiftShell #36
+- added a whole bunch of tests
 
 ## 0.6.1
 
