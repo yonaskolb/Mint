@@ -43,7 +43,7 @@ enum CommandError: Error, CustomStringConvertible {
     }
 }
 
-func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: String, command: String, verbose: Bool) {
+func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: String, command: String, verbose: Bool, global: Bool) {
     guard let repoVersion = args.first else { throw CommandError.repoRequired }
     let version: String
     let command: String
@@ -69,11 +69,16 @@ func getOptions(flags: Flags, args: [String]) throws -> (repo: String, version: 
     default:
         throw CommandError.tooManyArguments
     }
-    return (repo: repo, version: version, command: command, verbose: flags.getBool(name: "verbose") ?? false)
+    return (repo: repo,
+            version: version,
+            command: command,
+            verbose: flags.getBool(name: "verbose") ?? false,
+            global: flags.getBool(name: "global") ?? false)
 }
 
 let versionFlag = Flag(longName: "version", value: false, description: "Prints the version")
 let verboseFlag = Flag(longName: "verbose", value: false, description: "Show installation output")
+let globalFlag = Flag(longName: "global", value: false, description: "Install executable globally so it's accessible without \"mint run\". This will overwrite any other globally installed versions. An extra $PATH entry will also be added")
 
 let command = Command(usage: "mint", flags: [versionFlag])
 command.run = { flags, _ in
@@ -92,24 +97,31 @@ This command takes allows you to specify a repo, a version and an executable com
 - The second argument qualifies the command name, otherwise this will be assumed to the be the end of the repo name.
 """
 
-let runCommand = Command(usage: "run repo (version) (command)", shortMessage: "Run a package", longMessage: "This will run a package tool. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", flags: [verboseFlag], example: "mint run realm/SwiftLint@0.22.0") { flags, args in
+let runCommand = Command(usage: "run package(@version) (command)", shortMessage: "Run a package", longMessage: "This will run a package. If it isn't installed if will do so first.\n\(commandHelp) The command can include any arguments and flags but the whole command must then be surrounded in quotes.", flags: [verboseFlag], example: "mint run realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
         try mint.run(repo: options.repo, version: options.version, command: options.command, verbose: options.verbose)
     }
 }
 
-let installCommand = Command(usage: "install repo (version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", flags: [verboseFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
+let installCommand = Command(usage: "install package(@version) (command)", shortMessage: "Install a package", longMessage: "This will install a package. If it's already installed no action will be taken.\n\(commandHelp)", flags: [verboseFlag, globalFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
-        try mint.install(repo: options.repo, version: options.version, command: options.command, force: false, verbose: options.verbose)
+        try mint.install(repo: options.repo, version: options.version, command: options.command, force: false, verbose: options.verbose, global: options.global)
     }
 }
 
-let updateCommand = Command(usage: "update repo (version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", flags: [verboseFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
+let updateCommand = Command(usage: "update package(@version) (command)", shortMessage: "Update a package", longMessage: "This will update a package even if it's already installed.\n\(commandHelp)", flags: [verboseFlag, globalFlag], example: "mint install realm/SwiftLint@0.22.0") { flags, args in
     catchError {
         let options = try getOptions(flags: flags, args: args)
-        try mint.install(repo: options.repo, version: options.version, command: options.command, force: true, verbose: options.verbose)
+        try mint.install(repo: options.repo, version: options.version, command: options.command, force: true, verbose: options.verbose, global: options.global)
+    }
+}
+
+let uninstallCommand = Command(usage: "uninstall (package)", shortMessage: "Uninstall a package", longMessage: "This will uninstall a package by name. See all installed packages with \"mint list\")", example: "mint uninstall SwiftLint") { flags, args in
+    catchError {
+        let options = try getOptions(flags: flags, args: args)
+        try mint.uninstall(name: options.repo)
     }
 }
 
@@ -125,6 +137,7 @@ let bootstrapCommand = Command(usage: "bootstrap") { _, _ in
 command.add(subCommand: runCommand)
 command.add(subCommand: installCommand)
 command.add(subCommand: updateCommand)
+command.add(subCommand: uninstallCommand)
 command.add(subCommand: listCommand)
 
 command.execute()

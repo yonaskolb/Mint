@@ -2,6 +2,7 @@
 
 ## Master
 
+- added `--global` flag to install executables globally #41
 - added streaming of run command output #36
 - added `--verbose` flag for cloning and building output #36
 - add `MINT` and `RESOURCE_PATH` envs #36

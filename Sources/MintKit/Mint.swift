@@ -14,6 +14,10 @@ public struct Mint {
         return path + "packages"
     }
 
+    var installsPath: Path {
+        return path + "installs"
+    }
+
     var metadataPath: Path  {
         return path + "metadata.json"
     }
@@ -45,6 +49,11 @@ public struct Mint {
         try writeMetadata(metadata)
     }
 
+    func getPackageGit(name: String) throws -> String? {
+        let metadata = try readMetadata()
+        return metadata.packages.first(where: { $0.key.lowercased().contains(name.lowercased()) })?.key
+    }
+
     @discardableResult
     public func listPackages() throws -> [String] {
         guard packagesPath.exists else {
@@ -73,10 +82,9 @@ public struct Mint {
         let arguments = commandComponents.count > 1 ? Array(commandComponents.suffix(from: 1)) : []
         var git = repo
         if !git.contains("/") {
-            // name find repo
-            let metadata = try readMetadata()
-            if let map = metadata.packages.first(where: { $0.key.lowercased().contains(git.lowercased()) }) {
-                git = map.key
+            // find repo
+            if let existingGit = try getPackageGit(name: git) {
+                git = existingGit
             } else {
                 throw MintError.packageNotFound(git)
             }
@@ -87,7 +95,7 @@ public struct Mint {
     }
 
     public func run(_ package: Package, arguments: [String], verbose: Bool) throws {
-        try install(package, force: false, verbose: verbose)
+        try install(package, force: false, verbose: verbose, global: false)
         print("🌱  Running \(package.commandVersion)...")
 
         var context = CustomContext(main)
@@ -99,14 +107,14 @@ public struct Mint {
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String, force: Bool, verbose: Bool = false) throws -> Package {
+    public func install(repo: String, version: String, command: String, force: Bool, verbose: Bool = false, global: Bool = false) throws -> Package {
         let name = command.components(separatedBy: " ").first!
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, force: force, verbose: verbose)
+        try install(package, force: force, verbose: verbose, global: global)
         return package
     }
 
-    public func install(_ package: Package, force: Bool = false, verbose: Bool) throws {
+    public func install(_ package: Package, force: Bool = false, verbose: Bool = false, global: Bool = false) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
@@ -140,6 +148,9 @@ public struct Mint {
 
         if !force && packagePath.commandPath.exists {
             print("🌱  \(package.commandVersion) already installed".green)
+            if global {
+                try installGlobal(packagePath: packagePath)
+            }
             return
         }
 
@@ -188,7 +199,87 @@ public struct Mint {
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
         print("🌱  Installed \(package.commandVersion)".green)
 
+        if global {
+            try installGlobal(packagePath: packagePath)
+        }
+
+
         try? packageCheckoutPath.delete()
+    }
+
+    func installGlobal(packagePath: PackagePath) throws {
+
+        let installPath = installsPath + packagePath.package.name
+        try installsPath.mkpath()
+
+        // copy to global installs
+        try? installPath.delete()
+        let output = main.run(bash: "ln -s \(packagePath.commandPath.absolute().string) \(installPath.absolute().string)")
+        guard output.succeeded else {
+            print("🌱  Could not install \(packagePath.package.commandVersion) globally")
+            return
+        }
+
+        let exportCommand = "export PATH=\"\(installsPath):$PATH\""
+
+        // add $PATH to current shell
+        main.run(bash: exportCommand)
+
+        // add $PATH to common files
+        let exportSection = "# Register Mint install path\n\(exportCommand)"
+
+        let files = [
+            "~/.bash_profile",
+            "~/.bashrc",
+            "~/.zshenv",
+            ]
+
+        try files.forEach {
+            let file = Path($0).absolute()
+            if file.exists {
+                let existingString: String = try file.read()
+                if !existingString.contains(exportSection) {
+                    let newString = "\(existingString)\n\n\(exportSection)"
+                    try file.write(newString)
+                }
+            }
+        }
+    }
+
+    public func uninstall(name: String) throws {
+
+        // find packages
+        var metadata = try readMetadata()
+        let packages = metadata.packages.filter { $0.key.lowercased().contains(name.lowercased()) }
+
+        // remove package
+        switch packages.count {
+        case 0:
+            print("🌱 \(name.quoted) package was not found".red)
+        case 1:
+            let package = packages.first!.value
+            let packagePath = packagesPath + package
+            try? packagePath.delete()
+            print("🌱 \(name) was uninstalled")
+        default:
+            //TODO: ask for user input about which to delete
+            for package in packages {
+                let packagePath = packagesPath + package.value
+                try? packagePath.delete()
+            }
+
+            print("🌱 \(packages.count) packages that matched the name \(name.quoted) were uninstalled")
+        }
+
+        // remove metadata
+        for (key, _) in packages {
+            metadata.packages[key] = nil
+        }
+        try writeMetadata(metadata)
+
+        // remove global install
+        let executablePath = installsPath + name
+        try? executablePath.delete()
     }
 
     private func runCommand(_ command: String, at: Path, verbose: Bool) throws {
