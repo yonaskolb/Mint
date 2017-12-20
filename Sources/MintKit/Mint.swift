@@ -55,24 +55,26 @@ public struct Mint {
     }
 
     @discardableResult
-    public func listPackages() throws -> [String] {
+    public func listPackages() throws -> [String: [String]] {
         guard packagesPath.exists else {
             print("No mint packages installed")
-            return []
+            return [:]
         }
 
+        var versionsByPackage: [String: [String]] = [:]
         let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
-            let versions = try (packagePath + "build").children().sorted()
-            let packageName = packagePath.lastComponent.split(separator: "_").last!
+            let versions = try (packagePath + "build").children().sorted().map { $0.lastComponent }
+            let packageName = String(packagePath.lastComponent.split(separator: "_").last!)
             var package = "  \(packageName)"
             for version in versions {
-                package += "\n    - \(version.lastComponent)"
+                package += "\n    - \(version)"
+                versionsByPackage[packageName, default: []].append(version)
             }
             return package
         }
 
         print("Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))")
-        return packages
+        return versionsByPackage
     }
 
     @discardableResult
@@ -107,7 +109,7 @@ public struct Mint {
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String, force: Bool, verbose: Bool = false, global: Bool = false) throws -> Package {
+    public func install(repo: String, version: String, command: String, force: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
         let name = command.components(separatedBy: " ").first!
         let package = Package(repo: repo, version: version, name: name)
         try install(package, force: force, verbose: verbose, global: global)
