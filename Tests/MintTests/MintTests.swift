@@ -11,9 +11,9 @@ class MintTests: XCTestCase {
     let testVersion = "0.6.0"
     let testCommand = "mint"
 
-    override class func setUp() {
+    override func setUp() {
         super.setUp()
-        try? (Path.temporary + "mint").delete()
+        try? mint.path.delete()
     }
 
     func testPackagePaths() {
@@ -48,34 +48,81 @@ class MintTests: XCTestCase {
         }
     }
 
+    func expectMintVersion(package: Package) {
+        let packagePath = PackagePath(path: mint.packagesPath, package: package)
+        XCTAssertTrue(packagePath.commandPath.exists)
+        let output = main.run(packagePath.commandPath.string, "--version")
+        XCTAssertEqual(output.stdout, package.version)
+    }
+
     func testInstallCommand() throws {
 
-        // install specific version
-        let testPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand, force: false)
-        let testPackagePath = PackagePath(path: mint.packagesPath, package: testPackage)
-        XCTAssertTrue(testPackagePath.commandPath.exists)
-        let output = main.run(testPackagePath.commandPath.string, "--version")
-        XCTAssertEqual(output.stdout, testVersion)
+        let globalPath = mint.installsPath + "mint"
 
-        // install already installed version
-        try mint.install(repo: testRepo, version: testVersion, command: testCommand, force: false)
+        // install specific version
+        let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)
+        expectMintVersion(package: specificPackage)
+
+        // check that not globally installed
+        XCTAssertFalse(globalPath.exists)
+
+        // install already installed version globally
+        try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
+
+        XCTAssertTrue(globalPath.exists)
+        let globalOutput = main.run(globalPath.string, "--version")
+        XCTAssertEqual(globalOutput.stdout, testVersion)
 
         // install latest version
-        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, force: false)
+        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
+        expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, Mint.version)
+        let latestGlobalOutput = main.run(globalPath.string, "--version")
+        XCTAssertEqual(latestGlobalOutput.stdout, Mint.version)
 
-        let packages = try mint.listPackages()
-        XCTAssertTrue(packages.count > 0)
+        // check package list has installed versions
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages["mint", default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages.count, 1)
+
+        // uninstall
+        try mint.uninstall(name: "mint")
+
+        // check not globally installed
+        XCTAssertFalse(globalPath.exists)
+
+        // check package list is empty
+        XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
     func testRunCommand() throws {
-        // run existing version
-        try mint.run(repo: testRepo, version: testVersion, command: "mint --version")
 
-        // install and run specific version
-        let package = try mint.run(repo: testRepo, version: testVersion, command: "mint --version")
-        let packagePath = PackagePath(path: mint.packagesPath, package: package)
-        XCTAssertTrue(packagePath.commandPath.exists)
+        let versionCommand = "mint --version"
+        // run a specific version
+        let specificPackage = try mint.run(repo: testRepo, version: testVersion, command: versionCommand)
+        expectMintVersion(package: specificPackage)
+
+        // run an already installed version
+        try mint.run(repo: testRepo, version: testVersion, command: versionCommand)
+
+        // run without arguments
+        try mint.run(repo: testRepo, version: testVersion, command: "mint")
+
+        // run latest version
+        let latestPackage = try mint.run(repo: testRepo, version: "", command: versionCommand)
+        expectMintVersion(package: latestPackage)
+        XCTAssertEqual(latestPackage.version, Mint.version)
+
+        // check package list has installed versions
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages["mint", default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages.count, 1)
+
+        // uninstall
+        try mint.uninstall(name: "mint")
+
+        // check package list is empty
+        XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
     func testMintErrors() {

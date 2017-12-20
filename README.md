@@ -47,6 +47,20 @@ $ cd Mint
 $ make
 ```
 
+### Using Mint itself!
+
+##### Install
+```sh
+$ git clone https://github.com/yonaskolb/Mint.git
+$ cd Mint
+$ swift run mint install yonaskolb/mint --global
+```
+
+##### Update
+```sh
+$ mint install yonaskolb/mint --global
+```
+
 ### Swift Package Manager
 
 **Use CLI**
@@ -69,27 +83,15 @@ And then import wherever needed: `import MintKit`
 
 ## Usage
 
-Run `mint` to see usage instructions.
+Run `mint --help` to see usage instructions.
 
-```
-$ mint
-Usage:
-  mint [command]
+- **install**: Installs a package. If it is already installed this won't do anything
+- **run**: Runs a package. This will install it first if it isn't already installed.
+- **update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update it.
+- **list**: Lists all currently installed packages and versions.
+- **uninstall**: Uninstalls a package by name.
 
-Available Commands:
-  install  Install a package
-  run      Run a package
-  update   Update a package
-  list     List all installed packages
-
-Use "mint [command] --help" for more information about a command.
-```
-
-- **Install**: Installs a package. If it is already installed this won't do anything
-- **Run**: Runs a package. This will install if first if it doesn't exist
-- **Update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update.
-
-These commands all have 1 or 2 arguments:
+Run, install and update commands have 1 or 2 arguments:
 
 - **repo (required)**: This can be a shorthand for a github repo `install realm/SwiftLint` or a fully qualified git path `install https://github.com/realm/SwiftLint.git`. In the case of `run` you can also just pass the name of the repo if it is already installed `run swiftlint`. This will do a lookup of all installed packages. An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
 - **command (optional)**: The command to install or run. This defaults to the the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). In the case of `run` you can also pass any arguments to the command but make sure the whole thing is surrounded by quotes eg `mint run realm/swiftlint "swiftlint --path source"`
@@ -103,6 +105,15 @@ $ mint install yonaskolb/XcodeGen # use newest tag
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
+
+### Global installs
+Mint can also be used to install a package so it is accessible from anywhere. This means you don't have to prepend commands with `mint run`. 
+
+Simply pass `--global` to `mint install` or `mint update` and that version will globally installed. 
+
+Note that a mint install path will be added to your `$PATH`, and that only one global version can be installed at a time. If you need to run a specific older version use `mint run`.
+
+Note also, that after you install a global version you must launch a new shell to get access the package.
 
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
