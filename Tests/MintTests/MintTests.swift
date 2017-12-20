@@ -57,24 +57,28 @@ class MintTests: XCTestCase {
 
     func testInstallCommand() throws {
 
+        let globalPath = mint.installsPath + "mint"
+
         // install specific version
         let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)
         expectMintVersion(package: specificPackage)
 
         // check that not globally installed
-        XCTAssertFalse((mint.installsPath + "mint").exists)
+        XCTAssertFalse(globalPath.exists)
 
-        // install already installed version
-        try mint.install(repo: testRepo, version: testVersion, command: testCommand)
-
-        // install global version
+        // install already installed version globally
         try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
-        XCTAssertTrue((mint.installsPath + "mint").exists)
+
+        XCTAssertTrue(globalPath.exists)
+        let globalOutput = main.run(globalPath.string, "--version")
+        XCTAssertEqual(globalOutput.stdout, testVersion)
 
         // install latest version
-        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand)
+        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
         expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, Mint.version)
+        let latestGlobalOutput = main.run(globalPath.string, "--version")
+        XCTAssertEqual(latestGlobalOutput.stdout, Mint.version)
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
@@ -85,7 +89,7 @@ class MintTests: XCTestCase {
         try mint.uninstall(name: "mint")
 
         // check not globally installed
-        XCTAssertFalse((mint.installsPath + "mint").exists)
+        XCTAssertFalse(globalPath.exists)
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
