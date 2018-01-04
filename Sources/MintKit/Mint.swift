@@ -259,12 +259,12 @@ public struct Mint {
         // remove package
         switch packages.count {
         case 0:
-            print("🌱 \(name.quoted) package was not found".red)
+            print("🌱  \(name.quoted) package was not found".red)
         case 1:
             let package = packages.first!.value
             let packagePath = packagesPath + package
             try? packagePath.delete()
-            print("🌱 \(name) was uninstalled")
+            print("🌱  \(name) was uninstalled")
         default:
             //TODO: ask for user input about which to delete
             for package in packages {
@@ -272,7 +272,7 @@ public struct Mint {
                 try? packagePath.delete()
             }
 
-            print("🌱 \(packages.count) packages that matched the name \(name.quoted) were uninstalled")
+            print("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled")
         }
 
         // remove metadata
