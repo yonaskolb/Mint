@@ -1,8 +1,7 @@
-import XCTest
+@testable import MintKit
 import PathKit
 import SwiftShell
-
-@testable import MintKit
+import XCTest
 
 class MintTests: XCTestCase {
 
@@ -99,17 +98,20 @@ class MintTests: XCTestCase {
     func testRunCommand() throws {
 
         // run a specific version
-        let specificPackage = try mint.run(repo: testRepo, version: testVersion, command: testCommand)
+        let specificPackage = try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
         expectMintVersion(package: specificPackage)
 
         // run an already installed version
-        try mint.run(repo: testRepo, version: testVersion, command: testCommand)
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
 
         // run without arguments
-        try mint.run(repo: testRepo, version: testVersion, command: testCommand)
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+
+        // run with arguments
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
 
         // run latest version
-        let latestPackage = try mint.run(repo: testRepo, version: "", command: testCommand)
+        let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
         expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
@@ -127,7 +129,7 @@ class MintTests: XCTestCase {
 
     func testMintErrors() {
 
-        func expectError(_ expectedError: MintError, closure: () throws -> ()) {
+        func expectError(_ expectedError: MintError, closure: () throws -> Void) {
             do {
                 try closure()
                 XCTFail("Expected to fail with \(expectedError)")
@@ -139,7 +141,7 @@ class MintTests: XCTestCase {
         }
 
         expectError(MintError.repoNotFound("http://invaliddomain.com/invalid")) {
-            try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, command: "invalid")
+            try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, arguments: ["invalid"])
         }
 
         expectError(MintError.invalidRepo("invalid repo")) {
@@ -147,11 +149,11 @@ class MintTests: XCTestCase {
         }
 
         expectError(MintError.invalidCommand("invalidCommand")) {
-            try mint.run(repo: testRepo, version: testVersion, command: "invalidCommand")
+            try mint.run(repo: testRepo, version: testVersion, arguments: ["invalidCommand"])
         }
 
         expectError(MintError.packageNotFound("invalidPackage")) {
-            try mint.run(repo: "invalidPackage", version: testVersion, command: "")
+            try mint.run(repo: "invalidPackage", version: testVersion, arguments: [])
         }
     }
 

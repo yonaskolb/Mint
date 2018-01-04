@@ -19,7 +19,6 @@ let package = Package(
         .package(url: "https://github.com/kylef/PathKit.git", from: "0.8.0"),
         .package(url: "https://github.com/kareman/SwiftShell.git", from: "4.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "2.1.0"),
-        .package(url: "https://github.com/nsomar/Guaka.git", from: "0.1.3"),
         .package(url: "https://github.com/apple/swift-package-manager.git", from: "0.1.0"),
         ],
     targets: [
@@ -30,7 +29,6 @@ let package = Package(
             dependencies: [
                 "MintKit",
                 "Rainbow",
-                "Guaka",
                 "SwiftShell",
                 ]),
         .target(

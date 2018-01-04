@@ -1,10 +1,3 @@
-//
-//  MintPath.swift
-//  MintKit
-//
-//  Created by Yonas Kolb on 19/12/17.
-//
-
 import Foundation
 import PathKit
 
@@ -31,7 +24,6 @@ struct PackagePath {
     var packagePath: Path { return path + repoPath }
     var installPath: Path { return packagePath + "build" + package.version }
     var commandPath: Path { return installPath + package.name }
-    
 
     static func gitURLFromString(_ string: String) -> String {
         if let url = URL(string: string), url.scheme != nil {

@@ -1,7 +1,7 @@
-import SwiftShell
-import PathKit
 import Foundation
+import PathKit
 import Rainbow
+import SwiftShell
 import Utility
 
 public struct Mint {
@@ -18,7 +18,7 @@ public struct Mint {
         return path + "installs"
     }
 
-    var metadataPath: Path  {
+    var metadataPath: Path {
         return path + "metadata.json"
     }
 
@@ -78,10 +78,11 @@ public struct Mint {
     }
 
     @discardableResult
-    public func run(repo: String, version: String, command: String, verbose: Bool = false) throws -> Package {
-        let commandComponents = command.components(separatedBy: " ")
-        let name = commandComponents.first!
-        let arguments = commandComponents.count > 1 ? Array(commandComponents.suffix(from: 1)) : []
+    public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
+        let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        let name = arguments?.first ?? guessedCommand
+        var arguments = arguments ?? [guessedCommand]
+        arguments = arguments.count > 1 ? Array(arguments.dropFirst()) : []
         var git = repo
         if !git.contains("/") {
             // find repo
@@ -109,8 +110,9 @@ public struct Mint {
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String, force: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
-        let name = command.components(separatedBy: " ").first!
+    public func install(repo: String, version: String, command: String?, force: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
+        let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        let name = command ?? guessedCommand
         let package = Package(repo: repo, version: version, name: name)
         try install(package, force: force, verbose: verbose, global: global)
         return package
@@ -205,7 +207,6 @@ public struct Mint {
             try installGlobal(packagePath: packagePath)
         }
 
-
         try? packageCheckoutPath.delete()
     }
 
@@ -235,7 +236,7 @@ public struct Mint {
             "~/.bash_profile",
             "~/.bashrc",
             "~/.zshenv",
-            ]
+        ]
 
         try files.forEach {
             let file = Path($0).absolute()
@@ -266,7 +267,7 @@ public struct Mint {
             try? packagePath.delete()
             print("🌱  \(name) was uninstalled")
         default:
-            //TODO: ask for user input about which to delete
+            // TODO: ask for user input about which to delete
             for package in packages {
                 let packagePath = packagesPath + package.value
                 try? packagePath.delete()
