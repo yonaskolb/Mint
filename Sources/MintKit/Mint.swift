@@ -9,21 +9,19 @@ public struct Mint {
     public static let version = "0.6.1"
 
     let path: Path
+    let installationPath: Path
 
     var packagesPath: Path {
         return path + "packages"
-    }
-
-    var installsPath: Path {
-        return path + "installs"
     }
 
     var metadataPath: Path {
         return path + "metadata.json"
     }
 
-    public init(path: Path) {
-        self.path = path
+    public init(path: Path = "/usr/local/lib/mint", installationPath: Path = "/usr/local/bin") {
+        self.path = path.absolute()
+        self.installationPath = installationPath.absolute()
     }
 
     struct Metadata: Codable {
@@ -151,9 +149,10 @@ public struct Mint {
         }
 
         if !force && packagePath.commandPath.exists {
-            print("🌱  \(package.commandVersion) already installed".green)
             if global {
                 try installGlobal(packagePath: packagePath)
+            } else {
+                print("🌱  \(package.commandVersion) already installed".green)
             }
             return
         }
@@ -201,10 +200,11 @@ public struct Mint {
         }
 
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
-        print("🌱  Installed \(package.commandVersion)".green)
 
         if global {
             try installGlobal(packagePath: packagePath)
+        } else {
+            print("🌱  Installed \(package.commandVersion)".green)
         }
 
         try? packageCheckoutPath.delete()
@@ -212,41 +212,37 @@ public struct Mint {
 
     func installGlobal(packagePath: PackagePath) throws {
 
-        let installPath = installsPath + packagePath.package.name
-        try installsPath.mkpath()
+        let toolPath = packagePath.commandPath
+        let installPath = installationPath + packagePath.package.name
 
-        // copy to global installs
-        try? installPath.delete()
-        let output = main.run(bash: "ln -s \(packagePath.commandPath.absolute().string) \(installPath.absolute().string)")
+        try checkInstallExecutable(installPath, confirmation: "🌱  An executable that was not installed by mint already exists. Ovewrite it?".yellow)
+        try? installPath.absolute().delete()
+        try? installPath.parent().mkpath()
+
+        let output = main.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
         guard output.succeeded else {
-            print("🌱  Could not install \(packagePath.package.commandVersion) globally")
+            print("🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)")
             return
         }
+        print("🌱  Installed \(packagePath.package.commandVersion)".green)
+    }
 
-        let exportCommand = "export PATH=\"\(installsPath):$PATH\""
+    // checks if an existing executable is a symylink from mint. If it isn't, ask for confirmation
+    func checkInstallExecutable(_ path: Path, confirmation: String) throws {
+        var isValid = true
+        if path.isSymlink {
+            let actualPath = try path.symlinkDestination()
+            if !actualPath.absolute().string.contains(packagesPath.absolute().string) {
+                isValid = false
+            }
+        } else if path.exists {
+            isValid = false
+        }
 
-        // add $PATH to current shell
-        // FIXME: this doesn't seem to work
-        main.run(bash: exportCommand)
-
-        // add $PATH to common files
-        let exportSection = "# Register Mint install path\n\(exportCommand)"
-
-        let files = [
-            "~/.bash_profile",
-            "~/.bashrc",
-            "~/.zshenv",
-        ]
-
-        try files.forEach {
-            let file = Path($0).absolute()
-            if file.exists {
-                let existingString: String = try file.read()
-                if !existingString.contains(exportSection) {
-                    let newString = "\(existingString)\n\n\(exportSection)"
-                    try file.write(newString)
-                    print("🌱  Added mint install $PATH to \(file.string)")
-                }
+        if !isValid {
+            let ok = Question().confirmation(confirmation)
+            if !ok {
+                exit(0)
             }
         }
     }
@@ -273,7 +269,7 @@ public struct Mint {
                 try? packagePath.delete()
             }
 
-            print("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled")
+            print("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled".yellow)
         }
 
         // remove metadata
@@ -283,8 +279,9 @@ public struct Mint {
         try writeMetadata(metadata)
 
         // remove global install
-        let executablePath = installsPath + name
-        try? executablePath.delete()
+        let installPath = installationPath + name
+        try checkInstallExecutable(installPath, confirmation: "🌱  An executable that was not installed by mint already exists at \(installPath.string). Do you still wish to remove it?")
+        try? installPath.delete()
     }
 
     private func runCommand(_ command: String, at: Path, verbose: Bool) throws {
