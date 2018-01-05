@@ -5,7 +5,7 @@ import XCTest
 
 class MintTests: XCTestCase {
 
-    let mint = Mint(path: Path.temporary + "mint")
+    let mint = Mint(path: Path.temporary + "mint", installationPath: Path.temporary + "mint-installs")
     let testRepo = "yonaskolb/simplepackage"
     let testVersion = "2.0.0"
     let latestVersion = "3.0.0"
@@ -14,20 +14,23 @@ class MintTests: XCTestCase {
     override func setUp() {
         super.setUp()
         try? mint.path.delete()
+        try? mint.installationPath.delete()
     }
 
     func testPackagePaths() {
 
-        let mint = Mint(path: "testPath/mint")
+        let testMint = Mint(path: "/testPath/mint", installationPath: "/testPath/mint-installs")
         let package = Package(repo: "yonaskolb/mint", version: "1.2.0", name: "mint")
-        let packagePath = PackagePath(path: mint.packagesPath, package: package)
+        let packagePath = PackagePath(path: testMint.packagesPath, package: package)
 
-        XCTAssertEqual(mint.packagesPath, "testPath/mint/packages")
+        XCTAssertEqual(testMint.path, "/testPath/mint")
+        XCTAssertEqual(testMint.packagesPath, "/testPath/mint/packages")
+        XCTAssertEqual(testMint.installationPath, "/testPath/mint-installs")
         XCTAssertEqual(packagePath.gitPath, "https://github.com/yonaskolb/mint.git")
         XCTAssertEqual(packagePath.repoPath, "github.com_yonaskolb_mint")
-        XCTAssertEqual(packagePath.packagePath, "testPath/mint/packages/github.com_yonaskolb_mint")
-        XCTAssertEqual(packagePath.installPath, "testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0")
-        XCTAssertEqual(packagePath.commandPath, "testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
+        XCTAssertEqual(packagePath.packagePath, "/testPath/mint/packages/github.com_yonaskolb_mint")
+        XCTAssertEqual(packagePath.installPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0")
+        XCTAssertEqual(packagePath.commandPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
     }
 
     func testPackageGitPaths() {
@@ -57,7 +60,7 @@ class MintTests: XCTestCase {
 
     func testInstallCommand() throws {
 
-        let globalPath = mint.installsPath + testCommand
+        let globalPath = mint.installationPath + testCommand
 
         // install specific version
         let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)

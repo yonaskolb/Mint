@@ -4,7 +4,7 @@ import Rainbow
 import SwiftShell
 
 do {
-    let mint = Mint(path: "/usr/local/lib/mint")
+    let mint = Mint()
     let mintInterface = MintInterace(mint: mint)
     try mintInterface.execute(arguments: Array(ProcessInfo.processInfo.arguments.dropFirst()))
 } catch {
