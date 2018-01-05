@@ -1,10 +1,3 @@
-//
-//  MintError.swift
-//  MintKit
-//
-//  Created by Yonas Kolb on 19/12/17.
-//
-
 import Foundation
 
 public enum MintError: Error, CustomStringConvertible, Equatable {
@@ -22,7 +15,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable {
         }
     }
 
-    public static func ==(lhs: MintError, rhs: MintError) -> Bool {
+    public static func == (lhs: MintError, rhs: MintError) -> Bool {
         return lhs.description == rhs.description
     }
 }
