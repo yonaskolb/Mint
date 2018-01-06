@@ -6,7 +6,7 @@ import Utility
 
 public struct Mint {
 
-    public static let version = "0.7.0"
+    public static let version = "0.7.1"
 
     let path: Path
     let installationPath: Path
