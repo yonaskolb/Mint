@@ -11,7 +11,15 @@ class RunCommand: PackageCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
-        let arguments = parsedArguments.get(commandArgument)
+        var arguments = parsedArguments.get(commandArgument)
+
+        // backwards compatability for arguments surrounded in quotes
+        if let args = arguments,
+            args.count == 1,
+            let firstArg = args.first,
+            firstArg.contains(" ") {
+            arguments = firstArg.split(separator: " ").map(String.init)
+        }
         try mint.run(repo: repo, version: version, verbose: verbose, arguments: arguments)
     }
 }
