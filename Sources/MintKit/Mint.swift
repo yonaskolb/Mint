@@ -145,7 +145,7 @@ public struct Mint {
                 }
             }
 
-            print("🌱  Resolved latest version of \(package.name) to \(package.version.quoted)")
+            print("🌱  Resolved latest version of \(package.name) to \(package.version)")
         }
 
         if !update && packagePath.commandPath.exists {
@@ -163,7 +163,7 @@ public struct Mint {
         try checkoutPath.mkpath()
 
         try? packageCheckoutPath.delete()
-        print("🌱  Cloning \(packagePath.gitPath) \(package.version.quoted)...")
+        print("🌱  Cloning \(packagePath.gitPath) \(package.version)...")
         do {
             try runCommand("git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)", at: checkoutPath, verbose: verbose)
         } catch {

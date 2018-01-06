@@ -4,7 +4,7 @@
 
 ## 0.7.0
 
-- `install` and `update` now link the executable to `usr/local/bin` for global usage by default. Disable this with `--global:false` #41 #44 #45
+- `install` and `update` now link the executable to `usr/local/bin` by default, for global usage. Disable this with `--global:false` #41 #44 #45
 - arguments to an executable no longer have to be surrounded in quotes. `mint run yonaskolb/xcodegen xcodegen --spec myspec.yml`
 - added streaming of run command output #36
 - added `--verbose` flag for cloning and building output #36
