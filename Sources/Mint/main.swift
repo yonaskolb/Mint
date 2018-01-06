@@ -11,7 +11,7 @@ do {
     if let error = error as? SwiftShell.CommandError {
         switch error {
         case let .inAccessibleExecutable(path): main.stderror.print("Couldn't run command \(path)")
-        case let .returnedErrorCode(command, _): main.stderror.print("\(command.quoted) failed")
+        case let .returnedErrorCode(command, _): break
         }
     } else if error._domain == NSCocoaErrorDomain {
         print("🌱  \(error.localizedDescription)".red)
