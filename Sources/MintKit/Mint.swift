@@ -232,7 +232,7 @@ public struct Mint {
             return
         }
         var confirmation = "Linked \(packagePath.package.commandVersion) to \(installationPath.string)"
-        if case .mint(let previousVersion) = installStatus.status {
+        if case let .mint(previousVersion) = installStatus.status {
             confirmation += ", replacing version \(previousVersion)"
         }
 
@@ -326,8 +326,8 @@ struct InstallStatus {
         case file
         case symlink(path: Path)
         case missing
-
     }
+
     var isSafe: Bool {
         switch status {
         case .file, .symlink: return true
@@ -338,7 +338,7 @@ struct InstallStatus {
     var warning: String? {
         switch status {
         case .file: return "An executable that was not installed by mint already exists at \(path)."
-        case .symlink(let symlink): return "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
+        case let .symlink(symlink): return "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
         default: return nil
         }
     }
