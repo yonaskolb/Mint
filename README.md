@@ -14,8 +14,9 @@ This would install and run [SwiftLint](https://github.com/realm/SwiftLint) versi
 
 Mint is designed to be used with Swift command line tools that build with the Swift Package Manager. It makes installing, running and distributing these tools much easier.
 
-- ✅ builds are **cached** globally by version
 - ✅ easily run a specific **version** of a tool
+- ✅ install a tool **globally**
+- ✅ builds are **cached** by version
 - ✅ use **different versions** of a tool side by side
 - ✅ easily run the **latest** version of a tool
 - ✅ distribute your own tools **without recipes and formulas**
@@ -30,7 +31,7 @@ Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 > Mint: a place where something is produced or manufactured
 
 ## Installing
-Make sure Xcode 9 is installed first.
+Make sure Xcode 9.2 is installed first.
 
 ### Homebrew
 
@@ -85,8 +86,8 @@ And then import wherever needed: `import MintKit`
 
 Run `mint --help` to see usage instructions.
 
-- **install**: Installs a package. If it is already installed this won't do anything
-- **run**: Runs a package. This will install it first if it isn't already installed.
+- **install**: Installs a package, so it can be run with `run` later, and also links that version globally
+- **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
 - **update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update it.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
@@ -100,18 +101,14 @@ Run, install and update commands have 1 or 2 arguments:
 #### Examples
 ```sh
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
-$ mint install yonaskolb/XcodeGen@1.2.4 --global # globally install version 1.2.4
+$ mint install yonaskolb/XcodeGen@1.2.4 --global:false # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
 
 ### Global installs
-Mint can also be used to install a package so it is accessible from anywhere. This means you don't have to prepend commands with `mint run`. 
-
-Simply pass `--global` to `mint install` or `mint update` and that version will globally installed. 
-
-Note that only one global version can be installed at a time. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--global:false` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
@@ -124,7 +121,7 @@ $ mint run github_name/repo_name
 ````
 
 ### Executable
-If your executable name is different from your repo name then you will need to append the name to the above command
+If your executable name is different from your repo name then you will need to append the name to the above command.
 
 ### Resources
 The Swift Package Manager doesn't yet have a way of specifying resources directories. If your tool requires access to resources from the repo you require a custom `Package.resources` file. This is a plain text file that lists the resources directories on different lines:

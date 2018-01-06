@@ -13,6 +13,6 @@ public class Package {
     }
 
     public var commandVersion: String {
-        return "\(name) \(version.quoted)"
+        return "\(name) \(version)"
     }
 }

@@ -145,7 +145,7 @@ public struct Mint {
                 }
             }
 
-            print("🌱  Using \(package.name) \(package.version.quoted)")
+            print("🌱  Resolved latest version of \(package.name) to \(package.version.quoted)")
         }
 
         if !update && packagePath.commandPath.exists {
@@ -201,10 +201,9 @@ public struct Mint {
 
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
 
+        print("🌱  Installed \(package.commandVersion)".green)
         if global {
             try installGlobal(packagePath: packagePath)
-        } else {
-            print("🌱  Installed \(package.commandVersion)".green)
         }
 
         try? packageCheckoutPath.delete()
@@ -215,7 +214,15 @@ public struct Mint {
         let toolPath = packagePath.commandPath
         let installPath = installationPath + packagePath.package.name
 
-        try checkInstallExecutable(installPath, confirmation: "🌱  An executable that was not installed by mint already exists. Ovewrite it?".yellow)
+        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
+
+        if let warning = installStatus.warning {
+            let ok = Question().confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
+            if !ok {
+                return
+            }
+        }
+
         try? installPath.absolute().delete()
         try? installPath.parent().mkpath()
 
@@ -224,27 +231,12 @@ public struct Mint {
             print("🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)")
             return
         }
-        print("🌱  Installed \(packagePath.package.commandVersion)".green)
-    }
-
-    // checks if an existing executable is a symylink from mint. If it isn't, ask for confirmation
-    func checkInstallExecutable(_ path: Path, confirmation: String) throws {
-        var isValid = true
-        if path.isSymlink {
-            let actualPath = try path.symlinkDestination()
-            if !actualPath.absolute().string.contains(packagesPath.absolute().string) {
-                isValid = false
-            }
-        } else if path.exists {
-            isValid = false
+        var confirmation = "Linked \(packagePath.package.commandVersion) to \(installationPath.string)"
+        if case .mint(let previousVersion) = installStatus.status {
+            confirmation += ", replacing version \(previousVersion)"
         }
 
-        if !isValid {
-            let ok = Question().confirmation(confirmation)
-            if !ok {
-                exit(0)
-            }
-        }
+        print("🌱  \(confirmation).".green)
     }
 
     public func uninstall(name: String) throws {
@@ -269,7 +261,7 @@ public struct Mint {
                 try? packagePath.delete()
             }
 
-            print("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled".yellow)
+            print("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled".green)
         }
 
         // remove metadata
@@ -280,7 +272,15 @@ public struct Mint {
 
         // remove global install
         let installPath = installationPath + name
-        try checkInstallExecutable(installPath, confirmation: "🌱  An executable that was not installed by mint already exists at \(installPath.string). Do you still wish to remove it?")
+
+        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
+
+        if let warning = installStatus.warning {
+            let ok = Question().confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
+            if !ok {
+                return
+            }
+        }
         try? installPath.delete()
     }
 
@@ -294,6 +294,52 @@ public struct Mint {
             if let error = output.error {
                 throw error
             }
+        }
+    }
+}
+
+struct InstallStatus {
+
+    let status: Status
+    let path: Path
+
+    init(path: Path, mintPackagesPath: Path) throws {
+        self.path = path
+        if path.isSymlink {
+            let actualPath = try path.symlinkDestination()
+            if actualPath.absolute().string.contains(mintPackagesPath.absolute().string) {
+                let version = actualPath.parent().lastComponent
+                status = .mint(version: version)
+            } else {
+                status = .symlink(path: actualPath)
+            }
+        } else if path.exists {
+            status = .file
+        } else {
+            status = .missing
+        }
+    }
+
+    enum Status {
+
+        case mint(version: String)
+        case file
+        case symlink(path: Path)
+        case missing
+
+    }
+    var isSafe: Bool {
+        switch status {
+        case .file, .symlink: return true
+        case .missing, .mint: return true
+        }
+    }
+
+    var warning: String? {
+        switch status {
+        case .file: return "An executable that was not installed by mint already exists at \(path)."
+        case .symlink(let symlink): return "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
+        default: return nil
         }
     }
 }
