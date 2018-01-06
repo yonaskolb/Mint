@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.7.1
+
+- add backwards compatibility for `mint run` calls still using quotes
+- don't log error message from mint if run executable fails
+
+[Commits](https://github.com/yonaskolb/XcodeGen/compare/0.7.0...0.7.1)
+
 ## 0.7.0
 
 - `install` and `update` now link the executable to `usr/local/bin` by default, for global usage. Disable this with `--global:false` #41 #44 #45
