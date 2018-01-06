@@ -2,13 +2,18 @@
 
 ## Master
 
-- added `--global` flag to install executables globally #41
+## 0.7.0
+
+- `install` and `update` now link the executable to `usr/local/bin` for global usage by default. Disable this with `--global:false` #41 #44 #45
+- arguments to an executable no longer have to be surrounded in quotes. `mint run yonaskolb/xcodegen xcodegen --spec myspec.yml`
 - added streaming of run command output #36
 - added `--verbose` flag for cloning and building output #36
 - add `MINT` and `RESOURCE_PATH` envs #36
 - fixed ANSI color issue #36
 - replaced ShellOut with SwiftShell #36
 - added a whole bunch of tests
+
+[Commits](https://github.com/yonaskolb/XcodeGen/compare/0.6.1...0.7.0)
 
 ## 0.6.1
 
