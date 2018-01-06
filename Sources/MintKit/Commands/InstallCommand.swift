@@ -38,12 +38,12 @@ class InstallOrUpdateCommand: PackageCommand {
         self.update = update
         super.init(mint: mint, parser: parser, name: name, description: description)
         executableArgument = subparser.add(positional: "executable", kind: String.self, optional: true, usage: "The executable to install")
-        globalArgument = subparser.add(option: "--global", shortName: "-g", kind: Bool.self, usage: "The executable to install")
+        globalArgument = subparser.add(option: "--global", shortName: "-g", kind: Bool.self, usage: "Whether to install the executable globally. Defaults to true")
     }
 
     override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
         let executable = parsedArguments.get(executableArgument)
-        let global = parsedArguments.get(globalArgument) ?? false
+        let global = parsedArguments.get(globalArgument) ?? true
 
         try mint.install(repo: repo, version: version, command: executable, update: update, verbose: verbose, global: global)
     }
