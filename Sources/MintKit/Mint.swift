@@ -96,7 +96,7 @@ public struct Mint {
     }
 
     public func run(_ package: Package, arguments: [String], verbose: Bool) throws {
-        try install(package, force: false, verbose: verbose, global: false)
+        try install(package, update: false, verbose: verbose, global: false)
         print("🌱  Running \(package.commandVersion)...")
 
         var context = CustomContext(main)
@@ -108,15 +108,15 @@ public struct Mint {
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String?, force: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
+    public func install(repo: String, version: String, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = command ?? guessedCommand
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, force: force, verbose: verbose, global: global)
+        try install(package, update: update, verbose: verbose, global: global)
         return package
     }
 
-    public func install(_ package: Package, force: Bool = false, verbose: Bool = false, global: Bool = false) throws {
+    public func install(_ package: Package, update: Bool = false, verbose: Bool = false, global: Bool = false) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
@@ -148,7 +148,7 @@ public struct Mint {
             print("🌱  Using \(package.name) \(package.version.quoted)")
         }
 
-        if !force && packagePath.commandPath.exists {
+        if !update && packagePath.commandPath.exists {
             if global {
                 try installGlobal(packagePath: packagePath)
             } else {
