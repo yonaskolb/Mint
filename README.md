@@ -54,7 +54,8 @@ $ make
 ```sh
 $ git clone https://github.com/yonaskolb/Mint.git
 $ cd Mint
-$ swift run mint install yonaskolb/mint --global
+$ swift run mint install yonaskolb/mint --
+l
 ```
 
 ##### Update
@@ -101,14 +102,14 @@ Run, install and update commands have 1 or 2 arguments:
 #### Examples
 ```sh
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
-$ mint install yonaskolb/XcodeGen@1.2.4 --global:false # installs a certain version but not globally
+$ mint install yonaskolb/XcodeGen@1.2.4 --global=false # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
 
 ### Global installs
-By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--global:false` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--global=false` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
