@@ -1,7 +1,20 @@
-os:
-  - osx
-language: swift
-osx_image: xcode9
-script:
-  - swift build
-  - swift test
+language: generic
+matrix:
+  include:
+    - os: osx
+      env:
+        - JOB="macOS + Swift Package Manager"
+      osx_image: xcode9.2
+      script:
+        - "swift test"
+    - os: linux
+      env:
+        - JOB="Linux"
+      dist: trusty
+      script:
+        - "export SWIFT_VERSION=4.0"
+        - "eval \"$(curl -sL https://gist.githubusercontent.com/kylef/5c0475ff02b7c7671d2a/raw/9f442512a46d7a2af7b850d65a7e9bd31edfb09b/swiftenv-install.sh)\""
+        - "swift test"
+
+  allow_failures:
+    - os: linux
