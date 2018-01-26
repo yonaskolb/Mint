@@ -1,7 +1,6 @@
 import Foundation
 import PathKit
 import Rainbow
-import SwiftShell
 import Utility
 
 public struct Mint {
@@ -10,6 +9,7 @@ public struct Mint {
 
     let path: Path
     let installationPath: Path
+    let shell: CustomShell
 
     var packagesPath: Path {
         return path + "packages"
@@ -19,9 +19,10 @@ public struct Mint {
         return path + "metadata.json"
     }
 
-    public init(path: Path = "/usr/local/lib/mint", installationPath: Path = "/usr/local/bin") {
+    public init(path: Path = "/usr/local/lib/mint", installationPath: Path = "/usr/local/bin", shell: CustomShell? = nil) {
         self.path = path.absolute()
         self.installationPath = installationPath.absolute()
+        self.shell = shell ?? SyncShell()
     }
 
     struct Metadata: Codable {
@@ -99,12 +100,11 @@ public struct Mint {
         try install(package, update: false, verbose: verbose, global: false)
         print("🌱  Running \(package.commandVersion)...")
 
-        var context = CustomContext(main)
-        context.env["MINT"] = "YES"
-        context.env["RESOURCE_PATH"] = ""
-
         let packagePath = PackagePath(path: packagesPath, package: package)
-        try context.runAndPrint(packagePath.commandPath.string, arguments)
+        try shell.runAndPrint(packagePath.commandPath.string, arguments, env: [
+            "MINT": "YES",
+            "RESOURCE_PATH": ""
+        ])
     }
 
     @discardableResult
@@ -127,7 +127,7 @@ public struct Mint {
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
             print("🌱  Finding latest version of \(package.name)")
-            let tagOutput = main.run(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
+            let tagOutput = shell.run(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
 
             if !tagOutput.succeeded {
                 throw MintError.repoNotFound(packagePath.gitPath)
@@ -226,7 +226,7 @@ public struct Mint {
         try? installPath.absolute().delete()
         try? installPath.parent().mkpath()
 
-        let output = main.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
+        let output = shell.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
         guard output.succeeded else {
             print("🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)")
             return
@@ -285,12 +285,10 @@ public struct Mint {
     }
 
     private func runCommand(_ command: String, at: Path, verbose: Bool) throws {
-        var context = CustomContext(main)
-        context.currentdirectory = at.string
         if verbose {
-            try context.runAndPrint(bash: command)
+            try shell.runAndPrint(bash: command, directory: at.string)
         } else {
-            let output = context.run(bash: command)
+            let output = shell.run(bash: command, directory: at.string)
             if let error = output.error {
                 throw error
             }
