@@ -31,6 +31,7 @@ class InstallOrUpdateCommand: PackageCommand {
 
     var executableArgument: PositionalArgument<String>!
     var globalArgument: OptionArgument<Bool>!
+    var binaryArgument: OptionArgument<Bool>!
 
     var update: Bool
 
@@ -39,12 +40,14 @@ class InstallOrUpdateCommand: PackageCommand {
         super.init(mint: mint, parser: parser, name: name, description: description)
         executableArgument = subparser.add(positional: "executable", kind: String.self, optional: true, usage: "The executable to install")
         globalArgument = subparser.add(option: "--global", shortName: "-g", kind: Bool.self, usage: "Whether to install the executable globally. Defaults to true")
+        binaryArgument = subparser.add(option: "--binary", shortName: "-b", kind: Bool.self, usage: "Whether to perform binary install instead of clone and build. Defaults to false.")
     }
 
     override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
         let executable = parsedArguments.get(executableArgument)
         let global = parsedArguments.get(globalArgument) ?? true
+        let binary = parsedArguments.get(binaryArgument) ?? false
 
-        try mint.install(repo: repo, version: version, command: executable, update: update, verbose: verbose, global: global)
+        try mint.install(repo: repo, version: version, command: executable, update: update, verbose: verbose, global: global, binary: binary)
     }
 }
