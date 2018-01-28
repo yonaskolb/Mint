@@ -16,6 +16,7 @@ Mint is designed to be used with Swift command line tools that build with the Sw
 
 - ✅ easily run a specific **version** of a tool
 - ✅ install a tool **globally**
+- ✅ **binary install** option
 - ✅ builds are **cached** by version
 - ✅ use **different versions** of a tool side by side
 - ✅ easily run the **latest** version of a tool
@@ -103,6 +104,7 @@ Run, install and update commands have 1 or 2 arguments:
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
 $ mint install yonaskolb/XcodeGen@1.2.4 --global=false # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
+$ mint install yonaskolb/XcodeGen --binary # Download binary instead of clone and build.
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
