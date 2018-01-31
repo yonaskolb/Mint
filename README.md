@@ -2,7 +2,7 @@
 
 [![SPM](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat)](https://swift.org/package-manager)
 [![Git Version](https://img.shields.io/github/release/yonaskolb/Mint.svg)](https://github.com/yonaskolb/Mint/releases)
-[![Build Status](https://img.shields.io/travis/yonaskolb/Mint/master.svg?style=flat)](https://travis-ci.org/yonaskolb/Mint)
+[![Build Status](https://img.shields.io/circleci/project/github/yonaskolb/Mint.svg?style=flat)](https://circleci.com/gh/yonaskolb/Mint)
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/yonaskolb/Mint/blob/master/LICENSE)
 
 A package manager that installs and runs Swift command line tool packages.
