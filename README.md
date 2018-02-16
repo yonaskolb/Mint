@@ -134,6 +134,8 @@ MyOtherFiles
 ```
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
 
+**NOTE**: In case of binary install, resources are copied into `/usr/local/lib/${your-tool}/resources/`.
+
 ### How to support binary install
 Binary install is currently supported for only tools hosted on GitHub.
 Binary install is a lot faster than building from source, so you definitely should support it.
