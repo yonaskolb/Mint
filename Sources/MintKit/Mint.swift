@@ -76,8 +76,12 @@ public struct Mint {
     }
 
     public func archive(executableNames: [String]) throws {
-        for name in executableNames {
-            try runCommand("bash <(curl -s https://raw.githubusercontent.com/toshi0383/scripts/master/swiftpm/release.sh) \(name)", at: .current, verbose: true)
+        let names = executableNames.joined(separator: " ")
+        if let executablePath = Bundle.main.executablePath {
+            let usrlocalbin = Path(executablePath).components.dropLast().joined(separator: "/")
+            let resourcesDir = Path(usrlocalbin).parent() + "lib/mint/resources/"
+            let archiveTool = "\(resourcesDir)/lib/archive-binary.sh"
+            try runCommand("\(archiveTool) \(names)", at: .current, verbose: true)
         }
     }
 
