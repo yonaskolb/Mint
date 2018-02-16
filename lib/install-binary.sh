@@ -5,7 +5,7 @@
 #
 # description:
 #   Download latest release from GitHub and install.
-#   Uploaded binary must be created with release.sh.
+#   Uploaded zip file should be created with release.sh.
 #
 # parameters:
 #   1: "user/app" ... your github repository name. (e.g. toshi0383/cmdshelf)
@@ -68,11 +68,12 @@ if [ -d usr/local/bin ];then
     # backward compatibility
     PREFIX=/
     TARGETS=usr
+    chmod +x usr/local/bin/$APP_NAME
 else
     PREFIX=${PREFIX:-/usr/local}/
-    TARGETS=bin share lib
+    TARGETS="bin share lib"
+    chmod +x bin/$APP_NAME
 fi
-chmod +x usr/local/bin/$APP_NAME
 for target in $TARGETS
 do
     cp -Rf $target $PREFIX

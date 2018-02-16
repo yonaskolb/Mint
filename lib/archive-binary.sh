@@ -5,8 +5,8 @@
 #
 # description:
 #   Archive your SwiftPM executable.
-#   Created zip is intended to distributed via GitHub releases page and installed by using install.sh.
-#   Executable should be built with `-static-stdlib` option.
+#   Generated zip file is intended to uploaded to GitHub releases page and installed by using install.sh.
+#   Executable must be built with `-static-stdlib` option.
 #     e.g. `swift build -c release -Xswiftc -static-stdlib`
 #
 # parameters:
@@ -23,33 +23,42 @@
 #
 
 # executable
+TMPDIR=$(mktemp -d)
 APP_NAME=${1:?}
 
 RELEASE_DIR=.build/release
 EXECUTABLE=${RELEASE_DIR}/${APP_NAME}
 DOC=docs/man
-BIN=bin
+BIN=$TMPDIR/bin
 
 install_name_tool -delete_rpath `xcode-select -p`/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx $EXECUTABLE
-mkdir -p $BIN
+mkdir $BIN
 cp $EXECUTABLE $BIN/
 
 # manual pages
+SHARE=$TMPDIR/share
 MAN_DIR=doc/man
-SHARE=share
-mkdir -p $SHARE
+mkdir $SHARE
 cp -R $MAN_DIR $SHARE/
 
 # resources
+LIB=$TMPDIR/lib
 RESOURCES=
-PACKAGE_RESOURCES=Packge.resources
+PACKAGE_RESOURCES=Package.resources
+
 if [ -f $PACKAGE_RESOURCES ];then
-    RESOURCES=resources
-    mkdir $RESOURCES
+    RESOURCES=${LIB}/${APP_NAME}/resources
+    mkdir -p $RESOURCES
     while read dir
     do
         cp -R $dir $RESOURCES/
     done < $PACKAGE_RESOURCES
 fi
 
-zip -r ${APP_NAME}.zip $BIN $SHARE $RESOURCES
+cd $TMPDIR
+zip -r ${APP_NAME}.zip bin share lib
+cd -
+
+cp ${TMPDIR}/${APP_NAME}.zip .
+
+rm -rf ${TMPDIR}
