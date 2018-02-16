@@ -4,6 +4,13 @@ import Rainbow
 import SwiftShell
 import Utility
 
+private let resourcesDir: String = {
+    let executablePath = Bundle.main.executablePath!
+    let usrlocalbin = Path(executablePath).components.dropLast().joined(separator: "/")
+    let resourcesDir = Path(usrlocalbin).parent() + "lib/mint/resources/"
+    return resourcesDir.string
+}()
+
 public struct Mint {
 
     public static let version = "0.7.1"
@@ -77,12 +84,8 @@ public struct Mint {
 
     public func archive(executableNames: [String]) throws {
         let names = executableNames.joined(separator: " ")
-        if let executablePath = Bundle.main.executablePath {
-            let usrlocalbin = Path(executablePath).components.dropLast().joined(separator: "/")
-            let resourcesDir = Path(usrlocalbin).parent() + "lib/mint/resources/"
-            let archiveTool = "\(resourcesDir)/lib/archive-binary.sh"
-            try runCommand("\(archiveTool) \(names)", at: .current, verbose: true)
-        }
+        let archiveTool = "\(resourcesDir)/lib/archive-binary.sh"
+        try runCommand("\(archiveTool) \(names)", at: .current, verbose: true)
     }
 
     @discardableResult
@@ -134,12 +137,14 @@ public struct Mint {
 
         if binary {
             print("🌱  Performing binary install.".green)
-            let output = main.run(bash: "bash <(curl -sL https://raw.githubusercontent.com/toshi0383/scripts/master/swiftpm/install.sh) \(package.repo) \(package.version)")
-            guard output.succeeded else {
-                print("🌱  Could not install \(package.repo)@\(package.version)")
-                exit(1)
-            }
-            print("🌱  Installed \(package.repo) \(package.version).".green)
+            let installCommand = "\(resourcesDir)/lib/install-binary.sh \(package.repo) \(package.version)"
+            try runCommand(installCommand, at: .current, verbose: true)
+            //let output = main.run(bash: )
+            //guard output.succeeded else {
+            //    print("🌱  Could not install \(package.repo)@\(package.version)")
+            //    exit(1)
+            //}
+            //print("🌱  Installed \(package.repo) \(package.version).".green)
             return
         }
 
