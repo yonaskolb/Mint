@@ -13,7 +13,7 @@ private let resourcesDir: String = {
 
 public struct Mint {
 
-    public static let version = "0.7.1"
+    public static let version = "0.7.2-toshi0383-a"
 
     let path: Path
     let installationPath: Path
