@@ -134,6 +134,20 @@ MyOtherFiles
 ```
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
 
+### How to support binary install
+Binary install is currently supported for only tools hosted on GitHub.
+Binary install is a lot faster than building from source, so you definitely should support it.
+
+To do that, just run `mint archive [<executable>]` in your project dir.
+
+e.g.
+
+```
+$ mint archive cmdshelf
+```
+
+This will create a zip file including `bin/cmdshelf`. Make sure you upload the zip file to github release page.  
+So your user is going to run `mint install toshi0383/cmdshelf --binary` and it's installed under `/usr/local/`.
 
 ## A list of popular Mint compatible tools 🌱
 

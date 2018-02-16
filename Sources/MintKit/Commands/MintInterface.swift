@@ -16,6 +16,7 @@ public class MintInterace {
 
         let commands: [String: MintCommand] = [
             "run": RunCommand(mint: mint, parser: parser),
+            "archive": ArchiveCommand(mint: mint, parser: parser, arguments: arguments),
             "install": InstallCommand(mint: mint, parser: parser),
             "update": UpdateCommand(mint: mint, parser: parser),
             "uninstall": UninstallCommand(mint: mint, parser: parser),

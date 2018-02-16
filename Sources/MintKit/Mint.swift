@@ -75,6 +75,12 @@ public struct Mint {
         return versionsByPackage
     }
 
+    public func archive(executableNames: [String]) throws {
+        for name in executableNames {
+            try runCommand("bash <(curl -s https://raw.githubusercontent.com/toshi0383/scripts/master/swiftpm/release.sh) \(name)", at: .current, verbose: true)
+        }
+    }
+
     @discardableResult
     public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
