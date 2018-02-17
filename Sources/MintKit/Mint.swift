@@ -252,6 +252,17 @@ public struct Mint {
         try? installPath.absolute().delete()
         try? installPath.parent().mkpath()
 
+        let output = main.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
+        guard output.succeeded else {
+            print("🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)")
+            return
+        }
+        var confirmation = "Linked \(packagePath.package.commandVersion) to \(installationPath.string)"
+        if case let .mint(previousVersion) = installStatus.status {
+            confirmation += ", replacing version \(previousVersion)"
+        }
+
+        print("🌱  \(confirmation).".green)
     }
 
     public func uninstall(name: String) throws {
