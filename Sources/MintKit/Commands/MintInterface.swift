@@ -12,7 +12,7 @@ public class MintInterace {
 
     public func execute(arguments: [String]) throws {
         let parser = ArgumentParser(commandName: "mint", usage: "[subcommand]", overview: "Run and install Swift Package Manager executables")
-        let versionArgument = parser.add(option: "--version", shortName: "-v", kind: Bool.self, usage: "Prints the current version of Mint")
+        let versionArgument = parser.add(option: "--version", shortName: "-v", kind: Bool.self, usage: "Print the current version of Mint")
 
         let commands: [String: MintCommand] = [
             "run": RunCommand(mint: mint, parser: parser),
