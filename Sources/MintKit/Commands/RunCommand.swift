@@ -6,7 +6,7 @@ class RunCommand: PackageCommand {
     var commandArgument: PositionalArgument<[String]>!
 
     init(mint: Mint, parser: ArgumentParser) {
-        super.init(mint: mint, parser: parser, name: "run", description: "Installs and then runs a package")
+        super.init(mint: mint, parser: parser, name: "run", description: "Install and then run a package")
         commandArgument = subparser.add(positional: "command", kind: [String].self, optional: true, strategy: .remaining, usage: "The command to run. This will default to the package name")
     }
 

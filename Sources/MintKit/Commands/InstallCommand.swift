@@ -8,7 +8,7 @@ class InstallCommand: InstallOrUpdateCommand {
             mint: mint,
             parser: parser,
             name: "install",
-            description: "Installs a package. If the version is already installed no action will be taken",
+            description: "Install a package. If the version is already installed no action will be taken",
             update: false
         )
     }
@@ -21,7 +21,7 @@ class UpdateCommand: InstallOrUpdateCommand {
             mint: mint,
             parser: parser,
             name: "update",
-            description: "Updates a package even if it's already installed",
+            description: "Update a package even if it's already installed",
             update: true
         )
     }
