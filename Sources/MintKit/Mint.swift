@@ -55,22 +55,16 @@ public struct Mint {
     func getGlobalInstalledPackages() -> [String: String] {
         guard installationPath.exists,
             let packages = try? installationPath.children() else {
-                print("No mint packages installed to global")
                 return [:]
         }
 
         return packages.reduce(into: [:]) { result, package in
             guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: path),
-                case .mint = installStatus.status,
+                case let .mint(version) = installStatus.status,
                 let symlink = try? package.symlinkDestination() else {
                     return
             }
-
-            var componets = symlink.components
-            componets.removeLast()
-            let version = componets.removeLast()
-            componets.removeLast()
-            let packageName = String(componets.removeLast().split(separator: "_").last!)
+            let packageName = String(symlink.parent().parent().parent().lastComponent.split(separator: "_").last!)
             result[packageName] = version
         }
     }
