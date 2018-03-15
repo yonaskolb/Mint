@@ -68,6 +68,7 @@ class MintTests: XCTestCase {
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
 
         // install already installed version globally
         try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
@@ -75,6 +76,7 @@ class MintTests: XCTestCase {
         XCTAssertTrue(globalPath.exists)
         let globalOutput = main.run(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
         // install latest version
         let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
@@ -82,6 +84,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(latestPackage.version, latestVersion)
         let latestGlobalOutput = main.run(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: latestVersion])
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
@@ -93,6 +96,7 @@ class MintTests: XCTestCase {
 
         // check not globally installed
         XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)

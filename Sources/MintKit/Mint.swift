@@ -52,12 +52,31 @@ public struct Mint {
         return metadata.packages.first(where: { $0.key.lowercased().contains(name.lowercased()) })?.key
     }
 
+    func getGlobalInstalledPackages() -> [String: String] {
+        guard installationPath.exists,
+            let packages = try? installationPath.children() else {
+                return [:]
+        }
+
+        return packages.reduce(into: [:]) { result, package in
+            guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: path),
+                case let .mint(version) = installStatus.status,
+                let symlink = try? package.symlinkDestination() else {
+                    return
+            }
+            let packageName = String(symlink.parent().parent().parent().lastComponent.split(separator: "_").last!)
+            result[packageName] = version
+        }
+    }
+
     @discardableResult
     public func listPackages() throws -> [String: [String]] {
         guard packagesPath.exists else {
             print("No mint packages installed")
             return [:]
         }
+
+        let globalInstalledPackages: [String: String] = getGlobalInstalledPackages()
 
         var versionsByPackage: [String: [String]] = [:]
         let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
@@ -66,6 +85,9 @@ public struct Mint {
             var package = "  \(packageName)"
             for version in versions {
                 package += "\n    - \(version)"
+                if globalInstalledPackages[packageName] == version {
+                    package += " *"
+                }
                 versionsByPackage[packageName, default: []].append(version)
             }
             return package

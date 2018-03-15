@@ -4,7 +4,13 @@ import Utility
 class ListCommand: MintCommand {
 
     init(mint: Mint, parser: ArgumentParser) {
-        super.init(mint: mint, parser: parser, name: "list", description: "List all the currently installed packages")
+
+        let description = """
+        List all the currently installed packages
+        Globally installed packages are marked with *
+        """
+        
+        super.init(mint: mint, parser: parser, name: "list", description: description)
     }
 
     override func execute(parsedArguments: ArgumentParser.Result) throws {
