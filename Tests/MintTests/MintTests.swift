@@ -96,6 +96,7 @@ class MintTests: XCTestCase {
 
         // check not globally installed
         XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
