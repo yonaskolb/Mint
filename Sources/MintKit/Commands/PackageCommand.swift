@@ -21,19 +21,9 @@ class PackageCommand: MintCommand {
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 
-        let version: String
-        let packageParts = package.components(separatedBy: "@")
-        let repo: String
+       let packageInfo = PackageInfo(package: package)
 
-        if packageParts.count > 1 {
-            repo = packageParts[0]
-            version = packageParts[1]
-        } else {
-            repo = package
-            version = ""
-        }
-
-        try execute(parsedArguments: parsedArguments, repo: repo, version: version, verbose: verbose)
+        try execute(parsedArguments: parsedArguments, repo: packageInfo.repo, version: packageInfo.version, verbose: verbose)
     }
 
     func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
