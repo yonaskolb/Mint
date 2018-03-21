@@ -50,6 +50,27 @@ class MintTests: XCTestCase {
             XCTAssertEqual(PackagePath.gitURLFromString(url), expected)
         }
     }
+  
+    func testPackageInfo() {
+      
+      XCTAssertEqual(PackageInfo(package: "yonaskolb/mint"), PackageInfo(version: "", repo: "yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo: "yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "github.com/yonaskolb/mint"), PackageInfo(version: "", repo:  "github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "github.com/yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo:  "github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint"), PackageInfo(version: "", repo:  "https://github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo:  "https://github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint.git"), PackageInfo(version: "", repo:  "https://github.com/yonaskolb/mint.git"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint.git@0.0.1"), PackageInfo(version: "0.0.1", repo:  "https://github.com/yonaskolb/mint.git"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package"), PackageInfo(version: "", repo: "mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package@0.0.1"), PackageInfo(version: "0.0.1", repo: "mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package.git"), PackageInfo(version: "", repo: "mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package"), PackageInfo(version: "", repo: "https://mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git"), PackageInfo(version: "", repo: "https://mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package.git"))
+      
+    }
 
     func expectMintVersion(package: Package) {
         let packagePath = PackagePath(path: mint.packagesPath, package: package)
