@@ -44,6 +44,7 @@ class MintTests: XCTestCase {
             "mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
             "https://mycustomdomain.com/package": "https://mycustomdomain.com/package",
             "https://mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
+            "git@github.com:yonaskolb/Mint.git": "git@github.com:yonaskolb/Mint.git"
         ]
 
         for (url, expected) in urls {

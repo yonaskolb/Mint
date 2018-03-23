@@ -29,7 +29,9 @@ struct PackagePath {
         if let url = URL(string: string), url.scheme != nil {
             return url.absoluteString
         } else {
-            if string.contains("github.com") {
+            if string.contains("@") {
+              return string
+            } else if string.contains("github.com") {
                 return "https://\(string).git"
             } else if string.contains(".") {
                 return "https://\(string)"
