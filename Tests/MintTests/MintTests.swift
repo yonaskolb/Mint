@@ -69,6 +69,8 @@ class MintTests: XCTestCase {
       XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package"))
       XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git"), PackageInfo(version: "", repo: "https://mycustomdomain.com/package.git"))
       XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "git@github.com:yonaskolb/Mint.git"), PackageInfo(version: "", repo: "git@github.com:yonaskolb/Mint.git"))
+      XCTAssertEqual(PackageInfo(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "git@github.com:yonaskolb/Mint.git"))
       
     }
 
