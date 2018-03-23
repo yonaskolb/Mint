@@ -19,6 +19,8 @@ struct PackagePath {
             .components(separatedBy: "://").last!
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: ".git", with: "")
+            .replacingOccurrences(of: ":", with: "_")
+            .replacingOccurrences(of: "@", with: "_")
     }
 
     var packagePath: Path { return path + repoPath }
