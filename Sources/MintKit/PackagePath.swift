@@ -19,6 +19,8 @@ struct PackagePath {
             .components(separatedBy: "://").last!
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: ".git", with: "")
+            .replacingOccurrences(of: ":", with: "_")
+            .replacingOccurrences(of: "@", with: "_")
     }
 
     var packagePath: Path { return path + repoPath }
@@ -29,7 +31,9 @@ struct PackagePath {
         if let url = URL(string: string), url.scheme != nil {
             return url.absoluteString
         } else {
-            if string.contains("github.com") {
+            if string.contains("@") {
+              return string
+            } else if string.contains("github.com") {
                 return "https://\(string).git"
             } else if string.contains(".") {
                 return "https://\(string)"

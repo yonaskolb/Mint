@@ -7,6 +7,7 @@ class MintTests: XCTestCase {
 
     let mint = Mint(path: Path.temporary + "mint", installationPath: Path.temporary + "mint-installs")
     let testRepo = "yonaskolb/simplepackage"
+    let sshTestRepo = "git@github.com:yonaskolb/simplepackage.git"
     let testVersion = "2.0.0"
     let latestVersion = "3.0.0"
     let testCommand = "simplepackage"
@@ -44,11 +45,35 @@ class MintTests: XCTestCase {
             "mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
             "https://mycustomdomain.com/package": "https://mycustomdomain.com/package",
             "https://mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
+            "git@github.com:yonaskolb/Mint.git": "git@github.com:yonaskolb/Mint.git"
         ]
 
         for (url, expected) in urls {
             XCTAssertEqual(PackagePath.gitURLFromString(url), expected)
         }
+    }
+  
+    func testPackageInfo() {
+      
+      XCTAssertEqual(PackageInfo(package: "yonaskolb/mint"), PackageInfo(version: "", repo: "yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo: "yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "github.com/yonaskolb/mint"), PackageInfo(version: "", repo:  "github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "github.com/yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo:  "github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint"), PackageInfo(version: "", repo:  "https://github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint@0.0.1"), PackageInfo(version: "0.0.1", repo:  "https://github.com/yonaskolb/mint"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint.git"), PackageInfo(version: "", repo:  "https://github.com/yonaskolb/mint.git"))
+      XCTAssertEqual(PackageInfo(package: "https://github.com/yonaskolb/mint.git@0.0.1"), PackageInfo(version: "0.0.1", repo:  "https://github.com/yonaskolb/mint.git"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package"), PackageInfo(version: "", repo: "mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package@0.0.1"), PackageInfo(version: "0.0.1", repo: "mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package.git"), PackageInfo(version: "", repo: "mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "mycustomdomain.com/package.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package"), PackageInfo(version: "", repo: "https://mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git"), PackageInfo(version: "", repo: "https://mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "https://mycustomdomain.com/package.git"))
+      XCTAssertEqual(PackageInfo(package: "git@github.com:yonaskolb/Mint.git"), PackageInfo(version: "", repo: "git@github.com:yonaskolb/Mint.git"))
+      XCTAssertEqual(PackageInfo(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), PackageInfo(version: "0.0.1", repo: "git@github.com:yonaskolb/Mint.git"))
+      
     }
 
     func expectMintVersion(package: Package) {
@@ -103,22 +128,22 @@ class MintTests: XCTestCase {
     }
 
     func testRunCommand() throws {
-
+      try [testRepo, sshTestRepo].forEach { repo in
         // run a specific version
-        let specificPackage = try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+        let specificPackage = try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
         expectMintVersion(package: specificPackage)
 
         // run an already installed version
-        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+        try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
 
         // run without arguments
-        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+        try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
 
         // run with arguments
-        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
+        try mint.run(repo: repo, version: testVersion, arguments: [testCommand, "--version"])
 
         // run latest version
-        let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
+        let latestPackage = try mint.run(repo: repo, version: "", arguments: [testCommand])
         expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
@@ -132,6 +157,7 @@ class MintTests: XCTestCase {
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
+      }
     }
 
     func testMintErrors() {
