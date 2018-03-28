@@ -142,5 +142,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
 - mint run [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
 - mint run [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
+- mint run [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
 
 Feel free to add your own!
