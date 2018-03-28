@@ -194,8 +194,12 @@ public struct Mint {
 
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
+
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+
         print("🌱  Building \(package.name). This may take a few minutes...")
-        try runCommand("swift build -c release", at: packageCheckoutPath, verbose: verbose)
+        try runCommand("swift build -c release -Xswiftc -target -Xswiftc \(target)", at: packageCheckoutPath, verbose: verbose)
 
         print("🌱  Installing \(package.name)...")
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
