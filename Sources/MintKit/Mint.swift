@@ -4,9 +4,16 @@ import Rainbow
 import SwiftShell
 import Utility
 
+private let resourcesDir: String = {
+    let executablePath = Bundle.main.executablePath!
+    let usrlocalbin = Path(executablePath).components.dropLast().joined(separator: "/")
+    let resourcesDir = Path(usrlocalbin).parent() + "lib/mint/resources/"
+    return resourcesDir.string
+}()
+
 public struct Mint {
 
-    public static let version = "0.7.1"
+    public static let version = "0.7.2-toshi0383-a"
 
     let path: Path
     let installationPath: Path
@@ -97,6 +104,12 @@ public struct Mint {
         return versionsByPackage
     }
 
+    public func archive(executableNames: [String]) throws {
+        let names = executableNames.joined(separator: " ")
+        let archiveTool = "\(resourcesDir)/lib/archive-binary.sh"
+        try runCommand("\(archiveTool) \(names)", at: .current, verbose: true)
+    }
+
     @discardableResult
     public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
@@ -130,18 +143,31 @@ public struct Mint {
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
+    public func install(repo: String, version: String, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false, binary: Bool = false) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = command ?? guessedCommand
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, update: update, verbose: verbose, global: global)
+        try install(package, update: update, verbose: verbose, global: global, binary: binary)
         return package
     }
 
-    public func install(_ package: Package, update: Bool = false, verbose: Bool = false, global: Bool = false) throws {
+    public func install(_ package: Package, update: Bool = false, verbose: Bool = false, global: Bool = false, binary: Bool = false) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
+        }
+
+        if binary {
+            print("🌱  Performing binary install.".green)
+            let installCommand = "\(resourcesDir)/lib/install-binary.sh \(package.repo) \(package.version)"
+            try runCommand(installCommand, at: .current, verbose: true)
+            //let output = main.run(bash: )
+            //guard output.succeeded else {
+            //    print("🌱  Could not install \(package.repo)@\(package.version)")
+            //    exit(1)
+            //}
+            //print("🌱  Installed \(package.repo) \(package.version).".green)
+            return
         }
 
         let packagePath = PackagePath(path: packagesPath, package: package)

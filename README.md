@@ -16,6 +16,7 @@ Mint is designed to be used with Swift command line tools that build with the Sw
 
 - ✅ easily run a specific **version** of a tool
 - ✅ install a tool **globally**
+- ✅ **binary install** option
 - ✅ builds are **cached** by version
 - ✅ use **different versions** of a tool side by side
 - ✅ easily run the **latest** version of a tool
@@ -103,6 +104,7 @@ Run, install and update commands have 1 or 2 arguments:
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
 $ mint install yonaskolb/XcodeGen@1.2.4 --global=false # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
+$ mint install yonaskolb/XcodeGen --binary # Download binary instead of clone and build.
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ```
@@ -132,6 +134,22 @@ MyOtherFiles
 ```
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
 
+**NOTE**: In case of binary install, resources are copied into `/usr/local/lib/${your-tool}/resources/`.
+
+### How to support binary install
+Binary install is currently supported for only tools hosted on GitHub.
+Binary install is a lot faster than building from source, so you definitely should support it.
+
+To do that, just run `mint archive [<executable>]` in your project dir.
+
+e.g.
+
+```
+$ mint archive cmdshelf
+```
+
+This will create a zip file including `bin/cmdshelf`. Make sure you upload the zip file to github release page.  
+So your user is going to run `mint install toshi0383/cmdshelf --binary` and it's installed under `/usr/local/`.
 
 ## A list of popular Mint compatible tools 🌱
 
