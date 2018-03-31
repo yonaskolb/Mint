@@ -5,7 +5,7 @@ import XCTest
 
 class MintTests: XCTestCase {
 
-    let mint = Mint(path: Path.temporary + "mint", installationPath: Path.temporary + "mint-installs")
+    let mint = Mint(path: Path.temporary + "mint", installationPath: Path.temporary + "mint-installs", standardOutput: { _ in })
     let testRepo = "yonaskolb/simplepackage"
     let sshTestRepo = "git@github.com:yonaskolb/simplepackage.git"
     let testVersion = "2.0.0"
