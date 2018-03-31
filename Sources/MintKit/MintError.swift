@@ -1,6 +1,6 @@
 import Foundation
 
-public enum MintError: Error, CustomStringConvertible, Equatable {
+public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError {
     case packageNotFound(String)
     case repoNotFound(String)
     case invalidCommand(String)
@@ -17,5 +17,9 @@ public enum MintError: Error, CustomStringConvertible, Equatable {
 
     public static func == (lhs: MintError, rhs: MintError) -> Bool {
         return lhs.description == rhs.description
+    }
+
+    public var errorDescription: String? {
+        return description
     }
 }
