@@ -36,7 +36,6 @@ Make sure Xcode 9.2 is installed first.
 ### Homebrew
 
 ```sh
-$ brew tap yonaskolb/Mint https://github.com/yonaskolb/Mint.git
 $ brew install mint
 ```
 
