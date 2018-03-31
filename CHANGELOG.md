@@ -2,6 +2,17 @@
 
 ## Master
 
+## 0.8.0
+
+- add ssh support #60 @Lutzifer
+- add `--silent` argument #64 @yonaskolb
+- build packages using the current version of macOS #61 @LinusU
+- show globally installed packages with a `*` in `mint list` #56 @yutailang0119
+- Move homebrew formula from this repo to official homebrew repo (no more custom tap required) #63 yonaskolb
+- help output changes #55 @pixyzehn
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.7.1...0.8.0)
+
 ## 0.7.1
 
 - add backwards compatibility for `mint run` calls still using quotes
