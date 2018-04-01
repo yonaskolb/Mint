@@ -7,8 +7,9 @@ class PackageCommand: MintCommand {
     var packageArgument: PositionalArgument<String>!
   
 
-    override init(mint: Mint, parser: ArgumentParser, name: String, description: String) {
-        super.init(mint: mint, parser: parser, name: name, description: description)
+    override init(mint: Mint, parser: ArgumentParser, name: String, description: String, installationPathArgument: OptionArgument<String>, pathArgument: OptionArgument<String>) {
+      super.init(mint: mint, parser: parser, name: name, description: description, installationPathArgument: installationPathArgument,
+                 pathArgument: pathArgument)
 
         let packageHelp = """
         The identifier for the Swift Package to use. It can be a shorthand for a github repo \"githubName/repo\", or a fully qualified .git path.
