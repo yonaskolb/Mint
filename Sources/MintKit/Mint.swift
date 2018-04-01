@@ -8,23 +8,17 @@ public class Mint {
 
     public static let version = "0.7.1"
 
-    let path: Path
-    let installationPath: Path
-
-    var packagesPath: Path {
+    func packagesPath(for path: Path) -> Path {
         return path + "packages"
     }
 
-    var metadataPath: Path {
+    func metadataPath(for path: Path) -> Path {
         return path + "metadata.json"
     }
-
     var standardOutput: (String) -> Void
     var errorOutput: (String) -> Void
 
     public init(
-        path: Path = "/usr/local/lib/mint",
-        installationPath: Path = "/usr/local/bin",
         standardOutput: @escaping (String) -> Void = { string in
             print(string)
         },
@@ -33,46 +27,44 @@ public class Mint {
         }) {
         self.standardOutput = standardOutput
         self.errorOutput = errorOutput
-        self.path = path.absolute()
-        self.installationPath = installationPath.absolute()
     }
 
     struct Metadata: Codable {
         var packages: [String: String]
     }
 
-    func writeMetadata(_ metadata: Metadata) throws {
+    func writeMetadata(_ metadata: Metadata, to path: Path) throws {
         let data = try JSONEncoder().encode(metadata)
-        try metadataPath.write(data)
+        try metadataPath(for: path).write(data)
     }
 
-    func readMetadata() throws -> Metadata {
-        guard metadataPath.exists else {
+  func readMetadata(at path: Path) throws -> Metadata {
+        guard metadataPath(for: path).exists else {
             return Metadata(packages: [:])
         }
-        let data: Data = try metadataPath.read()
+        let data: Data = try metadataPath(for: path).read()
         return try JSONDecoder().decode(Metadata.self, from: data)
     }
 
-    func addPackage(git: String, path: Path) throws {
-        var metadata = try readMetadata()
-        metadata.packages[git] = path.lastComponent
-        try writeMetadata(metadata)
+  func addPackage(git: String, packagePath: Path, mintPath: Path) throws {
+      var metadata = try readMetadata(at: mintPath)
+        metadata.packages[git] = packagePath.lastComponent
+      try writeMetadata(metadata, to: mintPath)
     }
 
-    func getPackageGit(name: String) throws -> String? {
-        let metadata = try readMetadata()
+  func getPackageGit(name: String, mintPath: Path) throws -> String? {
+    let metadata = try readMetadata(at: mintPath)
         return metadata.packages.first(where: { $0.key.lowercased().contains(name.lowercased()) })?.key
     }
 
-    func getGlobalInstalledPackages() -> [String: String] {
+  func getGlobalInstalledPackages(installationPath: Path, mintPath: Path) -> [String: String] {
         guard installationPath.exists,
             let packages = try? installationPath.children() else {
                 return [:]
         }
 
         return packages.reduce(into: [:]) { result, package in
-            guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: path),
+            guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: mintPath),
                 case let .mint(version) = installStatus.status,
                 let symlink = try? package.symlinkDestination() else {
                     return
@@ -83,16 +75,16 @@ public class Mint {
     }
 
     @discardableResult
-    public func listPackages() throws -> [String: [String]] {
-        guard packagesPath.exists else {
+  public func listPackages(mintPath: Path, installationPath: Path) throws -> [String: [String]] {
+        guard packagesPath(for: mintPath).exists else {
             standardOutput("No mint packages installed")
             return [:]
         }
 
-        let globalInstalledPackages: [String: String] = getGlobalInstalledPackages()
+        let globalInstalledPackages: [String: String] = getGlobalInstalledPackages(installationPath: installationPath, mintPath: mintPath)
 
         var versionsByPackage: [String: [String]] = [:]
-        let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
+        let packages: [String] = try packagesPath(for: mintPath).children().filter { $0.isDirectory }.map { packagePath in
             let versions = try (packagePath + "build").children().sorted().map { $0.lastComponent }
             let packageName = String(packagePath.lastComponent.split(separator: "_").last!)
             var package = "  \(packageName)"
@@ -111,7 +103,7 @@ public class Mint {
     }
 
     @discardableResult
-    public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
+  public func run(repo: String, version: String, verbose: Bool = false, mintPath: Path, installPath: Path, arguments: [String]? = nil) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = arguments?.first ?? guessedCommand
         var arguments = arguments ?? [guessedCommand]
@@ -119,45 +111,47 @@ public class Mint {
         var git = repo
         if !git.contains("/") {
             // find repo
-            if let existingGit = try getPackageGit(name: git) {
+            if let existingGit = try getPackageGit(name: git, mintPath: mintPath) {
                 git = existingGit
             } else {
                 throw MintError.packageNotFound(git)
             }
         }
         let package = Package(repo: git, version: version, name: name)
-        try run(package, arguments: arguments, verbose: verbose)
+      
+        try run(package, arguments: arguments, verbose: verbose, mintPath: mintPath, installationPath: installPath)
+      
         return package
     }
 
-    public func run(_ package: Package, arguments: [String], verbose: Bool) throws {
-        try install(package, update: false, verbose: verbose, global: false)
+  public func run(_ package: Package, arguments: [String], verbose: Bool, mintPath: Path, installationPath: Path) throws {
+    try install(package, mintPath: mintPath, installationPath: installationPath, update: false, verbose: verbose, global: false)
         standardOutput("🌱  Running \(package.commandVersion)...")
 
         var context = CustomContext(main)
         context.env["MINT"] = "YES"
         context.env["RESOURCE_PATH"] = ""
 
-        let packagePath = PackagePath(path: packagesPath, package: package)
+        let packagePath = PackagePath(path: packagesPath(for: mintPath), package: package)
         try context.runAndPrint(packagePath.commandPath.string, arguments)
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
+  public func install(repo: String, version: String, mintPath: Path, installationPath: Path, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = command ?? guessedCommand
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, update: update, verbose: verbose, global: global)
+      try install(package, mintPath: mintPath, installationPath: installationPath, update: update, verbose: verbose, global: global)
         return package
     }
 
-    public func install(_ package: Package, update: Bool = false, verbose: Bool = false, global: Bool = false) throws {
+  public func install(_ package: Package, mintPath: Path, installationPath: Path, update: Bool = false, verbose: Bool = false, global: Bool = false) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
         }
 
-        let packagePath = PackagePath(path: packagesPath, package: package)
+        let packagePath = PackagePath(path: packagesPath(for: mintPath), package: package)
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
@@ -185,7 +179,7 @@ public class Mint {
 
         if !update && packagePath.commandPath.exists {
             if global {
-                try installGlobal(packagePath: packagePath)
+                try installGlobal(packagePath: packagePath, installationPath: installationPath)
             } else {
                 standardOutput("🌱  \(package.commandVersion) already installed".green)
             }
@@ -238,22 +232,22 @@ public class Mint {
             }
         }
 
-        try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
+        try addPackage(git: packagePath.gitPath, packagePath: packagePath.packagePath, mintPath: mintPath)
 
         standardOutput("🌱  Installed \(package.commandVersion)".green)
         if global {
-            try installGlobal(packagePath: packagePath)
+            try installGlobal(packagePath: packagePath, installationPath: installationPath)
         }
 
         try? packageCheckoutPath.delete()
     }
 
-    func installGlobal(packagePath: PackagePath) throws {
+  func installGlobal(packagePath: PackagePath, installationPath: Path) throws {
 
         let toolPath = packagePath.commandPath
         let installPath = installationPath + packagePath.package.name
 
-        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
+        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath(for: installationPath))
 
         if let warning = installStatus.warning {
             let ok = Question().confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
@@ -278,10 +272,10 @@ public class Mint {
         standardOutput("🌱  \(confirmation).".green)
     }
 
-    public func uninstall(name: String) throws {
+  public func uninstall(name: String, installPath: Path, mintPath: Path) throws {
 
         // find packages
-        var metadata = try readMetadata()
+        var metadata = try readMetadata(at: installPath)
         let packages = metadata.packages.filter { $0.key.lowercased().contains(name.lowercased()) }
 
         // remove package
@@ -290,13 +284,13 @@ public class Mint {
             errorOutput("🌱  \(name.quoted) package was not found".red)
         case 1:
             let package = packages.first!.value
-            let packagePath = packagesPath + package
+            let packagePath = packagesPath(for: mintPath) + package
             try? packagePath.delete()
             standardOutput("🌱  \(name) was uninstalled")
         default:
             // TODO: ask for user input about which to delete
             for package in packages {
-                let packagePath = packagesPath + package.value
+                let packagePath = packagesPath(for: mintPath) + package.value
                 try? packagePath.delete()
             }
 
@@ -307,12 +301,12 @@ public class Mint {
         for (key, _) in packages {
             metadata.packages[key] = nil
         }
-        try writeMetadata(metadata)
+      try writeMetadata(metadata, to: installPath)
 
         // remove global install
-        let installPath = installationPath + name
+        let installPath = installPath + name
 
-        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
+        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath(for: mintPath))
 
         if let warning = installStatus.warning {
             let ok = Question().confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
