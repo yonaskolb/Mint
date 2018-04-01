@@ -28,18 +28,5 @@ class MintCommand {
         self.pathArgument = pathArgument
     }
 
-    func execute(parsedArguments: ArgumentParser.Result) throws {
-//      if let path = parsedArguments.get(pathArgument) {
-//        self.path = Path(path)
-//      } else {
-//        self.path = (path ?? MintCommand.defaultPath).absolute()
-//      }
-//      
-//      if let installationPath = parsedArguments.get(installationPathArgument) {
-//        self.installationPath = Path(installationPath)
-//      } else {
-//        self.installationPath = (installationPath ?? MintCommand.defaultInstallationPath).absolute()
-//      }
-
-    }
+    func execute(parsedArguments: ArgumentParser.Result) throws {}
 }

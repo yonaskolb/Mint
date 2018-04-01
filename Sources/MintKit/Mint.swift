@@ -8,9 +8,6 @@ public class Mint {
 
     public static let version = "0.7.1"
 
-//    let path: Path
-//    let installationPath: Path
-//
     func packagesPath(for path: Path) -> Path {
         return path + "packages"
     }
@@ -18,18 +15,10 @@ public class Mint {
     func metadataPath(for path: Path) -> Path {
         return path + "metadata.json"
     }
-
-
-//    public init(path: Path = "/usr/local/lib/mint", installationPath: Path = "/usr/local/bin") {
-//        self.path = path.absolute()
-//        self.installationPath = installationPath.absolute()
-//    }
     var standardOutput: (String) -> Void
     var errorOutput: (String) -> Void
 
     public init(
-//        path: Path = "/usr/local/lib/mint",
-//        installationPath: Path = "/usr/local/bin",
         standardOutput: @escaping (String) -> Void = { string in
             print(string)
         },
@@ -38,8 +27,6 @@ public class Mint {
         }) {
         self.standardOutput = standardOutput
         self.errorOutput = errorOutput
-//        self.path = path.absolute()
-//        self.installationPath = installationPath.absolute()
     }
 
     struct Metadata: Codable {

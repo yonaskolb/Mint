@@ -20,8 +20,6 @@ class PackageCommand: MintCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result) throws {
-
-
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 
