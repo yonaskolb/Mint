@@ -24,7 +24,7 @@ class PackageCommand: MintCommand {
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 
-       let packageInfo = PackageInfo(package: package)
+        let packageInfo = PackageInfo(package: package)
 
         try execute(parsedArguments: parsedArguments, repo: packageInfo.repo, version: packageInfo.version, verbose: verbose)
     }
