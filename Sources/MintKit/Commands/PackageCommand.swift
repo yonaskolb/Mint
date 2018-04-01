@@ -5,6 +5,7 @@ class PackageCommand: MintCommand {
 
     var verboseArgument: OptionArgument<Bool>!
     var packageArgument: PositionalArgument<String>!
+  
 
     override init(mint: Mint, parser: ArgumentParser, name: String, description: String) {
         super.init(mint: mint, parser: parser, name: name, description: description)
@@ -18,6 +19,8 @@ class PackageCommand: MintCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result) throws {
+
+
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 

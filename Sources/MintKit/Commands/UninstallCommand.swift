@@ -11,7 +11,8 @@ class UninstallCommand: MintCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result) throws {
-        let package = parsedArguments.get(packageArgument)!
-        try mint.uninstall(name: package)
+      try super.execute(parsedArguments: parsedArguments)
+      let package = parsedArguments.get(packageArgument)!
+        try mint.uninstall(name: package, installPath: installationPath!, mintPath: mintPath(parsedArguments: parsedArguments))
     }
 }

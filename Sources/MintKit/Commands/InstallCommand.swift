@@ -42,9 +42,11 @@ class InstallOrUpdateCommand: PackageCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
+        try super.execute(parsedArguments: parsedArguments, repo: repo, version: version, verbose: verbose)
+      
         let executable = parsedArguments.get(executableArgument)
         let global = parsedArguments.get(globalArgument) ?? true
 
-        try mint.install(repo: repo, version: version, command: executable, update: update, verbose: verbose, global: global)
+      try mint.install(repo: repo, version: version, mintPath: self.mintPath(parsedArguments: parsedArguments), installationPath:self.installationPath!, command: executable, update: update, verbose: verbose, global: global)
     }
 }

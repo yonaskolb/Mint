@@ -11,7 +11,9 @@ class RunCommand: PackageCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
-        var arguments = parsedArguments.get(commandArgument)
+      try super.execute(parsedArguments: parsedArguments, repo: repo, version: version, verbose: verbose)
+      
+      var arguments = parsedArguments.get(commandArgument)
 
         // backwards compatability for arguments surrounded in quotes
         if let args = arguments,
@@ -20,6 +22,7 @@ class RunCommand: PackageCommand {
             firstArg.contains(" ") {
             arguments = firstArg.split(separator: " ").map(String.init)
         }
-        try mint.run(repo: repo, version: version, verbose: verbose, arguments: arguments)
+      
+      try mint.run(repo: repo, version: version, verbose: verbose, mintPath: self.mintPath(parsedArguments: parsedArguments), installPath: self.installationPath!, arguments: arguments)
     }
 }
