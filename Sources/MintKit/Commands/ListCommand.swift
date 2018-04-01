@@ -14,6 +14,7 @@ class ListCommand: MintCommand {
     }
 
     override func execute(parsedArguments: ArgumentParser.Result) throws {
+        try super.execute(parsedArguments: parsedArguments)
         try mint.listPackages()
     }
 }
