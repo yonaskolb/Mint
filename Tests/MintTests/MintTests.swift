@@ -127,36 +127,35 @@ class MintTests: XCTestCase {
     }
 
     func testRunCommand() throws {
-        try [testRepo, sshTestRepo].forEach { repo in
-            // run a specific version
-            let specificPackage = try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
-            expectMintVersion(package: specificPackage)
 
-            // run an already installed version
-            try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
+        // run a specific version
+        let specificPackage = try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+        expectMintVersion(package: specificPackage)
 
-            // run without arguments
-            try mint.run(repo: repo, version: testVersion, arguments: [testCommand])
+        // run an already installed version
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
 
-            // run with arguments
-            try mint.run(repo: repo, version: testVersion, arguments: [testCommand, "--version"])
+        // run without arguments
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
 
-            // run latest version
-            let latestPackage = try mint.run(repo: repo, version: "", arguments: [testCommand])
-            expectMintVersion(package: latestPackage)
-            XCTAssertEqual(latestPackage.version, latestVersion)
+        // run with arguments
+        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
 
-            // check package list has installed versions
-            let installedPackages = try mint.listPackages()
-            XCTAssertEqual(installedPackages[testCommand, default: []], [testVersion, latestPackage.version])
-            XCTAssertEqual(installedPackages.count, 1)
+        // run latest version
+        let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
+        expectMintVersion(package: latestPackage)
+        XCTAssertEqual(latestPackage.version, latestVersion)
 
-            // uninstall
-            try mint.uninstall(name: testCommand)
+        // check package list has installed versions
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages[testCommand, default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages.count, 1)
 
-            // check package list is empty
-            XCTAssertTrue(try mint.listPackages().isEmpty)
-        }
+        // uninstall
+        try mint.uninstall(name: testCommand)
+
+        // check package list is empty
+        XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
     func testMintErrors() {
