@@ -212,7 +212,7 @@ public class Mint {
         let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
 
         standardOutput("🌱  Building \(package.name). This may take a few minutes...")
-        try runCommand("swift build -c release -Xswiftc -target -Xswiftc \(target)", at: packageCheckoutPath, verbose: verbose)
+        try runCommand("swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib", at: packageCheckoutPath, verbose: verbose)
 
         standardOutput("🌱  Installing \(package.name)...")
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
