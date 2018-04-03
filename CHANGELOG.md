@@ -7,6 +7,7 @@
 - add ssh support #60 @Lutzifer
 - add `--silent` argument #64 @yonaskolb
 - build packages using the current version of macOS #61 @LinusU
+- bundle Swift with installations, so they don't fail with Swift updates #70 @yonaskolb
 - show globally installed packages with a `*` in `mint list` #56 @yutailang0119
 - Move homebrew formula from this repo to official homebrew repo (no more custom tap required) #63 yonaskolb
 - help output changes #55 @pixyzehn
