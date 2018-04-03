@@ -6,7 +6,7 @@ import Utility
 
 public class Mint {
 
-    public static let version = "0.7.1"
+    public static let version = "0.8.0"
 
     let path: Path
     let installationPath: Path
@@ -30,7 +30,7 @@ public class Mint {
         },
         errorOutput: @escaping (String) -> Void = { string in
             print(string)
-        }) {
+    }) {
         self.standardOutput = standardOutput
         self.errorOutput = errorOutput
         self.path = path.absolute()
@@ -68,14 +68,14 @@ public class Mint {
     func getGlobalInstalledPackages() -> [String: String] {
         guard installationPath.exists,
             let packages = try? installationPath.children() else {
-                return [:]
+            return [:]
         }
 
         return packages.reduce(into: [:]) { result, package in
             guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: path),
                 case let .mint(version) = installStatus.status,
                 let symlink = try? package.symlinkDestination() else {
-                    return
+                return
             }
             let packageName = String(symlink.parent().parent().parent().lastComponent.split(separator: "_").last!)
             result[packageName] = version

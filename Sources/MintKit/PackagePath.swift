@@ -32,7 +32,7 @@ struct PackagePath {
             return url.absoluteString
         } else {
             if string.contains("@") {
-              return string
+                return string
             } else if string.contains("github.com") {
                 return "https://\(string).git"
             } else if string.contains(".") {
