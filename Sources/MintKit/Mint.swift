@@ -8,8 +8,8 @@ public class Mint {
 
     public static let version = "0.8.0"
 
-    let path: Path
-    let installationPath: Path
+    var path: Path
+    var installationPath: Path
 
     var packagesPath: Path {
         return path + "packages"

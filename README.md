@@ -109,6 +109,10 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
 ### Global installs
 By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--global=false` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
+### Advanced
+- You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
+- You can set `MINT_PATH` and `MINT_INSTALL_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
+
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
 

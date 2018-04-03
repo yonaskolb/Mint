@@ -1,5 +1,6 @@
 import Foundation
 import Utility
+import PathKit
 
 class MintCommand {
 
@@ -12,5 +13,11 @@ class MintCommand {
     }
 
     func execute(parsedArguments: ArgumentParser.Result) throws {
+        if let mintPath = ProcessInfo.processInfo.environment["MINT_PATH"], !mintPath.isEmpty {
+            mint.path = Path(mintPath)
+        }
+        if let mintInstallPath = ProcessInfo.processInfo.environment["MINT_INSTALL_PATH"], !mintInstallPath.isEmpty {
+            mint.installationPath = Path(mintInstallPath)
+        }
     }
 }

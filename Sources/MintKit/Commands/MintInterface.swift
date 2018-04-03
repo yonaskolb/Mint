@@ -2,7 +2,7 @@ import Basic
 import Foundation
 import Utility
 
-public class MintInterace {
+public class MintInterface {
 
     let mint: Mint
 
