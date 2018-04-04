@@ -66,7 +66,8 @@ struct Mintfile {
     packageInfos
       .map { $0.repo }
       .reduce(into: occurences) { (occurences, repo) in
-        occurences[repo] = (occurences[repo] ?? 0) + 1
+        let count = occurences[repo]
+        occurences[repo] = (count ?? 0) + 1
       }.filter { (_, count) -> Bool in
       count != 1
       }.forEach { (repo, _) in
