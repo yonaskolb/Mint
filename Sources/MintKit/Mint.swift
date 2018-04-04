@@ -199,11 +199,8 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
         standardOutput("🌱  Cloning \(packagePath.gitPath) \(package.version)...")
-        do {
-            try runCommand("git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)", at: checkoutPath, verbose: verbose)
-        } catch {
-            throw MintError.repoNotFound(packagePath.gitPath)
-        }
+        
+        try runInstallCommand("git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)", at: checkoutPath, verbose: verbose)
 
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
@@ -212,7 +209,7 @@ public class Mint {
         let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
 
         standardOutput("🌱  Building \(package.name). This may take a few minutes...")
-        try runCommand("swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib", at: packageCheckoutPath, verbose: verbose)
+        try runInstallCommand("swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib", at: packageCheckoutPath, verbose: verbose)
 
         standardOutput("🌱  Installing \(package.name)...")
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
@@ -323,15 +320,15 @@ public class Mint {
         try? installPath.delete()
     }
 
-    private func runCommand(_ command: String, at: Path, verbose: Bool) throws {
+    private func runInstallCommand(_ command: String, at: Path, verbose: Bool) throws {
         var context = CustomContext(main)
         context.currentdirectory = at.string
         if verbose {
             try context.runAndPrint(bash: command)
         } else {
             let output = context.run(bash: command)
-            if let error = output.error {
-                throw error
+            if let error = output.error{
+                throw MintError.buildError(error, output.stderror)
             }
         }
     }
