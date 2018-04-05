@@ -9,7 +9,7 @@ import Foundation
 import PathKit
 
 struct Mintfile {
-  static let defaultPath = Path(FileManager.default.currentDirectoryPath) + ".mintfile"
+  static let defaultPath = Path(FileManager.default.currentDirectoryPath) + "Mintfile"
   
   static func `default`() -> Mintfile? {
     return self.init(path: Mintfile.defaultPath)
