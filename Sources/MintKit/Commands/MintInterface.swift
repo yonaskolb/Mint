@@ -20,6 +20,7 @@ public class MintInterface {
             "update": UpdateCommand(mint: mint, parser: parser),
             "uninstall": UninstallCommand(mint: mint, parser: parser),
             "list": ListCommand(mint: mint, parser: parser),
+            "which": WhichCommand(mint: mint, parser: parser),
         ]
 
         let parsedArguments = try parser.parse(arguments)

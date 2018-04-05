@@ -82,6 +82,42 @@ public class Mint {
         }
     }
 
+    func getPackage(repo: String, version: String, name: String) throws -> Package {
+        if repo.contains("/") {
+            return Package(repo: repo, version: version, name: name)
+        }
+
+        guard let existingGit = try getPackageGit(name: repo) else {
+            throw MintError.packageNotFound(repo)
+        }
+
+        return Package(repo: existingGit, version: version, name: name)
+    }
+
+    func getPackagePath(for package: Package) -> PackagePath {
+        return PackagePath(path: packagesPath, package: package)
+    }
+
+    func findLatestVersion(of packagePath: PackagePath) throws -> String {
+        let tagOutput = main.run(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
+        if !tagOutput.succeeded {
+            throw MintError.repoNotFound(packagePath.gitPath)
+        }
+
+        let tagReferences = tagOutput.stdout
+        if tagReferences.isEmpty {
+            return "master"
+        }
+
+        let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
+        let versions = Git.convertTagsToVersionMap(tags)
+        if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
+            return tag
+        } else {
+            return "master"
+        }
+    }
+
     @discardableResult
     public func listPackages() throws -> [String: [String]] {
         guard packagesPath.exists else {
@@ -110,22 +146,26 @@ public class Mint {
         return versionsByPackage
     }
 
+    public func which(repo: String, version: String, command: String? = nil) throws -> String {
+        let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        let name = command ?? guessedCommand
+        let package = try getPackage(repo: repo, version: version, name: name)
+        let packagePath = getPackagePath(for: package)
+
+        if package.version.isEmpty {
+            package.version = try findLatestVersion(of: packagePath)
+        }
+
+        return packagePath.commandPath.string
+    }
+
     @discardableResult
     public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = arguments?.first ?? guessedCommand
         var arguments = arguments ?? [guessedCommand]
         arguments = arguments.count > 1 ? Array(arguments.dropFirst()) : []
-        var git = repo
-        if !git.contains("/") {
-            // find repo
-            if let existingGit = try getPackageGit(name: git) {
-                git = existingGit
-            } else {
-                throw MintError.packageNotFound(git)
-            }
-        }
-        let package = Package(repo: git, version: version, name: name)
+        let package = try getPackage(repo: repo, version: version, name: name)
         try run(package, arguments: arguments, verbose: verbose)
         return package
     }
@@ -138,7 +178,7 @@ public class Mint {
         context.env["MINT"] = "YES"
         context.env["RESOURCE_PATH"] = ""
 
-        let packagePath = PackagePath(path: packagesPath, package: package)
+        let packagePath = getPackagePath(for: package)
         try context.runAndPrint(packagePath.commandPath.string, arguments)
     }
 
@@ -157,29 +197,12 @@ public class Mint {
             throw MintError.invalidRepo(package.repo)
         }
 
-        let packagePath = PackagePath(path: packagesPath, package: package)
+        let packagePath = getPackagePath(for: package)
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
             standardOutput("🌱  Finding latest version of \(package.name)")
-            let tagOutput = main.run(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
-
-            if !tagOutput.succeeded {
-                throw MintError.repoNotFound(packagePath.gitPath)
-            }
-            let tagReferences = tagOutput.stdout
-            if tagReferences.isEmpty {
-                package.version = "master"
-            } else {
-                let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
-                let versions = Git.convertTagsToVersionMap(tags)
-                if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
-                    package.version = tag
-                } else {
-                    package.version = "master"
-                }
-            }
-
+            package.version = try findLatestVersion(of: packagePath)
             standardOutput("🌱  Resolved latest version of \(package.name) to \(package.version)")
         }
 
