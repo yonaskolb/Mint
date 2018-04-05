@@ -14,9 +14,9 @@ do {
         case .returnedErrorCode: break
         }
     } else if error._domain == NSCocoaErrorDomain {
-        print("🌱  \(error.localizedDescription)".red)
+        print("\(error.localizedDescription)".red)
     } else {
-        print("🌱  \(error)".red)
+        print("\(error)".red)
     }
     exit(1)
 }
