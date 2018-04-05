@@ -23,18 +23,17 @@ class PackageCommand: MintCommand {
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 
-        var packageInfo = PackageInfo(package: package)
+        var mintPackage = MintPackage(package: package)
       
-        if packageInfo.version.isEmpty, let mintfile = Mintfile.default() {
+        if mintPackage.version.isEmpty, let mintfile = Mintfile.default() {
           // set version to version from mintfile
-          let version = mintfile.version(for: packageInfo.repo)
-          if !version.isEmpty {
-            print("🌱  Using version \"\(version)\" for \"\(packageInfo.repo)\" from Mintfile.")
-            packageInfo = PackageInfo(version: version, repo: packageInfo.repo)
+          if let version = mintfile.version(for: mintPackage.repo), !version.isEmpty {
+            print("🌱  Using version \"\(version)\" for \"\(mintPackage.repo)\" from Mintfile.")
+            mintPackage = MintPackage(version: version, repo: mintPackage.repo)
           }
         }
 
-        try execute(parsedArguments: parsedArguments, repo: packageInfo.repo, version: packageInfo.version, verbose: verbose)
+        try execute(parsedArguments: parsedArguments, repo: mintPackage.repo, version: mintPackage.version, verbose: verbose)
     }
 
     func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {

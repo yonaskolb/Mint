@@ -9,35 +9,31 @@ import Foundation
 import PathKit
 
 struct Mintfile {
-  static let defaultPath = Path(FileManager.default.currentDirectoryPath) + "Mintfile"
+  static let defaultPath = Path("Mintfile")
   
   static func `default`() -> Mintfile? {
     return self.init(path: Mintfile.defaultPath)
   }
   
-  let packageInfos: [PackageInfo]
+  let packages: [MintPackage]
   
-  public func version(for repo: String) -> String {
-    return packageInfos.first { $0.repo == repo }?.version ?? ""
+  public func version(for repo: String) -> String? {
+    return packages.first { $0.repo == repo }?.version
   }
   
   init?(path: Path) {
-    guard FileManager.default.fileExists(atPath: path.string) else {
+    guard path.exists else {
       return nil
     }
     
-    guard let contents = try? String(contentsOfFile: path.string, encoding: .utf8) else {
+    guard let contents: String = try? path.read() else {
       fatalError("Could not read mintfile at \(path).")
     }
     
     self.init(string: contents)
   }
   
-  init?(string: String) {
-    guard !string.isEmpty else {
-      return nil
-    }
-    
+  init(string: String) {
     let lines = string
       .split(separator: "\n")
       .map{$0.trimmingCharacters(in: .whitespacesAndNewlines)}
@@ -51,31 +47,22 @@ struct Mintfile {
       let linesWithoutTrailingComments = linesWithoutCommentLines.flatMap { $0.split(separator: "#").first }
     #endif
     
-    self.packageInfos = linesWithoutTrailingComments
+    self.packages = linesWithoutTrailingComments
       .map{$0.trimmingCharacters(in: .whitespacesAndNewlines)}
-      .map { PackageInfo(package: String($0)) }
+      .map { MintPackage(package: String($0)) }
     
     // Print warning for empty version
-    packageInfos
+    packages
       .filter { $0.version.isEmpty }
       .forEach { print("🌱  MINTFILE: repository \($0.repo) has no defined version. Specify a version using <Repo>@<Commitish>.") }
 
     // Print warning for multiple definitions
-    let occurences = [String: Int]()
+    let duplicates = Dictionary(grouping: packages, by: { $0.repo })
+      .filter { $0.value.count > 1 }
+      .mapValues { $0.map { $0.version } }
     
-    packageInfos
-      .map { $0.repo }
-      .reduce(into: occurences) { (occurences, repo) in
-        let count = occurences[repo]
-        occurences[repo] = (count ?? 0) + 1
-      }.filter { (_, count) -> Bool in
-      count != 1
-      }.forEach { (repo, _) in
-        let version = packageInfos.first { packageInfo -> Bool in
-          packageInfo.repo == repo
-        }!.version
-        
-        print("🌱  MINTFILE: repository \"\(repo)\" defined multiple times. Using version \"\(version)\".")
+    duplicates.forEach { repo, versions in
+      print("🌱  MINTFILE: repository \"\(repo)\" defined multiple times with versions \(versions.joined(separator: ", ")).")
     }
   }
   
