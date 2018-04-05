@@ -119,7 +119,7 @@ If your Swift command line tool builds with the Swift Package Manager than it wi
 ````
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
-$ mint run github_name/repo_name
+$ mint install github_name/repo_name
 ```
 ````
 
@@ -138,13 +138,13 @@ If this file is found in you repo, then all those directories will be copied int
 
 ## A list of popular Mint compatible tools 🌱
 
-- mint run [realm/SwiftLint](https://github.com/realm/SwiftLint)
-- mint run [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- mint run [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- mint run [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
-- mint run [Carthage/Carthage](https://github.com/Carthage/Carthage)
-- mint run [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
-- mint run [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
-- mint run [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
+- mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
+- mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- mint install [Carthage/Carthage](https://github.com/Carthage/Carthage)
+- mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
+- mint install [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
+- mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
 
 Feel free to add your own!
