@@ -1,6 +1,6 @@
 import Foundation
 
-struct PackageInfo {
+struct MintPackage {
     let version: String
     let repo: String
 
@@ -25,8 +25,8 @@ struct PackageInfo {
     }
 }
 
-extension PackageInfo: Equatable {
-    static func == (lhs: PackageInfo, rhs: PackageInfo) -> Bool {
+extension MintPackage: Equatable {
+    static func == (lhs: MintPackage, rhs: MintPackage) -> Bool {
         return lhs.repo == rhs.repo && lhs.version == rhs.version
     }
 }

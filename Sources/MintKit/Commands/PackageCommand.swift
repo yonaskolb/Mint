@@ -1,5 +1,6 @@
 import Foundation
 import Utility
+import PathKit
 
 class PackageCommand: MintCommand {
 
@@ -22,9 +23,17 @@ class PackageCommand: MintCommand {
         let verbose = parsedArguments.get(verboseArgument) ?? false
         let package = parsedArguments.get(packageArgument)!
 
-        let packageInfo = PackageInfo(package: package)
+        var mintPackage = MintPackage(package: package)
+      
+        if mintPackage.version.isEmpty, let mintfile = Mintfile.default() {
+          // set version to version from mintfile
+          if let version = mintfile.version(for: mintPackage.repo), !version.isEmpty {
+            print("🌱  Using version \"\(version)\" for \"\(mintPackage.repo)\" from Mintfile.")
+            mintPackage = MintPackage(version: version, repo: mintPackage.repo)
+          }
+        }
 
-        try execute(parsedArguments: parsedArguments, repo: packageInfo.repo, version: packageInfo.version, verbose: verbose)
+        try execute(parsedArguments: parsedArguments, repo: mintPackage.repo, version: mintPackage.version, verbose: verbose)
     }
 
     func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
