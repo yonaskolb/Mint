@@ -5,10 +5,7 @@ class ListCommand: MintCommand {
 
     init(mint: Mint, parser: ArgumentParser) {
 
-        let description = """
-        List all the currently installed packages
-        Globally installed packages are marked with *
-        """
+        let description = "List all the currently installed packages. Globally installed packages are marked with *"
 
         super.init(mint: mint, parser: parser, name: "list", description: description)
     }
