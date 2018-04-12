@@ -14,14 +14,14 @@ This would install and run [SwiftLint](https://github.com/realm/SwiftLint) versi
 
 Mint is designed to be used with Swift command line tools that build with the Swift Package Manager. It makes installing, running and distributing these tools much easier.
 
-- ✅ easily run a specific **version** of a tool
-- ✅ install a tool **globally**
+- ✅ easily run a specific **version** of a package
+- ✅ install a package **globally**
 - ✅ builds are **cached** by version
-- ✅ use **different versions** of a tool side by side
-- ✅ easily run the **latest** version of a tool
-- ✅ distribute your own tools **without recipes and formulas**
+- ✅ use **different versions** of a package side by side
+- ✅ easily run the **latest** version of a package
+- ✅ distribute your own packages **without recipes and formulas**
 
-Homebrew is a popular method of distributing Swift executables, but that requires creating a formula and then maintaining that formula. Running specific versions of homebrew installations can also be tricky as only one global version is installed at any one time. Mint installs your tool via SPM and lets you run multiple versions of that tool, which are globally installed and cached on demand.
+Homebrew is a popular method of distributing Swift executables, but that requires creating a formula and then maintaining that formula. Running specific versions of homebrew installations can also be tricky as only one global version is installed at any one time. Mint installs your package via SPM and lets you run multiple versions of that package, which are globally installed and cached on demand.
 
 If your Swift executable package builds with SPM, then it can be run with Mint! See [Support](#support) for details.
 
@@ -103,7 +103,7 @@ $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some argumen
 $ mint install yonaskolb/XcodeGen@1.2.4 --global=false # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
-$ mint run XcodeGen # use newest tag and find XcodeGen in installed tools
+$ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
 ### Global installs
@@ -136,7 +136,7 @@ MyOtherFiles
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
 
 
-## A list of popular Mint compatible tools 🌱
+## A list of popular Mint compatible packages 🌱
 
 - mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
 - mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
