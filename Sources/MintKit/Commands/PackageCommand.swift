@@ -28,8 +28,8 @@ class PackageCommand: MintCommand {
         if mintPackage.version.isEmpty, let mintfile = Mintfile.default() {
           // set version to version from mintfile
           if let version = mintfile.version(for: mintPackage.repo), !version.isEmpty {
-            print("🌱  Using version \"\(version)\" for \"\(mintPackage.repo)\" from Mintfile.")
             mintPackage = MintPackage(version: version, repo: mintPackage.repo)
+            print("🌱  Using \"\(mintPackage.repo)\" \"\(mintPackage.version)\" from Mintfile.")
           }
         }
 
