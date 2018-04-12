@@ -20,6 +20,7 @@ Mint is designed to be used with Swift command line tools that build with the Sw
 - ✅ use **different versions** of a package side by side
 - ✅ easily run the **latest** version of a package
 - ✅ distribute your own packages **without recipes and formulas**
+- ✅ specify a list of versioned packages in a **Mintfile** for easy use
 
 Homebrew is a popular method of distributing Swift executables, but that requires creating a formula and then maintaining that formula. Running specific versions of homebrew installations can also be tricky as only one global version is installed at any one time. Mint installs your package via SPM and lets you run multiple versions of that package, which are globally installed and cached on demand.
 
@@ -108,6 +109,22 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 
 ### Global installs
 By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--global=false` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
+
+### Mintfile
+A `Mintfile` can specify a list of versioned packages. It makes installing and running these packages easy, as the specific repos and versions are centralized.
+
+Simply place this file in the directory you're running Mint in. The format of the `Mintfile` is simply a list of packages in the same form as the usual package parameter:
+
+```
+yonaskolb/xcodegen@0.9.0
+yonaskolb/genesis@0.2.0
+```
+
+Then you can simply run
+
+```
+mint run xcodegen
+```
 
 ### Advanced
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
