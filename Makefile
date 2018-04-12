@@ -26,7 +26,7 @@ format_code:
 
 publish:
 	# bump homebrew version
-	brew bump-formula-pr --url=$(RELEASE_TAR) --version=$(VERSION) Mint
+	brew bump-formula-pr --url=$(RELEASE_TAR) Mint
 
 release: format_code
 	sed -i '' 's|\(static let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintKit/Mint.swift
