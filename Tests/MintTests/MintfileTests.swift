@@ -23,6 +23,7 @@ class MintfileTests: XCTestCase {
       )
       
       XCTAssertEqual(mintfile.version(for: "realm/SwiftLint"), "0.25.0")
+      XCTAssertEqual(mintfile.version(for: "SwiftLint"), "0.25.0")
       XCTAssertEqual(mintfile.version(for: "another/Repo"), nil)
     }
 

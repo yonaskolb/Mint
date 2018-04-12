@@ -18,7 +18,7 @@ struct Mintfile {
   let packages: [MintPackage]
   
   public func version(for repo: String) -> String? {
-    return packages.first { $0.repo == repo }?.version
+    return packages.first { $0.repo.contains(repo) }?.version
   }
   
   init?(path: Path) {
