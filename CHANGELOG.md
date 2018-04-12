@@ -2,6 +2,14 @@
 
 ## Master
 
+## 0.9.0
+
+- added `Mintfile` for adding a list versioned dependencies #72 @Lutzifer
+- added `MINT_PATH` and `MINT_INSTALL_PATH` environment variables #65 @yonaskolb
+- fixed build errors not being logged #71 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.8.0...0.9.0)
+
 ## 0.8.0
 
 - add ssh support #60 @Lutzifer
@@ -9,7 +17,7 @@
 - build packages using the current version of macOS #61 @LinusU
 - bundle Swift with installations, so they don't fail with Swift updates #70 @yonaskolb
 - show globally installed packages with a `*` in `mint list` #56 @yutailang0119
-- Move homebrew formula from this repo to official homebrew repo (no more custom tap required) #63 yonaskolb
+- move homebrew formula from this repo to official homebrew repo (no more custom tap required) #63 yonaskolb
 - help output changes #55 @pixyzehn
 
 [Commits](https://github.com/yonaskolb/Mint/compare/0.7.1...0.8.0)

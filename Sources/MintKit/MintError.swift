@@ -13,7 +13,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .repoNotFound(repo): return "Git repo not found at \(repo.quoted)".red
         case let .invalidCommand(command): return "Couldn't find command \(command)".red
         case let .invalidRepo(repo): return "Invalid repo \(repo.quoted)".red
-        case let .buildError(_, stderr, stdout): return "Build error:".red + "\n\(stderr)\(stdout.isEmpty ? "": "\n\nFull output:\n")\(stdout)"
+        case let .buildError(_, stderr, stdout): return "Build error:".red + "\n\(stderr)\(stdout.isEmpty ? "" : "\n\nFull output:\n")\(stdout)"
         }
     }
 

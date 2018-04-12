@@ -6,7 +6,7 @@ import Utility
 
 public class Mint {
 
-    public static let version = "0.8.0"
+    public static let version = "0.9.0"
 
     var path: Path
     var installationPath: Path
@@ -199,7 +199,7 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
         standardOutput("🌱  Cloning \(packagePath.gitPath) \(package.version)...")
-        
+
         try runInstallCommand("git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)", at: checkoutPath, verbose: verbose)
 
         try? packagePath.installPath.delete()
@@ -327,7 +327,7 @@ public class Mint {
             try context.runAndPrint(bash: command)
         } else {
             let output = context.run(bash: command)
-            if let error = output.error{
+            if let error = output.error {
                 throw MintError.buildError(error: error, stderror: output.stderror.trimmingCharacters(in: .whitespacesAndNewlines), stdout: output.stdout.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }

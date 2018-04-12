@@ -1,6 +1,6 @@
 import Foundation
-import Utility
 import PathKit
+import Utility
 
 class MintCommand {
 
