@@ -328,7 +328,7 @@ public class Mint {
         } else {
             let output = context.run(bash: command)
             if let error = output.error{
-                throw MintError.buildError(error, output.stderror)
+                throw MintError.buildError(error: error, stderror: output.stderror.trimmingCharacters(in: .whitespacesAndNewlines), stdout: output.stdout.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
     }

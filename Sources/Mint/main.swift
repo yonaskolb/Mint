@@ -16,7 +16,7 @@ do {
     } else if error._domain == NSCocoaErrorDomain {
         print("\(error.localizedDescription)".red)
     } else {
-        print("\(error)".red)
+        print("\(error)")
     }
     exit(1)
 }

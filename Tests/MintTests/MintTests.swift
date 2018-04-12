@@ -174,9 +174,8 @@ class MintTests: XCTestCase {
         let cloneError = """
         Cloning into 'invaliddomain.com_invalid'...
         fatal: unable to access 'http://invaliddomain.com/invalid/': Could not resolve host: invaliddomain.com
-
         """
-        expectError(MintError.buildError(NSError(domain: "", code: 0, userInfo: nil), cloneError)) {
+        expectError(MintError.buildError(error: NSError(domain: "", code: 0, userInfo: nil), stderror: cloneError, stdout: "")) {
             try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, arguments: ["invalid"])
         }
 
