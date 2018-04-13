@@ -10,8 +10,8 @@ struct Mintfile {
 
     let packages: [MintPackage]
 
-    public func version(for repo: String) -> String? {
-        return packages.first { $0.repo.lowercased().contains(repo.lowercased()) }?.version
+    public func package(for repo: String) -> MintPackage? {
+        return packages.first { $0.repo.lowercased().contains(repo.lowercased()) }
     }
 
     init?(path: Path) {

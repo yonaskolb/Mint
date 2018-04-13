@@ -1,26 +1,26 @@
 import Foundation
 
 struct MintPackage {
-    let version: String
     let repo: String
+    let version: String
 
-    public init(version: String, repo: String) {
-        self.version = version
+    public init(repo: String, version: String = "") {
         self.repo = repo
+        self.version = version
     }
 
     public init(package: String) {
         let packageParts = package.components(separatedBy: "@")
         if packageParts.count == 3 {
-            self.init(version: packageParts[2], repo: [packageParts[0], packageParts[1]].joined(separator: "@"))
+            self.init(repo: [packageParts[0], packageParts[1]].joined(separator: "@"), version: packageParts[2])
         } else if packageParts.count == 2 {
             if packageParts[1].contains(":") {
-                self.init(version: "", repo: [packageParts[0], packageParts[1]].joined(separator: "@"))
+                self.init(repo: [packageParts[0], packageParts[1]].joined(separator: "@"), version: "")
             } else {
-                self.init(version: packageParts[1], repo: packageParts[0])
+                self.init(repo: packageParts[0], version: packageParts[1])
             }
         } else {
-            self.init(version: "", repo: package)
+            self.init(repo: package, version: "")
         }
     }
 }

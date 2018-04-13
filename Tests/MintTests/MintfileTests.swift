@@ -13,18 +13,20 @@ class MintfileTests: XCTestCase {
 
         let mintfile = Mintfile(string: contents)
 
+        let expectedPackage = MintPackage(repo: "realm/SwiftLint", version: "0.25.0")
+        
         XCTAssertEqual(
             mintfile.packages,
             [
-                MintPackage(version: "1.8.0", repo: "yonaskolb/xcodegen"),
-                MintPackage(version: "0.25.0", repo: "realm/SwiftLint"),
+                MintPackage(repo: "yonaskolb/xcodegen", version: "1.8.0"),
+                MintPackage(repo: "realm/SwiftLint", version: "0.25.0"),
             ]
         )
-
-        XCTAssertEqual(mintfile.version(for: "realm/SwiftLint"), "0.25.0")
-        XCTAssertEqual(mintfile.version(for: "SwiftLint"), "0.25.0")
-        XCTAssertEqual(mintfile.version(for: "realm/swiftLint"), "0.25.0")
-        XCTAssertEqual(mintfile.version(for: "swiftLint"), "0.25.0")
-        XCTAssertEqual(mintfile.version(for: "another/Repo"), nil)
+        
+        XCTAssertEqual(mintfile.package(for: "realm/SwiftLint"), expectedPackage)
+        XCTAssertEqual(mintfile.package(for: "SwiftLint"), expectedPackage)
+        XCTAssertEqual(mintfile.package(for: "realm/swiftLint"), expectedPackage)
+        XCTAssertEqual(mintfile.package(for: "swiftLint"), expectedPackage)
+        XCTAssertEqual(mintfile.package(for: "another/Repo"), nil)
     }
 }
