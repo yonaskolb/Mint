@@ -14,7 +14,7 @@ class MintfileTests: XCTestCase {
         let mintfile = Mintfile(string: contents)
 
         let expectedPackage = MintPackage(repo: "realm/SwiftLint", version: "0.25.0")
-        
+
         XCTAssertEqual(
             mintfile.packages,
             [
@@ -22,7 +22,7 @@ class MintfileTests: XCTestCase {
                 MintPackage(repo: "realm/SwiftLint", version: "0.25.0"),
             ]
         )
-        
+
         XCTAssertEqual(mintfile.package(for: "realm/SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "realm/swiftLint"), expectedPackage)

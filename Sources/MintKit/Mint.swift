@@ -6,7 +6,7 @@ import Utility
 
 public class Mint {
 
-    public static let version = "0.9.0"
+    public static let version = "0.9.1"
 
     var path: Path
     var installationPath: Path

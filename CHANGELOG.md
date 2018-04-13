@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.9.1
+
+- made `Mintfile` package lookup case insensitive @yonaskolb
+- fixed `Minfile` lookup by simple name on `install`
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.9.0...0.9.1)
+
 ## 0.9.0
 
 - added `Mintfile` for adding a list versioned dependencies #72 @Lutzifer
