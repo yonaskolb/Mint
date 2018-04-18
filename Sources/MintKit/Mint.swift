@@ -1,7 +1,7 @@
 import Foundation
 import PathKit
 import Rainbow
-import SwiftShell
+import SwiftCLI
 import Utility
 
 public class Mint {
@@ -19,22 +19,26 @@ public class Mint {
         return path + "metadata.json"
     }
 
-    var standardOutput: (String) -> Void
-    var errorOutput: (String) -> Void
+    var standardOut: WritableStream
+    var standardError: WritableStream
+
+    var verbose = false
+    var createStandardInProccess = true
 
     public init(
         path: Path = "/usr/local/lib/mint",
         installationPath: Path = "/usr/local/bin",
-        standardOutput: @escaping (String) -> Void = { string in
-            print(string)
-        },
-        errorOutput: @escaping (String) -> Void = { string in
-            print(string)
-    }) {
-        self.standardOutput = standardOutput
-        self.errorOutput = errorOutput
+        standardOut: WritableStream = WriteStream.stdout,
+        stanardError: WritableStream = WriteStream.stderr) {
+        self.standardOut = standardOut
+        standardError = stanardError
         self.path = path.absolute()
         self.installationPath = installationPath.absolute()
+    }
+
+    public func closeStreams() {
+        standardOut.closeWrite()
+        standardError.closeWrite()
     }
 
     struct Metadata: Codable {
@@ -85,7 +89,7 @@ public class Mint {
     @discardableResult
     public func listPackages() throws -> [String: [String]] {
         guard packagesPath.exists else {
-            standardOutput("No mint packages installed")
+            standardOut <<< "No mint packages installed"
             return [:]
         }
 
@@ -106,12 +110,12 @@ public class Mint {
             return package
         }
 
-        standardOutput("Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))")
+        standardOut <<< "Installed mint packages:\n\(packages.sorted().joined(separator: "\n"))"
         return versionsByPackage
     }
 
     @discardableResult
-    public func run(repo: String, version: String, verbose: Bool = false, arguments: [String]? = nil) throws -> Package {
+    public func run(repo: String, version: String, arguments: [String]? = nil) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = arguments?.first ?? guessedCommand
         var arguments = arguments ?? [guessedCommand]
@@ -131,27 +135,28 @@ public class Mint {
     }
 
     public func run(_ package: Package, arguments: [String], verbose: Bool) throws {
-        try install(package, update: false, verbose: verbose, global: false)
-        standardOutput("🌱  Running \(package.commandVersion)...")
-
-        var context = CustomContext(main)
-        context.env["MINT"] = "YES"
-        context.env["RESOURCE_PATH"] = ""
-
+        try install(package, update: false, global: false)
+        standardOut <<< "🌱  Running \(package.commandVersion)..."
         let packagePath = PackagePath(path: packagesPath, package: package)
-        try context.runAndPrint(packagePath.commandPath.string, arguments)
+
+        if createStandardInProccess {
+            try Task.execvp(packagePath.commandPath.string, arguments, env: ["MINT": "YES", "RESOURCE_PATH": ""])
+        } else {
+            let runTask = Task(executable: packagePath.commandPath.string, args: arguments)
+            _ = runTask.runSync()
+        }
     }
 
     @discardableResult
-    public func install(repo: String, version: String, command: String?, update: Bool = false, verbose: Bool = false, global: Bool = false) throws -> Package {
+    public func install(repo: String, version: String, command: String?, update: Bool = false, global: Bool = false) throws -> Package {
         let guessedCommand = repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
         let name = command ?? guessedCommand
         let package = Package(repo: repo, version: version, name: name)
-        try install(package, update: update, verbose: verbose, global: global)
+        try install(package, update: update, global: global)
         return package
     }
 
-    public func install(_ package: Package, update: Bool = false, verbose: Bool = false, global: Bool = false) throws {
+    public func install(_ package: Package, update: Bool = false, global: Bool = false) throws {
 
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
@@ -161,57 +166,71 @@ public class Mint {
 
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
-            standardOutput("🌱  Finding latest version of \(package.name)")
-            let tagOutput = main.run(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
+            standardOut <<< "🌱  Finding latest version of \(package.name)"
+            do {
+                let tagOutput = try SwiftCLI.capture(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
 
-            if !tagOutput.succeeded {
+                let tagReferences = tagOutput.stdout
+                if tagReferences.isEmpty {
+                    package.version = "master"
+                } else {
+                    let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
+                    let versions = Git.convertTagsToVersionMap(tags)
+                    if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
+                        package.version = tag
+                    } else {
+                        package.version = "master"
+                    }
+                }
+
+                standardOut <<< "🌱  Resolved latest version of \(package.name) to \(package.version)"
+            } catch {
                 throw MintError.repoNotFound(packagePath.gitPath)
             }
-            let tagReferences = tagOutput.stdout
-            if tagReferences.isEmpty {
-                package.version = "master"
-            } else {
-                let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
-                let versions = Git.convertTagsToVersionMap(tags)
-                if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
-                    package.version = tag
-                } else {
-                    package.version = "master"
-                }
-            }
-
-            standardOutput("🌱  Resolved latest version of \(package.name) to \(package.version)")
         }
 
         if !update && packagePath.commandPath.exists {
             if global {
                 try installGlobal(packagePath: packagePath)
             } else {
-                standardOutput("🌱  \(package.commandVersion) already installed".green)
+                standardOut <<< "🌱  \(package.commandVersion) already installed".green
             }
             return
         }
 
-        let checkoutPath = Path.temporary + "mint"
+        let checkoutPath = Path.temporary + "mint_\(CFAbsoluteTimeGetCurrent())"
         let packageCheckoutPath = checkoutPath + packagePath.repoPath
 
         try checkoutPath.mkpath()
 
         try? packageCheckoutPath.delete()
-        standardOutput("🌱  Cloning \(packagePath.gitPath) \(package.version)...")
+        standardOut <<< "🌱  Cloning \(packagePath.gitPath) \(package.version)..."
 
-        try runInstallCommand("git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)", at: checkoutPath, verbose: verbose)
+        let cloneCommand = "git clone --depth 1 -b \(package.version) \(packagePath.gitPath) \(packagePath.repoPath)"
+
+        do {
+            if verbose {
+                try SwiftCLI.run(bash: cloneCommand, directory: checkoutPath.string)
+            } else {
+                _ = try SwiftCLI.capture(bash: cloneCommand, directory: checkoutPath.string)
+            }
+        } catch {
+            if let error = error as? CaptureError {
+                if !error.captured.stderr.isEmpty, !verbose {
+                    standardError <<< error.captured.stderr
+                }
+            }
+            throw MintError.cloneError(url: packagePath.gitPath, version: package.version)
+        }
 
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+        standardOut <<< "🌱  Building \(package.name) with SPM..."
 
-        standardOutput("🌱  Building \(package.name). This may take a few minutes...")
-        try runInstallCommand("swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib", at: packageCheckoutPath, verbose: verbose)
+        try buildPackage(name: package.name, path: packageCheckoutPath)
 
-        standardOutput("🌱  Installing \(package.name)...")
+        standardOut <<< "🌱  Installing..."
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
         if !toolFile.exists {
             throw MintError.invalidCommand(package.name)
@@ -224,25 +243,82 @@ public class Mint {
             let resources = resourcesString.components(separatedBy: "\n")
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
-            standardOutput("🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ...")
+            standardOut <<< "🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ..."
             for resource in resources {
                 let resourcePath = packageCheckoutPath + resource
                 if resourcePath.exists {
                     try resourcePath.copy(packagePath.installPath + resource)
                 } else {
-                    standardOutput("resource \(resource) doesn't exist".yellow)
+                    standardOut <<< "resource \(resource) doesn't exist".yellow
                 }
             }
         }
 
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
 
-        standardOutput("🌱  Installed \(package.commandVersion)".green)
+        standardOut <<< "🌱  Installed \(package.commandVersion)".green
         if global {
             try installGlobal(packagePath: packagePath)
         }
 
         try? packageCheckoutPath.delete()
+    }
+
+    private func buildPackage(name: String, path: Path) throws {
+
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+        let command = "swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib"
+
+//        let buildSteps = [
+//            "Fetching": "Fetching Dependencies",
+//            "Cloning": "Resolving Dependencies",
+//            "Compile": "Compiling",
+//            "Linking": "Linking",
+//            ]
+//
+//        var currentBuildStep: String?
+//        var buildStepOutput = ""
+//
+//        let taskOut = LineStream { string in
+//            if self.verbose {
+//                self.standardOut <<< string
+//            } else {
+//                if let buildStep = buildSteps.first(where : { string.hasPrefix($0.key) })?.value {
+//                    if buildStep != currentBuildStep {
+//                        buildStepOutput = ""
+//                        if currentBuildStep != nil {
+//                            //self?.standardOut.print("👍")
+//                        }
+//                        currentBuildStep = buildStep
+//                        self.standardOut <<< "🌱  \(buildStep)..."
+//                    }
+//                }
+//            }
+//            buildStepOutput += string + "\n"
+//        }
+
+        let taskOut = verbose ? standardOut : PipeStream()
+        let taskError = PipeStream()
+        let task = Task(executable: "/bin/bash", args: ["-c", command], currentDirectory: path.string, stdout: taskOut, stderr: taskError)
+        task.runAsync()
+        let status = task.finish()
+//        taskOut.wait()
+//        taskOut.closeWrite()
+//        taskError.closeWrite()
+
+        if status != 0 {
+//            let out = verbose ? "" : "\(buildStepOutput.trimmingCharacters(in: .whitespacesAndNewlines))\n"
+//            let out = ""
+//            let error = taskError.readAll().trimmingCharacters(in: .whitespacesAndNewlines)
+//            var string = "\(out)\(error)"
+            var string = "🌱  Error encountered while building \(name)"
+            if !verbose {
+                string += ". Use --verbose to see full output"
+            }
+            standardError <<< string
+            throw MintError.buildError(string)
+        }
     }
 
     func installGlobal(packagePath: PackagePath) throws {
@@ -262,9 +338,10 @@ public class Mint {
         try? installPath.absolute().delete()
         try? installPath.parent().mkpath()
 
-        let output = main.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
-        guard output.succeeded else {
-            errorOutput("🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)")
+        do {
+            try SwiftCLI.run(bash: "ln -s \(toolPath.string) \(installPath.string)")
+        } catch {
+            standardError <<< "🌱  Could not install \(packagePath.package.commandVersion) in \(installPath.string)"
             return
         }
         var confirmation = "Linked \(packagePath.package.commandVersion) to \(installationPath.string)"
@@ -272,7 +349,7 @@ public class Mint {
             confirmation += ", replacing version \(previousVersion)"
         }
 
-        standardOutput("🌱  \(confirmation).".green)
+        standardOut <<< "🌱  \(confirmation).".green
     }
 
     public func uninstall(name: String) throws {
@@ -284,12 +361,12 @@ public class Mint {
         // remove package
         switch packages.count {
         case 0:
-            errorOutput("🌱  \(name.quoted) package was not found".red)
+            standardError <<< "🌱  \(name.quoted) package was not found".red
         case 1:
             let package = packages.first!.value
             let packagePath = packagesPath + package
             try? packagePath.delete()
-            standardOutput("🌱  \(name) was uninstalled")
+            standardOut <<< "🌱  \(name) was uninstalled"
         default:
             // TODO: ask for user input about which to delete
             for package in packages {
@@ -297,7 +374,7 @@ public class Mint {
                 try? packagePath.delete()
             }
 
-            standardOutput("🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled".green)
+            standardOut <<< "🌱  \(packages.count) packages that matched the name \(name.quoted) were uninstalled".green
         }
 
         // remove metadata
@@ -318,64 +395,5 @@ public class Mint {
             }
         }
         try? installPath.delete()
-    }
-
-    private func runInstallCommand(_ command: String, at: Path, verbose: Bool) throws {
-        var context = CustomContext(main)
-        context.currentdirectory = at.string
-        if verbose {
-            try context.runAndPrint(bash: command)
-        } else {
-            let output = context.run(bash: command)
-            if let error = output.error {
-                throw MintError.buildError(error: error, stderror: output.stderror.trimmingCharacters(in: .whitespacesAndNewlines), stdout: output.stdout.trimmingCharacters(in: .whitespacesAndNewlines))
-            }
-        }
-    }
-}
-
-struct InstallStatus {
-
-    let status: Status
-    let path: Path
-
-    init(path: Path, mintPackagesPath: Path) throws {
-        self.path = path
-        if path.isSymlink {
-            let actualPath = try path.symlinkDestination()
-            if actualPath.absolute().string.contains(mintPackagesPath.absolute().string) {
-                let version = actualPath.parent().lastComponent
-                status = .mint(version: version)
-            } else {
-                status = .symlink(path: actualPath)
-            }
-        } else if path.exists {
-            status = .file
-        } else {
-            status = .missing
-        }
-    }
-
-    enum Status {
-
-        case mint(version: String)
-        case file
-        case symlink(path: Path)
-        case missing
-    }
-
-    var isSafe: Bool {
-        switch status {
-        case .file, .symlink: return true
-        case .missing, .mint: return true
-        }
-    }
-
-    var warning: String? {
-        switch status {
-        case .file: return "An executable that was not installed by mint already exists at \(path)."
-        case let .symlink(symlink): return "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
-        default: return nil
-        }
     }
 }

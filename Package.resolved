@@ -38,12 +38,12 @@
         }
       },
       {
-        "package": "SwiftShell",
-        "repositoryURL": "https://github.com/kareman/SwiftShell.git",
+        "package": "SwiftCLI",
+        "repositoryURL": "https://github.com/jakeheis/SwiftCLI",
         "state": {
           "branch": null,
-          "revision": "b9fd06798993153bc57cde10ee6c75ddc55c2dbd",
-          "version": "4.0.2"
+          "revision": "51ba542611878b2e64e82467b895fdf4240ec32e",
+          "version": "5.0.0"
         }
       }
     ]

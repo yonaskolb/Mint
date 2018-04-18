@@ -1,5 +1,6 @@
 import Foundation
 import PathKit
+import SwiftCLI
 import Utility
 
 class PackageCommand: MintCommand {
@@ -21,6 +22,7 @@ class PackageCommand: MintCommand {
     override func execute(parsedArguments: ArgumentParser.Result) throws {
         try super.execute(parsedArguments: parsedArguments)
         let verbose = parsedArguments.get(verboseArgument) ?? false
+        mint.verbose = verbose
         let package = parsedArguments.get(packageArgument)!
 
         var mintPackage = MintPackage(package: package)
@@ -29,13 +31,13 @@ class PackageCommand: MintCommand {
             // set version to version from mintfile
             if let package = mintfile.package(for: mintPackage.repo), !package.version.isEmpty {
                 mintPackage = package
-                mint.standardOutput("🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile.")
+                mint.standardOut <<< "🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile."
             }
         }
 
-        try execute(parsedArguments: parsedArguments, repo: mintPackage.repo, version: mintPackage.version, verbose: verbose)
+        try execute(parsedArguments: parsedArguments, repo: mintPackage.repo, version: mintPackage.version)
     }
 
-    func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
+    func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String) throws {
     }
 }

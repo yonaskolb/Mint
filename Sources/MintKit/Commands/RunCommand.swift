@@ -1,4 +1,5 @@
 import Foundation
+import SwiftCLI
 import Utility
 
 class RunCommand: PackageCommand {
@@ -12,7 +13,7 @@ class RunCommand: PackageCommand {
         silentArgument = subparser.add(option: "--silent", kind: Bool.self, usage: "Silences any output from Mint itself")
     }
 
-    override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String, verbose: Bool) throws {
+    override func execute(parsedArguments: ArgumentParser.Result, repo: String, version: String) throws {
         var arguments = parsedArguments.get(commandArgument)
         let silent = parsedArguments.get(silentArgument) ?? false
         // backwards compatability for arguments surrounded in quotes
@@ -23,8 +24,8 @@ class RunCommand: PackageCommand {
             arguments = firstArg.split(separator: " ").map(String.init)
         }
         if silent {
-            mint.standardOutput = { _ in }
+            mint.standardOut = PipeStream()
         }
-        try mint.run(repo: repo, version: version, verbose: verbose, arguments: arguments)
+        try mint.run(repo: repo, version: version, arguments: arguments)
     }
 }

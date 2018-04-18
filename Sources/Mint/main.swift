@@ -1,22 +1,22 @@
 import Foundation
 import MintKit
 import Rainbow
-import SwiftShell
+import SwiftCLI
 
+let mint = Mint()
+let mintInterface = MintCLI(mint: mint)
 do {
-    let mint = Mint()
-    let mintInterface = MintInterface(mint: mint)
     try mintInterface.execute(arguments: Array(ProcessInfo.processInfo.arguments.dropFirst()))
 } catch {
-    if let error = error as? SwiftShell.CommandError {
-        switch error {
-        case let .inAccessibleExecutable(path): main.stderror.print("Couldn't run command \(path)")
-        case .returnedErrorCode: break
-        }
+
+    if let error = error as? CLI.Error {
+        WriteStream.stderr <<< "Couldn't run command:\n\(error.message ?? "")"
+    } else if let error = error as? MintError {
+        WriteStream.stderr <<< error.description.red
     } else if error._domain == NSCocoaErrorDomain {
-        print("\(error.localizedDescription)".red)
+        WriteStream.stderr <<< "\(error.localizedDescription)".red
     } else {
-        print("\(error)")
+        WriteStream.stderr <<< "\(error)"
     }
     exit(1)
 }
