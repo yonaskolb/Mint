@@ -19,15 +19,15 @@ public class Mint {
         return path + "metadata.json"
     }
 
-    var standardOut: WritableStream
-    var standardError: WritableStream
+    public var standardOut: WritableStream
+    public var standardError: WritableStream
 
-    var verbose = false
-    var createStandardInProccess = true
+    public var verbose = false
+    public var createStandardInProcess = true
 
     public init(
-        path: Path = "/usr/local/lib/mint",
-        installationPath: Path = "/usr/local/bin",
+        path: Path,
+        installationPath: Path,
         standardOut: WritableStream = WriteStream.stdout,
         stanardError: WritableStream = WriteStream.stderr) {
         self.standardOut = standardOut
@@ -139,10 +139,10 @@ public class Mint {
         standardOut <<< "🌱  Running \(package.commandVersion)..."
         let packagePath = PackagePath(path: packagesPath, package: package)
 
-        if createStandardInProccess {
-            try Task.execvp(packagePath.commandPath.string, arguments, env: ["MINT": "YES", "RESOURCE_PATH": ""])
+        if createStandardInProcess {
+            try Task.execvp(packagePath.commandPath.string, arguments: arguments, env: ["MINT": "YES", "RESOURCE_PATH": ""])
         } else {
-            let runTask = Task(executable: packagePath.commandPath.string, args: arguments)
+            let runTask = Task(executable: packagePath.commandPath.string, arguments: arguments)
             _ = runTask.runSync()
         }
     }
@@ -300,7 +300,7 @@ public class Mint {
 
         let taskOut = verbose ? standardOut : PipeStream()
         let taskError = PipeStream()
-        let task = Task(executable: "/bin/bash", args: ["-c", command], currentDirectory: path.string, stdout: taskOut, stderr: taskError)
+        let task = Task(executable: "/bin/bash", arguments: ["-c", command], directory: path.string, stdout: taskOut, stderr: taskError)
         task.runAsync()
         let status = task.finish()
 //        taskOut.wait()
@@ -312,11 +312,10 @@ public class Mint {
 //            let out = ""
 //            let error = taskError.readAll().trimmingCharacters(in: .whitespacesAndNewlines)
 //            var string = "\(out)\(error)"
-            var string = "🌱  Error encountered while building \(name)"
+            var string = "Failed to build \(name)"
             if !verbose {
                 string += ". Use --verbose to see full output"
             }
-            standardError <<< string
             throw MintError.buildError(string)
         }
     }

@@ -16,7 +16,8 @@ let package = Package(
         .package(url: "https://github.com/jakeheis/SwiftCLI", from: "5.0.0"),
     ],
     targets: [
-        .target(name: "Mint", dependencies: ["MintKit", "Rainbow"]),
+        .target(name: "Mint", dependencies: ["MintCLI"]),
+        .target(name: "MintCLI", dependencies: ["Rainbow", "SwiftCLI", "MintKit"]),
         .target(name: "MintKit", dependencies: ["Rainbow", "PathKit", "Utility", "SwiftCLI"]),
         .testTarget(name: "MintTests", dependencies: ["MintKit"]),
     ]

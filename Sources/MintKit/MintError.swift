@@ -16,7 +16,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .invalidCommand(command): return "Couldn't find command \(command)"
         case let .invalidRepo(repo): return "Invalid repo \(repo.quoted)"
         case let .cloneError(url, version): return "Couldn't clone \(url) \(version)"
-        case .buildError: return "Error building package"
+        case let .buildError(error): return error
         }
     }
 
