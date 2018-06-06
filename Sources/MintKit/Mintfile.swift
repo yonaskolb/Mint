@@ -1,10 +1,10 @@
 import Foundation
 import PathKit
 
-struct Mintfile {
+public struct Mintfile {
     static let defaultPath = Path("Mintfile")
 
-    static func `default`() -> Mintfile? {
+    public static func `default`() -> Mintfile? {
         return self.init(path: Mintfile.defaultPath)
     }
 

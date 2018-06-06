@@ -1,8 +1,8 @@
 import Foundation
 
-struct MintPackage {
-    let repo: String
-    let version: String
+public struct MintPackage {
+    public let repo: String
+    public let version: String
 
     public init(repo: String, version: String = "") {
         self.repo = repo
@@ -26,7 +26,7 @@ struct MintPackage {
 }
 
 extension MintPackage: Equatable {
-    static func == (lhs: MintPackage, rhs: MintPackage) -> Bool {
+    public static func == (lhs: MintPackage, rhs: MintPackage) -> Bool {
         return lhs.repo == rhs.repo && lhs.version == rhs.version
     }
 }

@@ -1,11 +1,13 @@
 @testable import MintKit
 import PathKit
-import SwiftShell
+import SwiftCLI
 import XCTest
 
 class MintTests: XCTestCase {
 
-    let mint = Mint(path: Path.temporary + "mint", installationPath: Path.temporary + "mint-installs", standardOutput: { _ in })
+    let mint = Mint(path: Path.temporary + "mint",
+                    installationPath: Path.temporary + "mint-installs",
+                    standardOut: PipeStream())
     let testRepo = "yonaskolb/simplepackage"
     let sshTestRepo = "git@github.com:yonaskolb/simplepackage.git"
     let testVersion = "2.0.0"
@@ -14,6 +16,7 @@ class MintTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        mint.createStandardInProcess = false
         try? mint.path.delete()
         try? mint.installationPath.delete()
     }
@@ -75,10 +78,10 @@ class MintTests: XCTestCase {
         XCTAssertEqual(MintPackage(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), MintPackage(repo: "git@github.com:yonaskolb/Mint.git", version: "0.0.1"))
     }
 
-    func expectMintVersion(package: Package) {
+    func expectMintVersion(package: Package) throws {
         let packagePath = PackagePath(path: mint.packagesPath, package: package)
         XCTAssertTrue(packagePath.commandPath.exists)
-        let output = main.run(packagePath.commandPath.string, "--version")
+        let output = try capture(packagePath.commandPath.string, "--version")
         XCTAssertEqual(output.stdout, package.version)
     }
 
@@ -88,7 +91,7 @@ class MintTests: XCTestCase {
 
         // install specific version
         let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)
-        expectMintVersion(package: specificPackage)
+        try expectMintVersion(package: specificPackage)
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
@@ -98,15 +101,15 @@ class MintTests: XCTestCase {
         try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
 
         XCTAssertTrue(globalPath.exists)
-        let globalOutput = main.run(globalPath.string)
+        let globalOutput = try capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
         // install latest version
         let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
-        expectMintVersion(package: latestPackage)
+        try expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
-        let latestGlobalOutput = main.run(globalPath.string)
+        let latestGlobalOutput = try capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: latestVersion])
 
@@ -130,7 +133,7 @@ class MintTests: XCTestCase {
 
         // run a specific version
         let specificPackage = try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
-        expectMintVersion(package: specificPackage)
+        try expectMintVersion(package: specificPackage)
 
         // run an already installed version
         try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
@@ -143,7 +146,7 @@ class MintTests: XCTestCase {
 
         // run latest version
         let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
-        expectMintVersion(package: latestPackage)
+        try expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
         // check package list has installed versions
@@ -171,11 +174,7 @@ class MintTests: XCTestCase {
             }
         }
 
-        let cloneError = """
-        Cloning into 'invaliddomain.com_invalid'...
-        fatal: unable to access 'http://invaliddomain.com/invalid/': Could not resolve host: invaliddomain.com
-        """
-        expectError(MintError.buildError(error: NSError(domain: "", code: 0, userInfo: nil), stderror: cloneError, stdout: "")) {
+        expectError(MintError.cloneError(url: "http://invaliddomain.com/invalid", version: testVersion)) {
             try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, arguments: ["invalid"])
         }
 
