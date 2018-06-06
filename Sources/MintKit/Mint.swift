@@ -369,7 +369,7 @@ public class Mint {
 
         let packageCount = "\(mintFile.packages.count) \(mintFile.packages.count == 1 ? "package" : "packages")"
 
-        standardOut <<< "🌱  Found \(packageCount) in \(path.string)"
+        standardOut <<< "🌱  Found \(packageCount) in \(mintFilePath.string)"
         for mintPackage in mintFile.packages {
             try install(repo: mintPackage.repo, version: mintPackage.version, command: nil, update: false, global: false)
         }
