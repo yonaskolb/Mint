@@ -24,9 +24,14 @@ format_code:
 	swiftformat Tests --stripunusedargs closure-only --header strip --disable blankLinesAtStartOfScope
 	swiftformat Sources --stripunusedargs closure-only --header strip --disable blankLinesAtStartOfScope
 
-publish:
-	# bump homebrew version
+publish: zip_binary bump_brew
+	echo "published $(VERSION)"
+
+bump_brew:
 	brew bump-formula-pr --url=$(RELEASE_TAR) Mint
+
+zip_binary: build
+	zip -j $(TOOL_NAME).zip $(BUILD_PATH)
 
 release: format_code
 	sed -i '' 's|\(static let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintKit/Mint.swift
