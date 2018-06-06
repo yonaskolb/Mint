@@ -19,6 +19,7 @@ class MintTests: XCTestCase {
         mint.createStandardInProcess = false
         try? mint.path.delete()
         try? mint.installationPath.delete()
+        mint.mintFilePath = "Mintfile"
     }
 
     func testPackagePaths() {
@@ -161,18 +162,27 @@ class MintTests: XCTestCase {
         XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
-    func testMintErrors() {
+    func testBoostrapCommand() throws {
+        mint.mintFilePath = simpleMintFileFixture.absolute()
 
-        func expectError(_ expectedError: MintError, closure: () throws -> Void) {
-            do {
-                try closure()
-                XCTFail("Expected to fail with \(expectedError)")
-            } catch let error as MintError {
-                XCTAssertEqual(error, expectedError)
-            } catch {
-                XCTFail("Expected to fail with \(expectedError)")
-            }
-        }
+        try mint.bootstrap()
+
+        let package = Package(repo: "yonaskolb/simplepackage", version: "4.0.0", name: "simplepackage")
+
+        let globalPath = mint.installationPath + testCommand
+
+        // check that not globally installed
+        XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
+
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages[testCommand, default: []], [package.version])
+        XCTAssertEqual(installedPackages.count, 1)
+
+        try expectMintVersion(package: package)
+    }
+
+    func testMintErrors() {
 
         expectError(MintError.cloneError(url: "http://invaliddomain.com/invalid", version: testVersion)) {
             try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, arguments: ["invalid"])
@@ -188,6 +198,11 @@ class MintTests: XCTestCase {
 
         expectError(MintError.packageNotFound("invalidPackage")) {
             try mint.run(repo: "invalidPackage", version: testVersion, arguments: [])
+        }
+
+        expectError(MintError.mintfileNotFound("invalid")) {
+            mint.mintFilePath = "invalid"
+            try mint.bootstrap()
         }
     }
 

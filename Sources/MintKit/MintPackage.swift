@@ -11,6 +11,7 @@ public struct MintPackage {
 
     public init(package: String) {
         let packageParts = package.components(separatedBy: "@")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
         if packageParts.count == 3 {
             self.init(repo: [packageParts[0], packageParts[1]].joined(separator: "@"), version: packageParts[2])
         } else if packageParts.count == 2 {

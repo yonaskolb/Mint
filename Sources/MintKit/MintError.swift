@@ -8,6 +8,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
     case invalidRepo(String)
     case buildError(String)
     case cloneError(url: String, version: String)
+    case mintfileNotFound(String)
 
     public var description: String {
         switch self {
@@ -17,6 +18,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .invalidRepo(repo): return "Invalid repo \(repo.quoted)"
         case let .cloneError(url, version): return "Couldn't clone \(url) \(version)"
         case let .buildError(error): return error
+        case let .mintfileNotFound(path): return "\(path) not found"
         }
     }
 

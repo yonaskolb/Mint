@@ -3,9 +3,8 @@ import MintKit
 import PathKit
 import SwiftCLI
 
-class PackageCommand: MintCommand {
+class PackageCommand: MintfileCommand {
 
-    var verbose = Flag("-v", "--verbose", description: "Show verbose output", defaultValue: false)
     var package = Parameter()
 
     init(mint: Mint, name: String, description: String, parameterDescription: String? = nil) {
@@ -24,11 +23,12 @@ class PackageCommand: MintCommand {
 
     override func execute() throws {
         try super.execute()
-        mint.verbose = verbose.value
 
         var mintPackage = MintPackage(package: package.value)
 
-        if mintPackage.version.isEmpty, let mintfile = Mintfile.default() {
+        if mintPackage.version.isEmpty,
+            mint.mintFilePath.exists,
+            let mintfile = try? Mintfile(path: mint.mintFilePath) {
             // set version to version from mintfile
             if let package = mintfile.package(for: mintPackage.repo), !package.version.isEmpty {
                 mintPackage = package
