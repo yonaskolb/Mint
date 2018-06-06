@@ -97,7 +97,11 @@ public class Mint {
 
         var versionsByPackage: [String: [String]] = [:]
         let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
-            let versions = try (packagePath + "build").children().sorted().map { $0.lastComponent }
+            let versions = try (packagePath + "build")
+                .children()
+                .filter { !$0.lastComponent.hasPrefix(".") }
+                .sorted()
+                .map { $0.lastComponent }
             let packageName = String(packagePath.lastComponent.split(separator: "_").last!)
             var package = "  \(packageName)"
             for version in versions {
