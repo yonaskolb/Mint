@@ -18,7 +18,7 @@
 - Removed dotfiles from `mint list` output @yonaskolb
 - Print errors to stderr #78 @yonaskolb
 
-### Internal
+##### Internal
 - Replaced `ShellOut` with `SwiftCLI` #78 @yonaskolb
 - Replaced `SPM` with `SwiftCLI` #78 @yonaskolb
 
