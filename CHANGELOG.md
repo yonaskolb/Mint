@@ -12,6 +12,7 @@
 #### Changed
 - Improved error output #78 @yonaskolb
 - Customizable `standardOut` and `standardError` in `Mint` #78 @yonaskolb
+- As global installs are now the default, replaced `--global` with `--prevent-global` flag
 
 #### Fixed
 - Fixed output in run not being silenced when using a Mintfile #77 @yutailang0119
