@@ -2,6 +2,28 @@
 
 ## Master
 
+## 0.10.0
+
+#### Added
+- Added `mint bootstrap` command for installing all the packages in your `Mintfile` #79 @yonaskolb
+- Added `--mintfile` argument for custom `Mintfile` path #79 @yonaskolb
+- Added `stdin` support to `mint run` #78 @yonaskolb
+
+#### Changed
+- Improved error output #78 @yonaskolb
+- Customizable `standardOut` and `standardError` in `Mint` #78 @yonaskolb
+
+#### Fixed
+- Fixed output in run not being silenced when using a Mintfile #77 @yutailang0119
+- Removed dotfiles from `mint list` output @yonaskolb
+- Print errors to stderr #78 @yonaskolb
+
+### Internal
+- Replaced `ShellOut` with `SwiftCLI` #78 @yonaskolb
+- Replaced `SPM` with `SwiftCLI` #78 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.9.1...0.10.0)
+
 ## 0.9.1
 
 - made `Mintfile` package lookup case insensitive @yonaskolb
