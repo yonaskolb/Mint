@@ -91,6 +91,7 @@ Run `mint --help` to see usage instructions.
 - **update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update it.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
+- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile)
 
 Run, install and update commands have 1 or 2 arguments:
 
@@ -120,10 +121,16 @@ yonaskolb/xcodegen@0.9.0
 yonaskolb/genesis@0.2.0
 ```
 
-Then you can simply run
+Then you can simply run a package with:
 
-```
+```sh
 mint run xcodegen
+```
+
+Or install all the packages in one go with:
+
+```sh
+mint bootstrap
 ```
 
 ### Advanced
