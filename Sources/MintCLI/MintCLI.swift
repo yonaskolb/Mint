@@ -6,6 +6,8 @@ import SwiftCLI
 
 public class MintCLI {
 
+    public let version = "0.10.0old"
+
     let mint: Mint
     let cli: CLI
 
@@ -23,7 +25,7 @@ public class MintCLI {
 
         mint = Mint(path: mintPath, installationPath: installationPath)
 
-        cli = CLI(name: "mint", version: Mint.version, description: "Run and install Swift Package Manager executables", commands: [
+        cli = CLI(name: "mint", version: version, description: "Run and install Swift Package Manager executables", commands: [
             RunCommand(mint: mint),
             InstallCommand(mint: mint),
             UpdateCommand(mint: mint),
