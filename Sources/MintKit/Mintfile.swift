@@ -2,11 +2,6 @@ import Foundation
 import PathKit
 
 public struct Mintfile {
-    static let defaultPath = Path("Mintfile")
-
-    public static func `default`() -> Mintfile? {
-        return self.init(path: Mintfile.defaultPath)
-    }
 
     let packages: [MintPackage]
 
@@ -14,19 +9,15 @@ public struct Mintfile {
         return packages.first { $0.repo.lowercased().contains(repo.lowercased()) }
     }
 
-    init?(path: Path) {
+    public init(path: Path) throws {
         guard path.exists else {
-            return nil
+            throw MintError.mintfileNotFound(path.string)
         }
-
-        guard let contents: String = try? path.read() else {
-            fatalError("Could not read mintfile at \(path).")
-        }
-
+        let contents: String = try path.read()
         self.init(string: contents)
     }
 
-    init(string: String) {
+    public init(string: String) {
         let lines = string
             .split(separator: "\n")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

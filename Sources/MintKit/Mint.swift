@@ -8,8 +8,9 @@ public class Mint {
 
     public static let version = "0.9.1"
 
-    var path: Path
-    var installationPath: Path
+    public var path: Path
+    public var installationPath: Path
+    public var mintFilePath: Path
 
     var packagesPath: Path {
         return path + "packages"
@@ -28,12 +29,14 @@ public class Mint {
     public init(
         path: Path,
         installationPath: Path,
+        mintFilePath: Path = "Mintfile",
         standardOut: WritableStream = WriteStream.stdout,
         stanardError: WritableStream = WriteStream.stderr) {
         self.standardOut = standardOut
         standardError = stanardError
         self.path = path.absolute()
         self.installationPath = installationPath.absolute()
+        self.mintFilePath = mintFilePath
     }
 
     public func closeStreams() {
@@ -353,6 +356,24 @@ public class Mint {
         }
 
         standardOut <<< "🌱  \(confirmation).".green
+    }
+
+    public func bootstrap() throws {
+
+        let mintFile = try Mintfile(path: mintFilePath)
+
+        guard !mintFile.packages.isEmpty else {
+            standardOut <<< "🌱  Mintfile is empty"
+            return
+        }
+
+        let packageCount = "\(mintFile.packages.count) \(mintFile.packages.count == 1 ? "package" : "packages")"
+
+        standardOut <<< "🌱  Found \(packageCount) in \(path.string)"
+        for mintPackage in mintFile.packages {
+            try install(repo: mintPackage.repo, version: mintPackage.version, command: nil, update: false, global: false)
+        }
+        standardOut <<< "🌱  Installed \(packageCount) from \(mintFilePath.string)".green
     }
 
     public func uninstall(name: String) throws {

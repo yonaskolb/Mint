@@ -30,13 +30,6 @@ struct InstallStatus {
         case missing
     }
 
-    var isSafe: Bool {
-        switch status {
-        case .file, .symlink: return true
-        case .missing, .mint: return true
-        }
-    }
-
     var warning: String? {
         switch status {
         case .file: return "An executable that was not installed by mint already exists at \(path)."
