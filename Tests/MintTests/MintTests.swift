@@ -11,7 +11,7 @@ class MintTests: XCTestCase {
     let testRepo = "yonaskolb/simplepackage"
     let sshTestRepo = "git@github.com:yonaskolb/simplepackage.git"
     let testVersion = "2.0.0"
-    let latestVersion = "4.0.0"
+    let latestVersion = "5.0.0"
     let testCommand = "simplepackage"
 
     override func setUp() {
