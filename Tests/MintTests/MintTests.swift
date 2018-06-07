@@ -16,7 +16,7 @@ class MintTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        mint.createStandardInProcess = false
+        mint.runAsNewProcess = false
         try? mint.path.delete()
         try? mint.installationPath.delete()
         mint.mintFilePath = "Mintfile"

@@ -24,7 +24,7 @@ public class Mint {
     public var standardError: WritableStream
 
     public var verbose = false
-    public var createStandardInProcess = true
+    public var runAsNewProcess = true
 
     public init(
         path: Path,
@@ -146,8 +146,11 @@ public class Mint {
         standardOut <<< "🌱  Running \(package.commandVersion)..."
         let packagePath = PackagePath(path: packagesPath, package: package)
 
-        if createStandardInProcess {
-            try Task.execvp(packagePath.commandPath.string, arguments: arguments, env: ["MINT": "YES", "RESOURCE_PATH": ""])
+        if runAsNewProcess {
+            var env = ProcessInfo.processInfo.environment
+            env["MINT"] = "YES"
+            env["RESOURCE_PATH"] = ""
+            try Task.execvp(packagePath.commandPath.string, arguments: arguments, env: env)
         } else {
             let runTask = Task(executable: packagePath.commandPath.string, arguments: arguments)
             _ = runTask.runSync()
