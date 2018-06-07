@@ -2,6 +2,14 @@
 
 ## Master
 
+## 0.10.1
+
+#### Fixed
+- Fixed environment variables not being passed via `mint run` @yonaskolb
+- Fixed `mint bootstrap` output referring to the wrong path for `Mintfile` @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.10.0...0.10.1)
+
 ## 0.10.0
 
 #### Added
