@@ -233,18 +233,21 @@ public class Mint {
             throw MintError.cloneError(url: packagePath.gitPath, version: package.version)
         }
 
-        try? packagePath.installPath.delete()
-        try packagePath.installPath.mkpath()
-
         standardOut <<< "🌱  Building \(package.name) with SPM..."
 
         try buildPackage(name: package.name, path: packageCheckoutPath)
 
         standardOut <<< "🌱  Installing..."
+
         let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
         if !toolFile.exists {
             throw MintError.invalidCommand(package.name)
         }
+
+        //TODO: perhaps don't remove the whole directory once we install specific executables
+        try? packagePath.installPath.delete()
+        try packagePath.installPath.mkpath()
+
         try toolFile.copy(packagePath.commandPath)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
