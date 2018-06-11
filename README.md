@@ -1,6 +1,7 @@
 # Mint 🌱
 
 [![SPM](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=for-the-badge)](https://swift.org/package-manager)
+![Platforms](https://img.shields.io/badge/Platforms-macOS_Linux-blue.svg?style=for-the-badge)
 [![Git Version](https://img.shields.io/github/release/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/releases)
 [![Build Status](https://img.shields.io/circleci/project/github/yonaskolb/Mint.svg?style=for-the-badge)](https://circleci.com/gh/yonaskolb/Mint)
 [![license](https://img.shields.io/github/license/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/blob/master/LICENSE)
