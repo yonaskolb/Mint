@@ -84,11 +84,8 @@ class MintTests: XCTestCase {
     func expectMintVersion(package: Package, file: StaticString = #file, line: UInt = #line) throws {
         let packagePath = PackagePath(path: mint.packagesPath, package: package)
         XCTAssertTrue(packagePath.commandPath.exists)
-        #if os(macOS)
-        // not working on Linux for some reason
         let output = try capture(packagePath.commandPath.string, "--version")
         XCTAssertEqual(output.stdout, package.version, file: file, line: line)
-        #endif
     }
 
     func testInstallCommand() throws {
@@ -105,15 +102,15 @@ class MintTests: XCTestCase {
 
         // install already installed version globally
         try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
-
         XCTAssertTrue(globalPath.exists)
-        #if os(macOS)
         let globalOutput = try capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
-        #endif
+
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
         #if os(macOS)
+        // finding latest tag not working on Linux
+
         // install latest version
         let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommandLatest, global: true)
         try expectMintVersion(package: latestPackage)
@@ -157,6 +154,8 @@ class MintTests: XCTestCase {
         try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
 
         #if os(macOS)
+        // finding latest tag not working on Linux
+
         // run latest version
         let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
         try expectMintVersion(package: latestPackage)
