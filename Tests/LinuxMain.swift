@@ -1,6 +1,8 @@
-@testable import MintTests
 import XCTest
 
-XCTMain([
-    testCase(MintTests.allTests),
-])
+import MintTests
+
+var tests = [XCTestCaseEntry]()
+tests += MintTests.__allTests()
+
+XCTMain(tests)

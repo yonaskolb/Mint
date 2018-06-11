@@ -82,7 +82,7 @@ public class Mint {
                 let symlink = try? package.symlinkDestination() else {
                 return
             }
-            let packageName = String(symlink.parent().parent().parent().lastComponent.split(separator: "_").last!)
+            let packageName = symlink.lastComponent
             result[packageName] = version
         }
     }
@@ -143,7 +143,9 @@ public class Mint {
         try install(package, update: false, global: false)
         standardOut <<< "🌱  Running \(package.commandVersion)..."
         let packagePath = PackagePath(path: packagesPath, package: package)
-
+        if !packagePath.commandPath.exists {
+            throw MintError.invalidCommand(packagePath.commandPath.string)
+        }
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
             env["MINT"] = "YES"
@@ -277,9 +279,14 @@ public class Mint {
 
     private func buildPackage(name: String, path: Path) throws {
 
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-        let command = "swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib"
+        #if os(macOS)
+            let target: String
+            let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+                target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+            let command = "swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib"
+        #else
+            let command = "swift build -c release -Xswiftc -static-stdlib"
+        #endif
 
 //        let buildSteps = [
 //            "Fetching": "Fetching Dependencies",
