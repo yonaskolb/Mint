@@ -102,14 +102,14 @@ Run, install and update commands have 1 or 2 arguments:
 #### Examples
 ```sh
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
-$ mint install yonaskolb/XcodeGen@1.2.4 -p # installs a certain version but not globally
+$ mint install yonaskolb/XcodeGen@1.2.4 --prevent-global # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
 ### Global installs
-By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `-p` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--prevent-global` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
 ### Mintfile
 A `Mintfile` can specify a list of versioned packages. It makes installing and running these packages easy, as the specific repos and versions are centralized.
