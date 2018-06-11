@@ -91,7 +91,7 @@ Run `mint --help` to see usage instructions.
 - **update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update it.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
-- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile)
+- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile) without linking them globally
 
 Run, install and update commands have 1 or 2 arguments:
 
