@@ -2,6 +2,17 @@
 
 ## Master
 
+## 0.10.2
+
+#### Fixed
+- Don't overwrite install path of already installed version until after successful build
+- Fixed version number output
+
+#### Changed
+- Updated SwiftCLI 5.2.1 to allow nested help commands like `mint help install`
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.10.1...0.10.2)
+
 ## 0.10.1
 
 #### Fixed
