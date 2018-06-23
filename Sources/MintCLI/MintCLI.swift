@@ -6,7 +6,7 @@ import SwiftCLI
 
 public class MintCLI {
 
-    public let version = "0.10.0old"
+    public let version = "0.10.1"
 
     let mint: Mint
     let cli: CLI
