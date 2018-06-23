@@ -242,7 +242,7 @@ public class Mint {
             throw MintError.invalidCommand(package.name)
         }
 
-        //TODO: perhaps don't remove the whole directory once we install specific executables
+        // TODO: perhaps don't remove the whole directory once we install specific executables
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
