@@ -34,7 +34,7 @@ zip_binary: build
 	zip -j $(EXECUTABLE_NAME).zip $(BUILD_PATH)
 
 release: format_code
-	sed -i '' 's|\(static let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintKit/Mint.swift
+	sed -i '' 's|\(let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintCLI/MintCLI.swift
 
 	git add .
 	git commit -m "Update to $(VERSION)"
