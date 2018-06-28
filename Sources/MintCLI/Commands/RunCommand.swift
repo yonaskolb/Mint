@@ -13,6 +13,13 @@ class RunCommand: PackageCommand {
                    description: "Install and then run a package")
     }
 
+    override func execute() throws {
+        if silent.value {
+            mint.standardOut = PipeStream()
+        }
+        try super.execute()
+    }
+
     override func execute(repo: String, version: String) throws {
         var arguments = command.value
 
@@ -23,9 +30,6 @@ class RunCommand: PackageCommand {
             arguments = firstArg.split(separator: " ").map(String.init)
         }
 
-        if silent.value {
-            mint.standardOut = PipeStream()
-        }
         try mint.run(repo: repo, version: version, arguments: arguments)
     }
 }
