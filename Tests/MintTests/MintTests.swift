@@ -7,7 +7,7 @@ class MintTests: XCTestCase {
 
     let mint = Mint(path: Path.temporary + "mint",
                     installationPath: Path.temporary + "mint-installs",
-                    standardOut: PipeStream())
+                    standardOut: LineStream {_ in})
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = "2.0.0"
@@ -108,9 +108,6 @@ class MintTests: XCTestCase {
 
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
-        #if os(macOS)
-        // finding latest tag not working on Linux
-
         // install latest version
         let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommandLatest, global: true)
         try expectMintVersion(package: latestPackage)
@@ -123,12 +120,6 @@ class MintTests: XCTestCase {
         let installedPackages = try mint.listPackages()
         XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
-        #else
-        // check package list has installed versions
-        let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion])
-        XCTAssertEqual(installedPackages.count, 1)
-        #endif
 
         // uninstall
         try mint.uninstall(name: testCommand)
@@ -153,9 +144,6 @@ class MintTests: XCTestCase {
         // run with arguments
         try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
 
-        #if os(macOS)
-        // finding latest tag not working on Linux
-
         // run latest version
         let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
         try expectMintVersion(package: latestPackage)
@@ -165,11 +153,6 @@ class MintTests: XCTestCase {
         let installedPackages = try mint.listPackages()
         XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
-        #else
-        let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion])
-        XCTAssertEqual(installedPackages.count, 1)
-        #endif
 
         // uninstall
         try mint.uninstall(name: testCommand)

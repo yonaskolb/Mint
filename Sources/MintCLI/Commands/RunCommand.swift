@@ -15,7 +15,7 @@ class RunCommand: PackageCommand {
 
     override func execute() throws {
         if silent.value {
-            mint.standardOut = PipeStream()
+            mint.standardOut = LineStream {_ in}
         }
         try super.execute()
     }
