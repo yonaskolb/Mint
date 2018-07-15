@@ -7,17 +7,18 @@ class MintTests: XCTestCase {
 
     let mint = Mint(path: Path.temporary + "mint",
                     installationPath: Path.temporary + "mint-installs",
-                    standardOut: LineStream {_ in})
+                    standardOut: LineStream {_ in},
+                    standardError: LineStream {_ in})
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
-    let testVersion = "2.0.0"
+    let testVersion = "4.0.0"
     let latestVersion = "5.0.0"
-    let testCommandLatest = "simplepackage"
-    let testCommand = "SimplePackage"
+    let testCommand = "simplepackage"
     let testRepoName = "SimplePackage"
 
     override func setUp() {
         super.setUp()
+        //mint.verbose = true
         mint.runAsNewProcess = false
         try? mint.path.delete()
         try? mint.installationPath.delete()
@@ -93,7 +94,7 @@ class MintTests: XCTestCase {
         let globalPath = mint.installationPath + testCommand
 
         // install specific version
-        let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: "SimplePackage")
+        let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)
         try expectMintVersion(package: specificPackage)
 
         // check that not globally installed
@@ -109,12 +110,12 @@ class MintTests: XCTestCase {
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
         // install latest version
-        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommandLatest, global: true)
+        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
         try expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
         let latestGlobalOutput = try capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommandLatest: latestVersion])
+        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: latestVersion])
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
@@ -166,7 +167,7 @@ class MintTests: XCTestCase {
 
         try mint.bootstrap()
 
-        let package = Package(repo: "yonaskolb/SimplePackage", version: "2.0.0", name: "SimplePackage")
+        let package = Package(repo: "yonaskolb/SimplePackage", version: "5.0.0", name: "simplepackage")
 
         let globalPath = mint.installationPath + testCommand
 
@@ -175,7 +176,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[package.name, default: []], [package.version])
+        XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try expectMintVersion(package: package)
