@@ -29,9 +29,9 @@ public class Mint {
         installationPath: Path,
         mintFilePath: Path = "Mintfile",
         standardOut: WritableStream = WriteStream.stdout,
-        stanardError: WritableStream = WriteStream.stderr) {
+        standardError: WritableStream = WriteStream.stderr) {
         self.standardOut = standardOut
-        standardError = stanardError
+        self.standardError = standardError
         self.path = path.absolute()
         self.installationPath = installationPath.absolute()
         self.mintFilePath = mintFilePath
