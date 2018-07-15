@@ -280,11 +280,11 @@ public class Mint {
 
     private func buildPackage(name: String, path: Path) throws {
 
-        var command = "swift build -c release -Xswiftc -static-stdlib"
+        var command = "swift build -c release"
         #if os(macOS)
             let osVersion = ProcessInfo.processInfo.operatingSystemVersion
             let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-            command += " -Xswiftc -target -Xswiftc \(target)"
+            command += " -Xswiftc -static-stdlib -Xswiftc -target -Xswiftc \(target)"
         #endif
 
 //        let buildSteps = [
