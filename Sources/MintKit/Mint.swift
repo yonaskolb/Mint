@@ -248,7 +248,8 @@ public class Mint {
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
-        try toolFile.copy(packagePath.commandPath)
+        // copy using shell instead of FileManager via PathKit because it remove executable permissions on Linux
+        try SwiftCLI.run("cp", toolFile.string, packagePath.commandPath.string)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
