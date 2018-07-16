@@ -1,9 +1,22 @@
 version: 2
 jobs:
-  build:
+  macOS_swift_4.1:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     steps:
       - checkout
       - run: swift build
       - run: swift test
+  linux_swift_4.1:
+    docker:
+      - image: norionomura/swift:41
+    steps:
+      - checkout
+      - run: swift build
+      - run: swift test
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - macOS_swift_4.1
+      - linux_swift_4.1

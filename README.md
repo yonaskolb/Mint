@@ -1,6 +1,7 @@
 # Mint 🌱
 
 [![SPM](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=for-the-badge)](https://swift.org/package-manager)
+![Platforms](https://img.shields.io/badge/Platforms-macOS_Linux-blue.svg?style=for-the-badge)
 [![Git Version](https://img.shields.io/github/release/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/releases)
 [![Build Status](https://img.shields.io/circleci/project/github/yonaskolb/Mint.svg?style=for-the-badge)](https://circleci.com/gh/yonaskolb/Mint)
 [![license](https://img.shields.io/github/license/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/blob/master/LICENSE)
@@ -136,6 +137,11 @@ mint bootstrap
 ### Advanced
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
 - You can set `MINT_PATH` and `MINT_INSTALL_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
+
+### Linux
+Mint works on Linux but has some limitations:
+- linux doesn't support building with a statically linked version of Swift. This means when a new version of swift comes out the old installs won't work on linux. A stable ABI in Swift 5 will remove the need for this.
+- Linux is case sensitive so you must specify the correct case for repo urls as well as executables. As the `Mintfile` currently has no support for specifying the executable some packages may not work.
 
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:

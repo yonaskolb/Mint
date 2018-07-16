@@ -29,9 +29,9 @@ public class Mint {
         installationPath: Path,
         mintFilePath: Path = "Mintfile",
         standardOut: WritableStream = WriteStream.stdout,
-        stanardError: WritableStream = WriteStream.stderr) {
+        standardError: WritableStream = WriteStream.stderr) {
         self.standardOut = standardOut
-        standardError = stanardError
+        self.standardError = standardError
         self.path = path.absolute()
         self.installationPath = installationPath.absolute()
         self.mintFilePath = mintFilePath
@@ -82,7 +82,7 @@ public class Mint {
                 let symlink = try? package.symlinkDestination() else {
                 return
             }
-            let packageName = String(symlink.parent().parent().parent().lastComponent.split(separator: "_").last!)
+            let packageName = symlink.lastComponent
             result[packageName] = version
         }
     }
@@ -143,7 +143,9 @@ public class Mint {
         try install(package, update: false, global: false)
         standardOut <<< "🌱  Running \(package.commandVersion)..."
         let packagePath = PackagePath(path: packagesPath, package: package)
-
+        if !packagePath.commandPath.exists {
+            throw MintError.invalidCommand(packagePath.commandPath.string)
+        }
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
             env["MINT"] = "YES"
@@ -206,7 +208,7 @@ public class Mint {
             return
         }
 
-        let checkoutPath = Path.temporary + "mint_\(CFAbsoluteTimeGetCurrent())"
+        let checkoutPath = Path.temporary + "mint"
         let packageCheckoutPath = checkoutPath + packagePath.repoPath
 
         try checkoutPath.mkpath()
@@ -246,7 +248,8 @@ public class Mint {
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
-        try toolFile.copy(packagePath.commandPath)
+        // copy using shell instead of FileManager via PathKit because it remove executable permissions on Linux
+        try SwiftCLI.run("cp", toolFile.string, packagePath.commandPath.string)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
@@ -277,9 +280,12 @@ public class Mint {
 
     private func buildPackage(name: String, path: Path) throws {
 
-        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-        let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-        let command = "swift build -c release -Xswiftc -target -Xswiftc \(target) -Xswiftc -static-stdlib"
+        var command = "swift build -c release"
+        #if os(macOS)
+            let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+            let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+            command += " -Xswiftc -static-stdlib -Xswiftc -target -Xswiftc \(target)"
+        #endif
 
 //        let buildSteps = [
 //            "Fetching": "Fetching Dependencies",
@@ -309,8 +315,8 @@ public class Mint {
 //            buildStepOutput += string + "\n"
 //        }
 
-        let taskOut = verbose ? standardOut : PipeStream()
-        let taskError = PipeStream()
+        let taskOut = verbose ? standardOut : LineStream {_ in}
+        let taskError = LineStream {_ in}
         let task = Task(executable: "/bin/bash", arguments: ["-c", command], directory: path.string, stdout: taskOut, stderr: taskError)
         task.runAsync()
         let status = task.finish()
@@ -345,7 +351,7 @@ public class Mint {
             }
         }
 
-        try? installPath.absolute().delete()
+        try? installPath.delete()
         try? installPath.parent().mkpath()
 
         do {
