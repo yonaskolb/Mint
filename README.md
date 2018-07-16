@@ -138,6 +138,11 @@ mint bootstrap
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
 - You can set `MINT_PATH` and `MINT_INSTALL_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
 
+### Linux
+Mint works on Linux but has some limitations:
+- linux doesn't support building with a statically linked version of Swift. This means when a new version of swift comes out the old installs won't work on linux. A stable ABI in Swift 5 will remove the need for this.
+- Linux is case sensitive so you must specify the correct case for repo urls as well as executables. As the `Mintfile` currently has no support for specifying the executable some packages may not work.
+
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
 
