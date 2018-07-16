@@ -351,7 +351,7 @@ public class Mint {
             }
         }
 
-        try? installPath.absolute().delete()
+        try? installPath.delete()
         try? installPath.parent().mkpath()
 
         do {
