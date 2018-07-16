@@ -111,8 +111,10 @@ class MintTests: XCTestCase {
 
         // install latest version
         let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
+        XCTAssertEqual(latestPackage.version, latestVersion)
         try expectMintVersion(package: latestPackage)
         XCTAssertEqual(latestPackage.version, latestVersion)
+
         let latestGlobalOutput = try capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: latestVersion])
@@ -162,6 +164,8 @@ class MintTests: XCTestCase {
         XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
+    #if os(macOS)
+    // Doesn't work on Linux as Mintfile can't define the command and the casing of Repo and executable can differ
     func testBootstrapCommand() throws {
         mint.mintFilePath = simpleMintFileFixture.absolute()
 
@@ -181,6 +185,7 @@ class MintTests: XCTestCase {
 
         try expectMintVersion(package: package)
     }
+    #endif
 
     func testMintErrors() {
 
