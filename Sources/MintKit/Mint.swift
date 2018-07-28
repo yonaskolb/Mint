@@ -275,6 +275,7 @@ public class Mint {
                 .flatMap { try $0.recursiveChildren() }
                 .map { $0.lastComponent }
                 .joined(separator: ", ")
+
             standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
 
             for manpage in manpages {
