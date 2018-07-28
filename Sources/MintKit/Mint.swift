@@ -268,6 +268,14 @@ public class Mint {
             }
         }
 
+        // copy manpages
+        for manpage in Path("\(packageCheckoutPath)/doc/man/").glob("*")  {
+            let dest = installationPath + "../share/man/" + manpage.lastComponent
+
+            // Path#copy(_:) fails if the dest already exists.
+            try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
+        }
+
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
 
         standardOut <<< "🌱  Installed \(package.commandVersion)".green
