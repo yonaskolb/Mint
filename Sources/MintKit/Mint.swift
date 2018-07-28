@@ -269,11 +269,20 @@ public class Mint {
         }
 
         // copy manpages
-        for manpage in Path("\(packageCheckoutPath)/doc/man/").glob("*")  {
-            let dest = installationPath + "../share/man/" + manpage.lastComponent
+        do {
+            let manpages = Path("\(packageCheckoutPath)/doc/man/").glob("*")
+            let allFiles = try manpages
+                .flatMap { try $0.recursiveChildren() }
+                .map { $0.lastComponent }
+                .joined(separator: ", ")
+            standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
 
-            // Path#copy(_:) fails if the dest already exists.
-            try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
+            for manpage in manpages {
+                let dest = installationPath + "../share/man/" + manpage.lastComponent
+
+                // Path#copy(_:) fails if the dest already exists.
+                try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
+            }
         }
 
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
