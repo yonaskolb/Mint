@@ -280,7 +280,7 @@ public class Mint {
                 standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
 
                 for manpage in manpages {
-                    let dest = installationPath + "../share/man/" + manpage.lastComponent
+                    let dest = packagePath.manpagesPath + manpage.lastComponent
 
                     // Path#copy(_:) fails if the dest already exists.
                     try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
@@ -357,6 +357,29 @@ public class Mint {
         }
     }
 
+    private func checkForExistingExecutable(installStatus: InstallStatus) -> Bool {
+        let warning: String? = {
+            switch installStatus.status {
+            case .file:
+                return message(.executableIsNonMintFileWarning(installStatus.path.string))
+            case .symlink(let symlink):
+                return message(.executableIsNonMintSymlinkWarning(path: installStatus.path.string,
+                                                                  symlink: symlink.string))
+            default:
+                return nil
+            }
+        }()
+
+        if let warning = warning {
+            let ok = Question().confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
+            if !ok {
+                return false
+            }
+        }
+
+        return true
+    }
+
     func installGlobal(packagePath: PackagePath) throws {
 
         let toolPath = packagePath.commandPath
@@ -364,11 +387,8 @@ public class Mint {
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
-        if let warning = installStatus.warning {
-            let ok = Question().confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
-            if !ok {
-                return
-            }
+        if !checkForExistingExecutable(installStatus: installStatus) {
+            return
         }
 
         try? installPath.delete()
@@ -386,6 +406,39 @@ public class Mint {
         }
 
         standardOut <<< "🌱  \(confirmation).".green
+
+        // symlink each manpages
+        let manpages = try packagePath.manpagesPath.glob("*")
+            .compactMap { try $0.recursiveChildren() }
+
+        for packageManpagePath in manpages {
+            if let latterPath = packageManpagePath.split(separator: "share/man/").last {
+                let dest = Path("/usr/local/share/man/\(latterPath)")
+
+                let installStatus = try InstallStatus(path: dest, mintPackagesPath: packagesPath)
+
+                let warning: String? = {
+                    switch installStatus.status {
+                    case .file:
+                        return message(.manpageIsNonMintFileWarning(installStatus.path.string))
+                    case .symlink(let symlink):
+                        return message(.manpageIsNonMintSymlinkWarning(path: installStatus.path.string,
+                                                                       symlink: symlink.string))
+                    default:
+                        return nil
+                    }
+                }()
+
+                if let warning = warning {
+                    let ok = Question().confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
+                    if !ok {
+                        continue
+                    }
+                }
+
+                try SwiftCLI.run(bash: "ln -s \(packageManpagePath) \(dest)")
+            }
+        }
     }
 
     public func bootstrap() throws {
@@ -442,12 +495,10 @@ public class Mint {
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
-        if let warning = installStatus.warning {
-            let ok = Question().confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
-            if !ok {
-                return
-            }
+        if !checkForExistingExecutable(installStatus: installStatus) {
+            return
         }
+
         try? installPath.delete()
     }
 }

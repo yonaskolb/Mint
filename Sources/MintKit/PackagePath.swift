@@ -26,6 +26,7 @@ struct PackagePath {
     var packagePath: Path { return path + repoPath }
     var installPath: Path { return packagePath + "build" + package.version }
     var commandPath: Path { return installPath + package.name }
+    var manpagesPath: Path { return installPath + "share/man" }
 
     static func gitURLFromString(_ string: String) -> String {
         if let url = URL(string: string), url.scheme != nil {
