@@ -118,7 +118,7 @@ A `Mintfile` can specify a list of versioned packages. It makes installing and r
 Simply place this file in the directory you're running Mint in. The format of the `Mintfile` is simply a list of packages in the same form as the usual package parameter:
 
 ```
-yonaskolb/xcodegen@0.9.0
+yonaskolb/xcodegen@1.10.3
 yonaskolb/genesis@0.2.0
 ```
 
