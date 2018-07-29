@@ -233,44 +233,44 @@ public class Mint {
             throw MintError.cloneError(url: packagePath.gitPath, version: package.version)
         }
 
-        standardOut <<< "🌱  Building \(package.name) with SPM..."
-
-        try buildPackage(name: package.name, path: packageCheckoutPath)
-
-        standardOut <<< "🌱  Installing..."
-
-        let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
-        if !toolFile.exists {
-            throw MintError.invalidCommand(package.name)
-        }
-
-        // TODO: perhaps don't remove the whole directory once we install specific executables
-        try? packagePath.installPath.delete()
-        try packagePath.installPath.mkpath()
-
-        // copy using shell instead of FileManager via PathKit because it remove executable permissions on Linux
-        try SwiftCLI.run("cp", toolFile.string, packagePath.commandPath.string)
-
-        let resourcesFile = packageCheckoutPath + "Package.resources"
-        if resourcesFile.exists {
-            let resourcesString: String = try resourcesFile.read()
-            let resources = resourcesString.components(separatedBy: "\n")
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
-            standardOut <<< "🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ..."
-            for resource in resources {
-                let resourcePath = packageCheckoutPath + resource
-                if resourcePath.exists {
-                    try resourcePath.copy(packagePath.installPath + resource)
-                } else {
-                    standardOut <<< "resource \(resource) doesn't exist".yellow
-                }
-            }
-        }
+//        standardOut <<< "🌱  Building \(package.name) with SPM..."
+//
+//        try buildPackage(name: package.name, path: packageCheckoutPath)
+//
+//        standardOut <<< "🌱  Installing..."
+//
+//        let toolFile = packageCheckoutPath + ".build/release/\(package.name)"
+//        if !toolFile.exists {
+//            throw MintError.invalidCommand(package.name)
+//        }
+//
+//        // TODO: perhaps don't remove the whole directory once we install specific executables
+//        try? packagePath.installPath.delete()
+//        try packagePath.installPath.mkpath()
+//
+//        // copy using shell instead of FileManager via PathKit because it remove executable permissions on Linux
+//        try SwiftCLI.run("cp", toolFile.string, packagePath.commandPath.string)
+//
+//        let resourcesFile = packageCheckoutPath + "Package.resources"
+//        if resourcesFile.exists {
+//            let resourcesString: String = try resourcesFile.read()
+//            let resources = resourcesString.components(separatedBy: "\n")
+//                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+//                .filter { !$0.isEmpty }
+//            standardOut <<< "🌱  Copying resources for \(package.name): \(resources.joined(separator: ", ")) ..."
+//            for resource in resources {
+//                let resourcePath = packageCheckoutPath + resource
+//                if resourcePath.exists {
+//                    try resourcePath.copy(packagePath.installPath + resource)
+//                } else {
+//                    standardOut <<< "resource \(resource) doesn't exist".yellow
+//                }
+//            }
+//        }
 
         // copy manpages
         do {
-            let manpages = Path("\(packageCheckoutPath)/doc/man/").glob("*")
+            let manpages = Path("\(packageCheckoutPath)/docs/man/").glob("*")
             let allFiles = try manpages
                 .flatMap { try $0.recursiveChildren() }
                 .map { $0.lastComponent }
