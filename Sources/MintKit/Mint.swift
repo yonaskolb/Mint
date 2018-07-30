@@ -261,7 +261,9 @@ public class Mint {
             for resource in resources {
                 let resourcePath = packageCheckoutPath + resource
                 if resourcePath.exists {
-                    try resourcePath.copy(packagePath.installPath + resource)
+                    let filename = String(resource.split(separator: "/").last!)
+                    let dest = packagePath.installPath + filename
+                    try SwiftCLI.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
                 } else {
                     standardOut <<< "resource \(resource) doesn't exist".yellow
                 }
