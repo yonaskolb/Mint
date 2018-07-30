@@ -273,11 +273,15 @@ public class Mint {
             let manpages = Path("\(packageCheckoutPath)/docs/man/").glob("*")
             if !manpages.isEmpty {
                 let allFiles = try manpages
-                    .flatMap { try $0.recursiveChildren() }
+                    .flatMap { $0.isDirectory ? try $0.recursiveChildren() : [$0] }
                     .map { $0.lastComponent }
                     .joined(separator: ", ")
 
                 standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
+
+                if !packagePath.manpagesPath.exists {
+                    try packagePath.manpagesPath.mkpath()
+                }
 
                 for manpage in manpages {
                     let dest = packagePath.manpagesPath + manpage.lastComponent
@@ -409,10 +413,10 @@ public class Mint {
 
         // symlink each manpages
         let manpages = try packagePath.manpagesPath.glob("*")
-            .compactMap { try $0.recursiveChildren() }
+            .flatMap { try $0.recursiveChildren() }
 
         for packageManpagePath in manpages {
-            if let latterPath = packageManpagePath.split(separator: "share/man/").last {
+            if let latterPath = packageManpagePath.string.split(around: "share/man/").1 {
                 let dest = Path("/usr/local/share/man/\(latterPath)")
 
                 let installStatus = try InstallStatus(path: dest, mintPackagesPath: packagesPath)
@@ -434,9 +438,10 @@ public class Mint {
                     if !ok {
                         continue
                     }
+                    try dest.delete()
                 }
 
-                try SwiftCLI.run(bash: "ln -s \(packageManpagePath) \(dest)")
+                try! SwiftCLI.run(bash: "ln -s \(packageManpagePath) \(dest)")
             }
         }
     }
