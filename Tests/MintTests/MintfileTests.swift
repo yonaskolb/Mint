@@ -36,15 +36,15 @@ class MintfileTests: XCTestCase {
         XCTAssertEqual(
             mintfile.packages,
             [
-                PackageReference(repo: "yonaskolb/simplepackage", version: "4.0.0"),
-                PackageReference(repo: "yonaskolb/mint", version: "0.9.1"),
+                PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0"),
+                PackageReference(repo: "yonaskolb/Mint", version: "0.9.1"),
             ]
         )
 
-        let expectedPackage = PackageReference(repo: "yonaskolb/simplepackage", version: "4.0.0")
+        let expectedPackage = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
         XCTAssertEqual(mintfile.package(for: "yonaskolb/SimplePackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SimplePackage"), expectedPackage)
-        XCTAssertEqual(mintfile.package(for: "yonaskolb/simplepackage"), expectedPackage)
+        XCTAssertEqual(mintfile.package(for: "yonaskolb/Simplepackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "simplepackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "another/Repo"), nil)
     }

@@ -167,8 +167,6 @@ class MintTests: XCTestCase {
         XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
-    #if os(macOS)
-    // Doesn't work on Linux as Mintfile can't define the command and the casing of Repo and executable can differ
     func testBootstrapCommand() throws {
         mint.mintFilePath = simpleMintFileFixture.absolute()
 
@@ -188,7 +186,6 @@ class MintTests: XCTestCase {
 
         try checkInstalledVersion(package: package, executable: testCommand)
     }
-    #endif
 
     func testMintErrors() {
 
