@@ -4,7 +4,7 @@ extension MintTests {
     static let __allTests = [
         ("testInstallCommand", testInstallCommand),
         ("testMintErrors", testMintErrors),
-        ("testMintPackageInfo", testMintPackageInfo),
+        ("testPackageReferenceInfo", testPackageReferenceInfo),
         ("testPackageGitPaths", testPackageGitPaths),
         ("testPackagePaths", testPackagePaths),
         ("testRunCommand", testRunCommand),

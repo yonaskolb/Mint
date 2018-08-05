@@ -110,7 +110,7 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
 ### Global installs
-By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--prevent-global` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--prevent-global` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run package`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
 ### Mintfile
 A `Mintfile` can specify a list of versioned packages. It makes installing and running these packages easy, as the specific repos and versions are centralized.

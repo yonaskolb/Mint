@@ -4,7 +4,7 @@ import SwiftCLI
 
 class RunCommand: PackageCommand {
 
-    var command = OptionalCollectedParameter()
+    var arguments = OptionalCollectedParameter()
     var silent = Flag("-s", "--silent", description: "Silences any output from Mint itself")
 
     init(mint: Mint) {
@@ -20,16 +20,7 @@ class RunCommand: PackageCommand {
         try super.execute()
     }
 
-    override func execute(repo: String, version: String) throws {
-        var arguments = command.value
-
-        // backwards compatability for arguments surrounded in quotes
-        if arguments.count == 1,
-            let firstArg = arguments.first,
-            firstArg.contains(" ") {
-            arguments = firstArg.split(separator: " ").map(String.init)
-        }
-
-        try mint.run(repo: repo, version: version, arguments: arguments)
+    override func execute(package: PackageReference) throws {
+        try mint.run(package: package, arguments: arguments.value)
     }
 }

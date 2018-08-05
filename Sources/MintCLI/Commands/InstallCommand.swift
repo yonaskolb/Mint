@@ -40,10 +40,8 @@ class InstallOrUpdateCommand: PackageCommand {
                    parameterDescription: "The executable to install defaults to the repo name")
     }
 
-    override func execute(repo: String, version: String) throws {
-        let executable = self.executable.value
+    override func execute(package: PackageReference) throws {
         let global = !preventGlobal.value
-
-        try mint.install(repo: repo, version: version, command: executable, update: update, global: global)
+        try mint.install(package: package, executable: executable.value, update: update, global: global)
     }
 }

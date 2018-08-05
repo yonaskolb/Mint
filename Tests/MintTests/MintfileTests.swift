@@ -16,12 +16,12 @@ class MintfileTests: XCTestCase {
         XCTAssertEqual(
             mintfile.packages,
             [
-                MintPackage(repo: "yonaskolb/xcodegen", version: "1.8.0"),
-                MintPackage(repo: "realm/SwiftLint", version: "0.25.0"),
+                PackageReference(repo: "yonaskolb/xcodegen", version: "1.8.0"),
+                PackageReference(repo: "realm/SwiftLint", version: "0.25.0"),
             ]
         )
 
-        let expectedPackage = MintPackage(repo: "realm/SwiftLint", version: "0.25.0")
+        let expectedPackage = PackageReference(repo: "realm/SwiftLint", version: "0.25.0")
         XCTAssertEqual(mintfile.package(for: "realm/SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "realm/swiftLint"), expectedPackage)
@@ -36,12 +36,12 @@ class MintfileTests: XCTestCase {
         XCTAssertEqual(
             mintfile.packages,
             [
-                MintPackage(repo: "yonaskolb/simplepackage", version: "4.0.0"),
-                MintPackage(repo: "yonaskolb/mint", version: "0.9.1"),
+                PackageReference(repo: "yonaskolb/simplepackage", version: "4.0.0"),
+                PackageReference(repo: "yonaskolb/mint", version: "0.9.1"),
             ]
         )
 
-        let expectedPackage = MintPackage(repo: "yonaskolb/simplepackage", version: "4.0.0")
+        let expectedPackage = PackageReference(repo: "yonaskolb/simplepackage", version: "4.0.0")
         XCTAssertEqual(mintfile.package(for: "yonaskolb/SimplePackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SimplePackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "yonaskolb/simplepackage"), expectedPackage)

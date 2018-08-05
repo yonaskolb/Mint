@@ -28,7 +28,7 @@ class MintTests: XCTestCase {
     func testPackagePaths() {
 
         let testMint = Mint(path: "/testPath/mint", installationPath: "/testPath/mint-installs")
-        let package = Package(repo: "yonaskolb/mint", version: "1.2.0", name: "mint")
+        let package = PackageReference(repo: "yonaskolb/mint", version: "1.2.0")
         let packagePath = PackagePath(path: testMint.packagesPath, package: package)
 
         XCTAssertEqual(testMint.path, "/testPath/mint")
@@ -38,7 +38,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(packagePath.repoPath, "github.com_yonaskolb_mint")
         XCTAssertEqual(packagePath.packagePath, "/testPath/mint/packages/github.com_yonaskolb_mint")
         XCTAssertEqual(packagePath.installPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0")
-        XCTAssertEqual(packagePath.commandPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
+        XCTAssertEqual(packagePath.executablePath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
     }
 
     func testPackageGitPaths() {
@@ -60,32 +60,32 @@ class MintTests: XCTestCase {
         }
     }
 
-    func testMintPackageInfo() {
+    func testPackageReferenceInfo() {
 
-        XCTAssertEqual(MintPackage(package: "yonaskolb/mint"), MintPackage(repo: "yonaskolb/mint"))
-        XCTAssertEqual(MintPackage(package: "yonaskolb/mint@0.0.1"), MintPackage(repo: "yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "github.com/yonaskolb/mint"), MintPackage(repo: "github.com/yonaskolb/mint"))
-        XCTAssertEqual(MintPackage(package: "github.com/yonaskolb/mint@0.0.1"), MintPackage(repo: "github.com/yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "https://github.com/yonaskolb/mint"), MintPackage(repo: "https://github.com/yonaskolb/mint"))
-        XCTAssertEqual(MintPackage(package: "https://github.com/yonaskolb/mint@0.0.1"), MintPackage(repo: "https://github.com/yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "https://github.com/yonaskolb/mint.git"), MintPackage(repo: "https://github.com/yonaskolb/mint.git"))
-        XCTAssertEqual(MintPackage(package: "https://github.com/yonaskolb/mint.git@0.0.1"), MintPackage(repo: "https://github.com/yonaskolb/mint.git", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "mycustomdomain.com/package"), MintPackage(repo: "mycustomdomain.com/package"))
-        XCTAssertEqual(MintPackage(package: "mycustomdomain.com/package@0.0.1"), MintPackage(repo: "mycustomdomain.com/package", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "mycustomdomain.com/package.git"), MintPackage(repo: "mycustomdomain.com/package.git"))
-        XCTAssertEqual(MintPackage(package: "mycustomdomain.com/package.git@0.0.1"), MintPackage(repo: "mycustomdomain.com/package.git", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "https://mycustomdomain.com/package"), MintPackage(repo: "https://mycustomdomain.com/package"))
-        XCTAssertEqual(MintPackage(package: "https://mycustomdomain.com/package@0.0.1"), MintPackage(repo: "https://mycustomdomain.com/package", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "https://mycustomdomain.com/package.git"), MintPackage(repo: "https://mycustomdomain.com/package.git"))
-        XCTAssertEqual(MintPackage(package: "https://mycustomdomain.com/package.git@0.0.1"), MintPackage(repo: "https://mycustomdomain.com/package.git", version: "0.0.1"))
-        XCTAssertEqual(MintPackage(package: "git@github.com:yonaskolb/Mint.git"), MintPackage(repo: "git@github.com:yonaskolb/Mint.git"))
-        XCTAssertEqual(MintPackage(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), MintPackage(repo: "git@github.com:yonaskolb/Mint.git", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "yonaskolb/mint"), PackageReference(repo: "yonaskolb/mint"))
+        XCTAssertEqual(PackageReference(package: "yonaskolb/mint@0.0.1"), PackageReference(repo: "yonaskolb/mint", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "github.com/yonaskolb/mint"), PackageReference(repo: "github.com/yonaskolb/mint"))
+        XCTAssertEqual(PackageReference(package: "github.com/yonaskolb/mint@0.0.1"), PackageReference(repo: "github.com/yonaskolb/mint", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint"), PackageReference(repo: "https://github.com/yonaskolb/mint"))
+        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint@0.0.1"), PackageReference(repo: "https://github.com/yonaskolb/mint", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint.git"), PackageReference(repo: "https://github.com/yonaskolb/mint.git"))
+        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint.git@0.0.1"), PackageReference(repo: "https://github.com/yonaskolb/mint.git", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package"), PackageReference(repo: "mycustomdomain.com/package"))
+        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package@0.0.1"), PackageReference(repo: "mycustomdomain.com/package", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package.git"), PackageReference(repo: "mycustomdomain.com/package.git"))
+        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package.git@0.0.1"), PackageReference(repo: "mycustomdomain.com/package.git", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package"), PackageReference(repo: "https://mycustomdomain.com/package"))
+        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package@0.0.1"), PackageReference(repo: "https://mycustomdomain.com/package", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package.git"), PackageReference(repo: "https://mycustomdomain.com/package.git"))
+        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageReference(repo: "https://mycustomdomain.com/package.git", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git"))
+        XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git", version: "0.0.1"))
     }
 
-    func expectMintVersion(package: Package, file: StaticString = #file, line: UInt = #line) throws {
-        let packagePath = PackagePath(path: mint.packagesPath, package: package)
-        XCTAssertTrue(packagePath.commandPath.exists)
-        let output = try capture(packagePath.commandPath.string, "--version")
+    func checkInstalledVersion(package: PackageReference, executable: String, file: StaticString = #file, line: UInt = #line) throws {
+        let packagePath = PackagePath(path: mint.packagesPath, package: package, executable: executable)
+        XCTAssertTrue(packagePath.executablePath.exists)
+        let output = try capture(packagePath.executablePath.string, "--version")
         XCTAssertEqual(output.stdout, package.version, file: file, line: line)
     }
 
@@ -94,15 +94,15 @@ class MintTests: XCTestCase {
         let globalPath = mint.installationPath + testCommand
 
         // install specific version
-        let specificPackage = try mint.install(repo: testRepo, version: testVersion, command: testCommand)
-        try expectMintVersion(package: specificPackage)
+        let specificPackage = PackageReference(repo: testRepo, version: testVersion)
+        try mint.install(package: specificPackage)
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
-
         // install already installed version globally
-        try mint.install(repo: testRepo, version: testVersion, command: testCommand, global: true)
+        try mint.install(package: PackageReference(repo: testRepo, version: testVersion), global: true)
         XCTAssertTrue(globalPath.exists)
         let globalOutput = try capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
@@ -110,9 +110,10 @@ class MintTests: XCTestCase {
         XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
 
         // install latest version
-        let latestPackage = try mint.install(repo: testRepo, version: "", command: testCommand, global: true)
+        let latestPackage = PackageReference(repo: testRepo)
+        try mint.install(package: latestPackage, executable: testCommand, global: true)
         XCTAssertEqual(latestPackage.version, latestVersion)
-        try expectMintVersion(package: latestPackage)
+        try checkInstalledVersion(package: latestPackage, executable: testCommand)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
         let latestGlobalOutput = try capture(globalPath.string)
@@ -138,18 +139,20 @@ class MintTests: XCTestCase {
     func testRunCommand() throws {
 
         // run a specific version
-        let specificPackage = try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
-        try expectMintVersion(package: specificPackage)
+        let specificPackage = PackageReference(repo: testRepo, version: testVersion)
+        try mint.run(package: specificPackage, arguments: [testCommand])
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
 
         // run an already installed version
-        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand])
+        try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: [testCommand])
 
         // run with arguments
-        try mint.run(repo: testRepo, version: testVersion, arguments: [testCommand, "--version"])
+        try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: [testCommand, "--version"])
 
         // run latest version
-        let latestPackage = try mint.run(repo: testRepo, version: "", arguments: [testCommand])
-        try expectMintVersion(package: latestPackage)
+        let latestPackage = PackageReference(repo: testRepo)
+        try mint.run(package: latestPackage, arguments: [testCommand])
+        try checkInstalledVersion(package: latestPackage, executable: testCommand)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
         // check package list has installed versions
@@ -171,7 +174,7 @@ class MintTests: XCTestCase {
 
         try mint.bootstrap()
 
-        let package = Package(repo: "yonaskolb/SimplePackage", version: "5.0.0", name: "simplepackage")
+        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "5.0.0")
 
         let globalPath = mint.installationPath + testCommand
 
@@ -183,26 +186,26 @@ class MintTests: XCTestCase {
         XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
-        try expectMintVersion(package: package)
+        try checkInstalledVersion(package: package, executable: testCommand)
     }
     #endif
 
     func testMintErrors() {
 
         expectError(MintError.cloneError(url: "http://invaliddomain.com/invalid", version: testVersion)) {
-            try mint.run(repo: "http://invaliddomain.com/invalid", version: testVersion, arguments: ["invalid"])
+            try mint.run(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion), arguments: ["invalid"])
         }
 
         expectError(MintError.invalidRepo("invalid repo")) {
-            try mint.install(repo: "invalid repo", version: testVersion, command: "", update: false)
+            try mint.install(package: PackageReference(repo: "invalid repo", version: testVersion), update: false)
         }
 
-        expectError(MintError.invalidCommand("invalidCommand")) {
-            try mint.run(repo: testRepo, version: testVersion, arguments: ["invalidCommand"])
+        expectError(MintError.invalidExecutable("invalidCommand")) {
+            try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: ["invalidCommand"])
         }
 
         expectError(MintError.packageNotFound("invalidPackage")) {
-            try mint.run(repo: "invalidPackage", version: testVersion, arguments: [])
+            try mint.run(package: PackageReference(repo: "invalidPackage", version: testVersion), arguments: [])
         }
 
         expectError(MintError.mintfileNotFound("invalid")) {
