@@ -7,7 +7,7 @@ import Utility
 public class Mint {
 
     public var path: Path
-    public var installationPath: Path
+    public var linkPath: Path
     public var mintFilePath: Path
 
     var packagesPath: Path {
@@ -27,14 +27,14 @@ public class Mint {
 
     public init(
         path: Path,
-        installationPath: Path,
+        linkPath: Path,
         mintFilePath: Path = "Mintfile",
         standardOut: WritableStream = WriteStream.stdout,
         standardError: WritableStream = WriteStream.stderr) {
         self.standardOut = standardOut
         self.standardError = standardError
         self.path = path.absolute()
-        self.installationPath = installationPath.absolute()
+        self.linkPath = linkPath.absolute()
         self.mintFilePath = mintFilePath
         self.inputReader = InputReader(standardOut: standardOut)
     }
@@ -72,9 +72,9 @@ public class Mint {
         return metadata.packages.first(where: { $0.key.lowercased().contains(name.lowercased()) })?.key
     }
 
-    func getGlobalInstalledPackages() -> [String: String] {
-        guard installationPath.exists,
-            let packages = try? installationPath.children() else {
+    func getLinkedPackages() -> [String: String] {
+        guard linkPath.exists,
+            let packages = try? linkPath.children() else {
             return [:]
         }
 
@@ -96,7 +96,7 @@ public class Mint {
             return [:]
         }
 
-        let globalInstalledPackages: [String: String] = getGlobalInstalledPackages()
+        let linkedPackages: [String: String] = getLinkedPackages()
 
         var versionsByPackage: [String: [String]] = [:]
         let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
@@ -109,7 +109,7 @@ public class Mint {
             var package = "  \(packageName)"
             for version in versions {
                 package += "\n    - \(version)"
-                if globalInstalledPackages[packageName] == version {
+                if linkedPackages[packageName] == version {
                     package += " *"
                 }
                 versionsByPackage[packageName, default: []].append(version)
@@ -133,7 +133,7 @@ public class Mint {
         }
 
         // install the package if not installed already
-        try install(package: package, force: false, global: false)
+        try install(package: package, force: false, link: false)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -166,7 +166,7 @@ public class Mint {
         }
     }
 
-    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, global: Bool = false) throws {
+    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false) throws {
 
         if package.version.isEmpty,
             mintFilePath.exists,
@@ -213,13 +213,13 @@ public class Mint {
         let alreadyInstalled = packagePath.installPath.exists
         if !force && alreadyInstalled {
             standardOut <<< "🌱  \(packagePath.commandVersion) already installed".green
-            if global {
+            if link {
                 if let executable = executable {
-                    try installGlobal(package: package, executable: executable)
+                    try linkPackage(package, executable: executable)
                 } else {
                     let executables = try packagePath.getExecutables()
                     for executable in executables {
-                        try installGlobal(package: package, executable: executable)
+                        try linkPackage(package, executable: executable)
                     }
                 }
             }
@@ -304,12 +304,12 @@ public class Mint {
         standardOut <<< "🌱  Installed \(spmPackage.name) \(package.version)".green
         try? packageCheckoutPath.delete()
 
-        if global {
+        if link {
             if let executable = executable {
-                try installGlobal(package: package, executable: executable)
+                try linkPackage(package, executable: executable)
             } else {
                 for executable in executables {
-                    try installGlobal(package: package, executable: executable)
+                    try linkPackage(package, executable: executable)
                 }
             }
 
@@ -375,10 +375,10 @@ public class Mint {
         }
     }
 
-    func installGlobal(package: PackageReference, executable: String) throws {
+    func linkPackage(_ package: PackageReference, executable: String) throws {
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-        let installPath = installationPath + packagePath.executable!
+        let installPath = linkPath + packagePath.executable!
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
@@ -395,10 +395,10 @@ public class Mint {
         do {
             try SwiftCLI.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
         } catch {
-            standardError <<< "🌱  Could not install \(packagePath.commandVersion) in \(installPath.string)"
+            standardError <<< "🌱  Could not link \(packagePath.commandVersion) to \(installPath.string)"
             return
         }
-        var confirmation = "Linked \(packagePath.commandVersion) to \(installationPath.string)"
+        var confirmation = "Linked \(packagePath.commandVersion) to \(linkPath.string)"
         if case let .mint(previousVersion) = installStatus.status {
             confirmation += ", replacing version \(previousVersion)"
         }
@@ -419,7 +419,7 @@ public class Mint {
 
         standardOut <<< "🌱  Found \(packageCount) in \(mintFilePath.string)"
         for package in mintFile.packages {
-            try install(package: package, force: false, global: false)
+            try install(package: package, force: false, link: false)
         }
         standardOut <<< "🌱  Installed \(packageCount) from \(mintFilePath.string)".green
     }
@@ -455,8 +455,8 @@ public class Mint {
         }
         try writeMetadata(metadata)
 
-        // remove global install
-        let installPath = installationPath + name
+        // remove link
+        let installPath = linkPath + name
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 

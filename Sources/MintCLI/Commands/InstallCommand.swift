@@ -6,7 +6,7 @@ import Utility
 class InstallCommand: PackageCommand {
 
     let executable = OptionalParameter()
-    let preventGlobal = Flag("-p", "--prevent-global", description: "Whether to prevent global installation")
+    let noLink = Flag("-n", "--no-link", description: "Whether to prevent global linkage")
     let force = Flag("-f", "--force", description: "Force a reinstall even if the package is already installed", defaultValue: false)
 
     init(mint: Mint) {
@@ -17,7 +17,7 @@ class InstallCommand: PackageCommand {
     }
 
     override func execute(package: PackageReference) throws {
-        let global = !preventGlobal.value
-        try mint.install(package: package, executable: executable.value, force: force.value, global: global)
+        let link = !noLink.value
+        try mint.install(package: package, executable: executable.value, force: force.value, link: link)
     }
 }
