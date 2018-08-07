@@ -10,7 +10,8 @@ class RunCommand: PackageCommand {
     init(mint: Mint) {
         super.init(mint: mint,
                    name: "run",
-                   description: "Install and then run a package")
+                   description: "Install and then run a package",
+                   parameterDescription: "The arguments can be used to specify a specific executable and it's arguments. By default the single executable in the Package.swift will be used, otherwise if there are multiple it will ask you to choose")
     }
 
     override func execute() throws {
