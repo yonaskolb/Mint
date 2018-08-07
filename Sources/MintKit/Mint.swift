@@ -199,27 +199,18 @@ public class Mint {
             }
         }
 
-        let alreadyInstalled: Bool
-        if packagePath.executable == nil {
-            alreadyInstalled = packagePath.executablePath.exists
-        } else {
-            alreadyInstalled = packagePath.installPath.exists
-        }
-
+        let alreadyInstalled = packagePath.installPath.exists
         if !update && alreadyInstalled {
+            standardOut <<< "🌱  \(packagePath.commandVersion) already installed".green
             if global {
                 if let executable = executable {
-                    let executablePackagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-                    try installGlobal(packagePath: executablePackagePath)
+                    try installGlobal(package: package, executable: executable)
                 } else {
                     let executables = try packagePath.getExecutables()
                     for executable in executables {
-                        let executablePackagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-                        try installGlobal(packagePath: executablePackagePath)
+                        try installGlobal(package: package, executable: executable)
                     }
                 }
-            } else {
-                standardOut <<< "🌱  \(package.namedVersion) already installed".green
             }
             return
         }
@@ -253,14 +244,9 @@ public class Mint {
             throw MintError.packageFileNotFound
         }
 
-        let executables: [String]
-        if let executable = executable {
-            executables = [executable]
-        } else {
-            executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
-            guard !executables.isEmpty else {
-                throw MintError.missingExecutable
-            }
+        let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
+        guard !executables.isEmpty else {
+            throw MintError.missingExecutable
         }
 
         standardOut <<< "🌱  Building \(spmPackage.name) Package with SPM..."
@@ -269,10 +255,8 @@ public class Mint {
 
         standardOut <<< "🌱  Installing \(spmPackage.name)..."
 
-        // clear the install directory unless we're installing a specific executable
-        if packagePath.executable == nil {
-            try? packagePath.installPath.delete()
-        }
+        // clear the install directory
+        try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
         for executable in executables {
@@ -308,10 +292,14 @@ public class Mint {
         try? packageCheckoutPath.delete()
 
         if global {
-            for executable in executables {
-                let executablePackagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-                try installGlobal(packagePath: executablePackagePath)
+            if let executable = executable {
+                try installGlobal(package: package, executable: executable)
+            } else {
+                for executable in executables {
+                    try installGlobal(package: package, executable: executable)
+                }
             }
+
         }
     }
 
@@ -374,8 +362,9 @@ public class Mint {
         }
     }
 
-    func installGlobal(packagePath: PackagePath) throws {
+    func installGlobal(package: PackageReference, executable: String) throws {
 
+        let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
         let installPath = installationPath + packagePath.executable!
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)

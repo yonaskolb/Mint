@@ -37,7 +37,7 @@ class InstallOrUpdateCommand: PackageCommand {
         super.init(mint: mint,
                    name: name,
                    description: description,
-                   parameterDescription: "By default all the executable products from the Package.swift are installed. The executable parameter can be used to install just a single executable globally.")
+                   parameterDescription: "By default all the executable products from the Package.swift are installed. The executable parameter can be used to link just a single executable globally.")
     }
 
     override func execute(package: PackageReference) throws {
