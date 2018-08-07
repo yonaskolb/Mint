@@ -202,7 +202,7 @@ class MintTests: XCTestCase {
         }
 
         expectError(MintError.invalidRepo("invalid repo")) {
-            try mint.install(package: PackageReference(repo: "invalid repo", version: testVersion), update: false)
+            try mint.install(package: PackageReference(repo: "invalid repo", version: testVersion), force: false)
         }
 
         expectError(MintError.invalidExecutable("invalidCommand")) {

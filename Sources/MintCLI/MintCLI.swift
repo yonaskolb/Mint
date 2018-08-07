@@ -28,7 +28,6 @@ public class MintCLI {
         cli = CLI(name: "mint", version: version, description: "Run and install Swift Package Manager executables", commands: [
             RunCommand(mint: mint),
             InstallCommand(mint: mint),
-            UpdateCommand(mint: mint),
             UninstallCommand(mint: mint),
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),

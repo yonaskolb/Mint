@@ -3,45 +3,21 @@ import MintKit
 import SwiftCLI
 import Utility
 
-class InstallCommand: InstallOrUpdateCommand {
+class InstallCommand: PackageCommand {
+
+    let executable = OptionalParameter()
+    let preventGlobal = Flag("-p", "--prevent-global", description: "Whether to prevent global installation")
+    let force = Flag("-f", "--force", description: "Force a reinstall even if the package is already installed", defaultValue: false)
 
     init(mint: Mint) {
         super.init(mint: mint,
                    name: "install",
                    description: "Install a package. If the version is already installed no action will be taken",
-                   update: false
-        )
-    }
-}
-
-class UpdateCommand: InstallOrUpdateCommand {
-
-    init(mint: Mint) {
-        super.init(mint: mint,
-                   name: "update",
-                   description: "Update a package even if it's already installed",
-                   update: true
-        )
-    }
-}
-
-class InstallOrUpdateCommand: PackageCommand {
-
-    var executable = OptionalParameter()
-    var preventGlobal = Flag("-p", "--prevent-global", description: "Whether to prevent global installation")
-
-    var update: Bool
-
-    init(mint: Mint, name: String, description: String, update: Bool) {
-        self.update = update
-        super.init(mint: mint,
-                   name: name,
-                   description: description,
                    parameterDescription: "By default all the executable products from the Package.swift are installed. The executable parameter can be used to link just a single executable globally.")
     }
 
     override func execute(package: PackageReference) throws {
         let global = !preventGlobal.value
-        try mint.install(package: package, executable: executable.value, update: update, global: global)
+        try mint.install(package: package, executable: executable.value, force: force.value, global: global)
     }
 }

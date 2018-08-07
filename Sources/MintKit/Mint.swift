@@ -133,7 +133,7 @@ public class Mint {
         }
 
         // install the package if not installed already
-        try install(package: package, update: false, global: false)
+        try install(package: package, force: false, global: false)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -166,7 +166,7 @@ public class Mint {
         }
     }
 
-    public func install(package: PackageReference, executable: String? = nil, update: Bool = false, global: Bool = false) throws {
+    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, global: Bool = false) throws {
 
         if package.version.isEmpty,
             mintFilePath.exists,
@@ -211,7 +211,7 @@ public class Mint {
         }
 
         let alreadyInstalled = packagePath.installPath.exists
-        if !update && alreadyInstalled {
+        if !force && alreadyInstalled {
             standardOut <<< "🌱  \(packagePath.commandVersion) already installed".green
             if global {
                 if let executable = executable {
@@ -419,7 +419,7 @@ public class Mint {
 
         standardOut <<< "🌱  Found \(packageCount) in \(mintFilePath.string)"
         for package in mintFile.packages {
-            try install(package: package, update: false, global: false)
+            try install(package: package, force: false, global: false)
         }
         standardOut <<< "🌱  Installed \(packageCount) from \(mintFilePath.string)".green
     }

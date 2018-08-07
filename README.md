@@ -89,14 +89,13 @@ Run `mint help` to see usage instructions.
 
 - **install**: Installs a package, so it can be run with `run` later, and also links that version globally
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
-- **update**: Installs a package while enforcing an update and rebuild. Shouldn't be required unless you are pointing at a branch and want to update it.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
 - **bootstrap**: Installs all the packages in your [Mintfile](#mintfile) without linking them globally
 
 **Package reference**
 
-`run`, `install` and `update` commands all require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`). This will do a lookup of all installed packages.
+`run` and `install` commands require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`). This will do a lookup of all installed packages.
 An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
 
 #### Examples
@@ -104,6 +103,7 @@ An optional version can be specified by appending `@version`, otherwise the newe
 $ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
 $ mint install yonaskolb/XcodeGen@1.2.4 --prevent-global # installs a certain version but not globally
 $ mint install yonaskolb/XcodeGen # install newest tag
+$ mint install yonaskolb/XcodeGen@master --force #reinstall the master branch
 $ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
@@ -136,6 +136,7 @@ mint bootstrap
 ### Advanced
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
 - You can set `MINT_PATH` and `MINT_INSTALL_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
+- You can use `mint install --force` to reinstall a package even if it's already installed. This shouldn't be required unless you are pointing at a branch and want to update it.
 
 ### Linux
 Mint works on Linux but has some limitations:
