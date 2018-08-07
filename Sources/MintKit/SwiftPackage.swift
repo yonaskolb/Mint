@@ -1,10 +1,3 @@
-//
-//  SwiftPackage.swift
-//  MintKit
-//
-//  Created by Yonas Kolb on 5/8/18.
-//
-
 import Foundation
 import PathKit
 import SwiftCLI

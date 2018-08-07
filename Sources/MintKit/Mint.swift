@@ -1,5 +1,5 @@
-import PathKit
 import Foundation
+import PathKit
 import Rainbow
 import SwiftCLI
 import Utility
@@ -36,7 +36,7 @@ public class Mint {
         self.path = path.absolute()
         self.linkPath = linkPath.absolute()
         self.mintFilePath = mintFilePath
-        self.inputReader = InputReader(standardOut: standardOut)
+        inputReader = InputReader(standardOut: standardOut)
     }
 
     public func closeStreams() {
@@ -115,7 +115,7 @@ public class Mint {
                 versionsByPackage[packageName, default: []].append(version)
             }
             return package
-        }.sorted { $0.localizedStandardCompare($1) == .orderedAscending  }
+        }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
 
         standardOut <<< "Installed mint packages:\n\(packages.joined(separator: "\n"))"
         return versionsByPackage
@@ -312,7 +312,6 @@ public class Mint {
                     try linkPackage(package, executable: executable)
                 }
             }
-
         }
     }
 

@@ -18,7 +18,7 @@ class MintTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        //mint.verbose = true
+        // mint.verbose = true
         mint.runAsNewProcess = false
         try? mint.path.delete()
         try? mint.linkPath.delete()

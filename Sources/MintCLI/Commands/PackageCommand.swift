@@ -26,7 +26,7 @@ class PackageCommand: MintfileCommand {
         if silent.value {
             mint.standardOut = WriteStream.null
         }
-        
+
         try super.execute()
 
         let package = PackageReference(package: self.package.value)

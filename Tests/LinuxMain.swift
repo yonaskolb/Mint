@@ -1,6 +1,5 @@
-import XCTest
-
 import MintTests
+import XCTest
 
 var tests = [XCTestCaseEntry]()
 tests += MintTests.__allTests()

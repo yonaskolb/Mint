@@ -26,11 +26,11 @@ extension PackageTests {
 }
 
 #if !os(macOS)
-public func __allTests() -> [XCTestCaseEntry] {
-    return [
-        testCase(MintTests.__allTests),
-        testCase(MintfileTests.__allTests),
-        testCase(PackageTests.__allTests),
-    ]
-}
+    public func __allTests() -> [XCTestCaseEntry] {
+        return [
+            testCase(MintTests.__allTests),
+            testCase(MintfileTests.__allTests),
+            testCase(PackageTests.__allTests),
+        ]
+    }
 #endif

@@ -48,4 +48,3 @@ extension PackageReference: Equatable {
         return lhs.repo == rhs.repo && lhs.version == rhs.version
     }
 }
-
