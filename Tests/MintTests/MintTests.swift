@@ -6,7 +6,7 @@ import XCTest
 class MintTests: XCTestCase {
 
     let mint = Mint(path: Path.temporary + "mint",
-                    installationPath: Path.temporary + "mint-installs",
+                    linkPath: Path.temporary + "mint-installs",
                     standardOut: WriteStream.null,
                     standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
@@ -21,65 +21,8 @@ class MintTests: XCTestCase {
         //mint.verbose = true
         mint.runAsNewProcess = false
         try? mint.path.delete()
-        try? mint.installationPath.delete()
+        try? mint.linkPath.delete()
         mint.mintFilePath = "Mintfile"
-    }
-
-    func testPackagePaths() {
-
-        let testMint = Mint(path: "/testPath/mint", installationPath: "/testPath/mint-installs")
-        let package = PackageReference(repo: "yonaskolb/mint", version: "1.2.0")
-        let packagePath = PackagePath(path: testMint.packagesPath, package: package)
-
-        XCTAssertEqual(testMint.path, "/testPath/mint")
-        XCTAssertEqual(testMint.packagesPath, "/testPath/mint/packages")
-        XCTAssertEqual(testMint.installationPath, "/testPath/mint-installs")
-        XCTAssertEqual(packagePath.gitPath, "https://github.com/yonaskolb/mint.git")
-        XCTAssertEqual(packagePath.repoPath, "github.com_yonaskolb_mint")
-        XCTAssertEqual(packagePath.packagePath, "/testPath/mint/packages/github.com_yonaskolb_mint")
-        XCTAssertEqual(packagePath.installPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0")
-        XCTAssertEqual(packagePath.executablePath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
-    }
-
-    func testPackageGitPaths() {
-
-        let urls: [String: String] = [
-            "yonaskolb/mint": "https://github.com/yonaskolb/mint.git",
-            "github.com/yonaskolb/mint": "https://github.com/yonaskolb/mint.git",
-            "https://github.com/yonaskolb/mint": "https://github.com/yonaskolb/mint",
-            "https://github.com/yonaskolb/mint.git": "https://github.com/yonaskolb/mint.git",
-            "mycustomdomain.com/package": "https://mycustomdomain.com/package",
-            "mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
-            "https://mycustomdomain.com/package": "https://mycustomdomain.com/package",
-            "https://mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
-            "git@github.com:yonaskolb/Mint.git": "git@github.com:yonaskolb/Mint.git",
-        ]
-
-        for (url, expected) in urls {
-            XCTAssertEqual(PackagePath.gitURLFromString(url), expected)
-        }
-    }
-
-    func testPackageReferenceInfo() {
-
-        XCTAssertEqual(PackageReference(package: "yonaskolb/mint"), PackageReference(repo: "yonaskolb/mint"))
-        XCTAssertEqual(PackageReference(package: "yonaskolb/mint@0.0.1"), PackageReference(repo: "yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "github.com/yonaskolb/mint"), PackageReference(repo: "github.com/yonaskolb/mint"))
-        XCTAssertEqual(PackageReference(package: "github.com/yonaskolb/mint@0.0.1"), PackageReference(repo: "github.com/yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint"), PackageReference(repo: "https://github.com/yonaskolb/mint"))
-        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint@0.0.1"), PackageReference(repo: "https://github.com/yonaskolb/mint", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint.git"), PackageReference(repo: "https://github.com/yonaskolb/mint.git"))
-        XCTAssertEqual(PackageReference(package: "https://github.com/yonaskolb/mint.git@0.0.1"), PackageReference(repo: "https://github.com/yonaskolb/mint.git", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package"), PackageReference(repo: "mycustomdomain.com/package"))
-        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package@0.0.1"), PackageReference(repo: "mycustomdomain.com/package", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package.git"), PackageReference(repo: "mycustomdomain.com/package.git"))
-        XCTAssertEqual(PackageReference(package: "mycustomdomain.com/package.git@0.0.1"), PackageReference(repo: "mycustomdomain.com/package.git", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package"), PackageReference(repo: "https://mycustomdomain.com/package"))
-        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package@0.0.1"), PackageReference(repo: "https://mycustomdomain.com/package", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package.git"), PackageReference(repo: "https://mycustomdomain.com/package.git"))
-        XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageReference(repo: "https://mycustomdomain.com/package.git", version: "0.0.1"))
-        XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git"))
-        XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git", version: "0.0.1"))
     }
 
     func checkInstalledVersion(package: PackageReference, executable: String, file: StaticString = #file, line: UInt = #line) throws {
@@ -91,7 +34,7 @@ class MintTests: XCTestCase {
 
     func testInstallCommand() throws {
 
-        let globalPath = mint.installationPath + testCommand
+        let globalPath = mint.linkPath + testCommand
 
         // install specific version
         let specificPackage = PackageReference(repo: testRepo, version: testVersion)
@@ -100,25 +43,25 @@ class MintTests: XCTestCase {
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
+        XCTAssertEqual(mint.getLinkedPackages(), [:])
         // install already installed version globally
-        try mint.install(package: PackageReference(repo: testRepo, version: testVersion), global: true)
+        try mint.install(package: PackageReference(repo: testRepo, version: testVersion), link: true)
         XCTAssertTrue(globalPath.exists)
         let globalOutput = try capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
 
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: testVersion])
+        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: testVersion])
 
         // install latest version
         let latestPackage = PackageReference(repo: testRepo)
-        try mint.install(package: latestPackage, executable: testCommand, global: true)
+        try mint.install(package: latestPackage, executable: testCommand, link: true)
         XCTAssertEqual(latestPackage.version, latestVersion)
         try checkInstalledVersion(package: latestPackage, executable: testCommand)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
         let latestGlobalOutput = try capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [testCommand: latestVersion])
+        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: latestVersion])
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
@@ -130,7 +73,7 @@ class MintTests: XCTestCase {
 
         // check not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
+        XCTAssertEqual(mint.getLinkedPackages(), [:])
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
@@ -174,11 +117,11 @@ class MintTests: XCTestCase {
 
         let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
 
-        let globalPath = mint.installationPath + testCommand
+        let globalPath = mint.linkPath + testCommand
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getGlobalInstalledPackages(), [:])
+        XCTAssertEqual(mint.getLinkedPackages(), [:])
 
         let installedPackages = try mint.listPackages()
         XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])

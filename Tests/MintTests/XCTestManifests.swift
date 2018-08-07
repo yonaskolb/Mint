@@ -6,9 +6,6 @@ extension MintTests {
         ("testInstallCommand", testInstallCommand),
         ("testMintErrors", testMintErrors),
         ("testMintFileInstall", testMintFileInstall),
-        ("testPackageGitPaths", testPackageGitPaths),
-        ("testPackagePaths", testPackagePaths),
-        ("testPackageReferenceInfo", testPackageReferenceInfo),
         ("testRunCommand", testRunCommand),
     ]
 }
@@ -20,11 +17,20 @@ extension MintfileTests {
     ]
 }
 
+extension PackageTests {
+    static let __allTests = [
+        ("testPackageGitPaths", testPackageGitPaths),
+        ("testPackagePaths", testPackagePaths),
+        ("testPackageReferenceInfo", testPackageReferenceInfo),
+    ]
+}
+
 #if !os(macOS)
 public func __allTests() -> [XCTestCaseEntry] {
     return [
         testCase(MintTests.__allTests),
         testCase(MintfileTests.__allTests),
+        testCase(PackageTests.__allTests),
     ]
 }
 #endif
