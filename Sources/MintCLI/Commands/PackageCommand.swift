@@ -24,7 +24,7 @@ class PackageCommand: MintfileCommand {
 
     override func execute() throws {
         if silent.value {
-            mint.standardOut = LineStream {_ in}
+            mint.standardOut = WriteStream.null
         }
         
         try super.execute()

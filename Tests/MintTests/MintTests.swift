@@ -7,8 +7,8 @@ class MintTests: XCTestCase {
 
     let mint = Mint(path: Path.temporary + "mint",
                     installationPath: Path.temporary + "mint-installs",
-                    standardOut: LineStream {_ in},
-                    standardError: LineStream {_ in})
+                    standardOut: WriteStream.null,
+                    standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = "4.0.0"

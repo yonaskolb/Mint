@@ -353,8 +353,8 @@ public class Mint {
 //            buildStepOutput += string + "\n"
 //        }
 
-        let taskOut = verbose ? standardOut : LineStream {_ in}
-        let taskError = LineStream {_ in}
+        let taskOut = verbose ? standardOut : WriteStream.null
+        let taskError = WriteStream.null
         let task = Task(executable: "/bin/bash", arguments: ["-c", command], directory: path.string, stdout: taskOut, stderr: taskError)
         task.runAsync()
         let status = task.finish()
