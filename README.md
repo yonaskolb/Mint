@@ -82,6 +82,9 @@ Add the following to your Package.swift file's dependencies:
 
 And then import wherever needed: `import MintKit`
 
+## Road to 1.0
+Until 1.0 is reached, minor versions will be breaking.
+
 ## Usage
 
 Run `mint help` to see usage instructions.
