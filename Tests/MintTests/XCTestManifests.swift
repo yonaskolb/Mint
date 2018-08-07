@@ -2,11 +2,13 @@ import XCTest
 
 extension MintTests {
     static let __allTests = [
+        ("testBootstrapCommand", testBootstrapCommand),
         ("testInstallCommand", testInstallCommand),
         ("testMintErrors", testMintErrors),
-        ("testPackageReferenceInfo", testPackageReferenceInfo),
+        ("testMintFileInstall", testMintFileInstall),
         ("testPackageGitPaths", testPackageGitPaths),
         ("testPackagePaths", testPackagePaths),
+        ("testPackageReferenceInfo", testPackageReferenceInfo),
         ("testRunCommand", testRunCommand),
     ]
 }

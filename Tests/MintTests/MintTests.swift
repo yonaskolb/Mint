@@ -172,7 +172,7 @@ class MintTests: XCTestCase {
 
         try mint.bootstrap()
 
-        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "5.0.0")
+        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
 
         let globalPath = mint.installationPath + testCommand
 
@@ -185,6 +185,14 @@ class MintTests: XCTestCase {
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)
+    }
+
+    func testMintFileInstall() throws {
+        mint.mintFilePath = simpleMintFileFixture.absolute()
+
+        let specificPackage = PackageReference(repo: testRepo)
+        try mint.install(package: specificPackage)
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
     }
 
     func testMintErrors() {

@@ -168,6 +168,17 @@ public class Mint {
 
     public func install(package: PackageReference, executable: String? = nil, update: Bool = false, global: Bool = false) throws {
 
+        if package.version.isEmpty,
+            mintFilePath.exists,
+            let mintfile = try? Mintfile(path: mintFilePath) {
+            // set version to version from mintfile
+            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
+                package.version = mintFilePackage.version
+                package.repo = mintFilePackage.repo
+                standardOut <<< "🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile."
+            }
+        }
+
         if !package.repo.contains("/") {
             throw MintError.invalidRepo(package.repo)
         }

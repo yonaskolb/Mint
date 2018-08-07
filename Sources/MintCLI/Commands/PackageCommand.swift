@@ -24,18 +24,7 @@ class PackageCommand: MintfileCommand {
     override func execute() throws {
         try super.execute()
 
-        var package = PackageReference(package: self.package.value)
-
-        if package.version.isEmpty,
-            mint.mintFilePath.exists,
-            let mintfile = try? Mintfile(path: mint.mintFilePath) {
-            // set version to version from mintfile
-            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
-                package = mintFilePackage
-                mint.standardOut <<< "🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile."
-            }
-        }
-
+        let package = PackageReference(package: self.package.value)
         try execute(package: package)
     }
 
