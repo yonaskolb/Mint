@@ -7,7 +7,7 @@ class InstallCommand: PackageCommand {
 
     let executable = OptionalParameter()
     let preventGlobal = Flag("-p", "--prevent-global", description: "Whether to prevent global installation")
-    let force = Flag("-u", "--update", description: "Force a reinstall if the package is already installed", defaultValue: false)
+    let force = Flag("-f", "--force", description: "Force a reinstall even if the package is already installed", defaultValue: false)
 
     init(mint: Mint) {
         super.init(mint: mint,
@@ -18,6 +18,6 @@ class InstallCommand: PackageCommand {
 
     override func execute(package: PackageReference) throws {
         let global = !preventGlobal.value
-        try mint.install(package: package, executable: executable.value, update: force.value, global: global)
+        try mint.install(package: package, executable: executable.value, force: force.value, global: global)
     }
 }
