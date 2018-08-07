@@ -12,7 +12,7 @@ class PackageCommand: MintfileCommand {
         \(description)
         
         The package can be a shorthand for a github repo \"githubName/repo\", or a fully qualified .git path.
-        An optional version can be specified by appending @version to the repo, otherwise the newest tag will be used (or master if no tags are found)
+        An optional version can be specified by appending @version to the repo, otherwise the newest tag will be used (or master if no tags are found.)
         """
         if let parameterDescription = parameterDescription {
             longDescription += "\n\n\(parameterDescription)"
@@ -24,21 +24,21 @@ class PackageCommand: MintfileCommand {
     override func execute() throws {
         try super.execute()
 
-        var mintPackage = MintPackage(package: package.value)
+        var package = PackageReference(package: self.package.value)
 
-        if mintPackage.version.isEmpty,
+        if package.version.isEmpty,
             mint.mintFilePath.exists,
             let mintfile = try? Mintfile(path: mint.mintFilePath) {
             // set version to version from mintfile
-            if let package = mintfile.package(for: mintPackage.repo), !package.version.isEmpty {
-                mintPackage = package
+            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
+                package = mintFilePackage
                 mint.standardOut <<< "🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile."
             }
         }
 
-        try execute(repo: mintPackage.repo, version: mintPackage.version)
+        try execute(package: package)
     }
 
-    func execute(repo: String, version: String) throws {
+    func execute(package: PackageReference) throws {
     }
 }

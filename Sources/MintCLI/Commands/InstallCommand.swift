@@ -37,13 +37,11 @@ class InstallOrUpdateCommand: PackageCommand {
         super.init(mint: mint,
                    name: name,
                    description: description,
-                   parameterDescription: "The executable to install defaults to the repo name")
+                   parameterDescription: "By default all the executable products from the Package.swift are installed. The executable parameter can be used to link just a single executable globally.")
     }
 
-    override func execute(repo: String, version: String) throws {
-        let executable = self.executable.value
+    override func execute(package: PackageReference) throws {
         let global = !preventGlobal.value
-
-        try mint.install(repo: repo, version: version, command: executable, update: update, global: global)
+        try mint.install(package: package, executable: executable.value, update: update, global: global)
     }
 }

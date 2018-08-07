@@ -78,14 +78,14 @@ $ swift run mint
 Add the following to your Package.swift file's dependencies:
 
 ```swift
-.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.1.0"),
+.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.10.0"),
 ```
 
 And then import wherever needed: `import MintKit`
 
 ## Usage
 
-Run `mint --help` to see usage instructions.
+Run `mint help` to see usage instructions.
 
 - **install**: Installs a package, so it can be run with `run` later, and also links that version globally
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
@@ -94,11 +94,10 @@ Run `mint --help` to see usage instructions.
 - **uninstall**: Uninstalls a package by name.
 - **bootstrap**: Installs all the packages in your [Mintfile](#mintfile) without linking them globally
 
-Run, install and update commands have 1 or 2 arguments:
+**Package reference**
 
-- **package (required)**: This can be a shorthand for a github repo `install realm/SwiftLint` or a fully qualified git path `install https://github.com/realm/SwiftLint.git`. In the case of `run` you can also just pass the name of the repo if it is already installed `run swiftlint`. This will do a lookup of all installed packages. An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
-- **command (optional)**: The command to install or run. This defaults to the the last path in the repo (so for `realm/swiftlint` it will be `swiftlint`). In the case of `run` you can also pass any arguments to the command eg `mint run realm/swiftlint swiftlint --path source`
-
+`run`, `install` and `update` commands all require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`). This will do a lookup of all installed packages.
+An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
 
 #### Examples
 ```sh
@@ -110,7 +109,7 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
 ### Global installs
-By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--prevent-global` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `usr/local/bin` when `install` or `update` are used, unless `--prevent-global` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run package`. Note that only one global version can be installed at a time though. If you need to run a specific older version use `mint run`.
 
 ### Mintfile
 A `Mintfile` can specify a list of versioned packages. It makes installing and running these packages easy, as the specific repos and versions are centralized.
@@ -141,7 +140,7 @@ mint bootstrap
 ### Linux
 Mint works on Linux but has some limitations:
 - linux doesn't support building with a statically linked version of Swift. This means when a new version of swift comes out the old installs won't work on linux. A stable ABI in Swift 5 will remove the need for this.
-- Linux is case sensitive so you must specify the correct case for repo urls as well as executables. As the `Mintfile` currently has no support for specifying the executable some packages may not work.
+- Linux is case sensitive so you must specify the correct case for repo urls as well as executables.
 
 ## Support
 If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
@@ -152,9 +151,6 @@ If your Swift command line tool builds with the Swift Package Manager than it wi
 $ mint install github_name/repo_name
 ```
 ````
-
-### Executable
-If your executable name is different from your repo name then you will need to append the name to the above command.
 
 ### Resources
 The Swift Package Manager doesn't yet have a way of specifying resources directories. If your tool requires access to resources from the repo you require a custom `Package.resources` file. This is a plain text file that lists the resources directories on different lines:
@@ -176,6 +172,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
 - mint install [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
 - mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
-- mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer) assetize
+- mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer)
 
 Feel free to add your own!

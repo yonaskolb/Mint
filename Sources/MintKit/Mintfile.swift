@@ -3,9 +3,9 @@ import PathKit
 
 public struct Mintfile {
 
-    let packages: [MintPackage]
+    let packages: [PackageReference]
 
-    public func package(for repo: String) -> MintPackage? {
+    public func package(for repo: String) -> PackageReference? {
         return packages.first { $0.repo.lowercased().contains(repo.lowercased()) }
     }
 
@@ -33,7 +33,7 @@ public struct Mintfile {
 
         packages = linesWithoutTrailingComments
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .map { MintPackage(package: String($0)) }
+            .map { PackageReference(package: String($0)) }
 
         // Print warning for empty version
         packages
