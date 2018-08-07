@@ -6,6 +6,7 @@ import SwiftCLI
 class PackageCommand: MintfileCommand {
 
     var package = Parameter()
+    var silent = Flag("-s", "--silent", description: "Silences any output from Mint itself")
 
     init(mint: Mint, name: String, description: String, parameterDescription: String? = nil) {
         var longDescription = """
@@ -22,6 +23,10 @@ class PackageCommand: MintfileCommand {
     }
 
     override func execute() throws {
+        if silent.value {
+            mint.standardOut = LineStream {_ in}
+        }
+        
         try super.execute()
 
         let package = PackageReference(package: self.package.value)
