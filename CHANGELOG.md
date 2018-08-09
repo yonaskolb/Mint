@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.11.1
+
+#### Fixed
+- Fixed not being able to pass arguments to `mint run` @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11....0.11.1)
+
 ## 0.11.0
 
 #### Added
