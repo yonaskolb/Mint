@@ -155,6 +155,8 @@ public class Mint {
         }
         standardOut <<< "🌱  Running \(packagePath.executable ?? "") \(package.version)..."
 
+        let arguments = arguments.isEmpty ? [] : Array(arguments.dropFirst())
+
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
             env["MINT"] = "YES"
