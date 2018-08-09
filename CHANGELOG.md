@@ -16,6 +16,10 @@
 - **Breaking:** replaced `mint update` with `mint install --force` #96 @yonaskolb
 - `--silent` now applies to `mint install` in addition to `mint run` @yonaskolb
 
+#### Removed
+- **Breaking**: Swift packages without executable products are no longer supported
+- **Breaking**: Older style quoted command invocations are no longer supported. eg `mint run realm/SwiftLint "swiftlint autocorrect"`
+
 #### Fixed
 - Fixed `Mintfile` output not adhering to `--silent` #85 @yutailang0119
 - Fixed installing nested resourcs in `Package.resources` #93 @toshi0383
