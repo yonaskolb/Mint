@@ -2,6 +2,16 @@
 
 ## Master
 
+## 0.11.2
+
+#### Added
+- Packages can now be referenced by name in `mint install` when already installed #100 @yonaskolb
+
+#### Fixed
+- Fixed packages from Mintfile not being read on `mint run` when specified by name #100 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.1...0.11.2)
+
 ## 0.11.1
 
 #### Fixed
