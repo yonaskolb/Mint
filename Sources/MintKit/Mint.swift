@@ -121,8 +121,21 @@ public class Mint {
         return versionsByPackage
     }
 
-    public func run(package: PackageReference, arguments: [String]) throws {
+    func resolvePackage(_ package: PackageReference) throws {
 
+        // resolve version from MintFile
+        if package.version.isEmpty,
+            mintFilePath.exists,
+            let mintfile = try? Mintfile(path: mintFilePath) {
+            // set version to version from mintfile
+            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
+                package.version = mintFilePackage.version
+                package.repo = mintFilePackage.repo
+                standardOut <<< "🌱  Using \(package.repo) \(package.version) from Mintfile."
+            }
+        }
+
+        // resolve repo from installed packages
         if !package.repo.contains("/") {
             // repo reference by name. Get the full git repo
             if let existingGit = try getPackageGit(name: package.repo) {
@@ -131,6 +144,38 @@ public class Mint {
                 throw MintError.packageNotFound(package.repo)
             }
         }
+
+        // resove latest version from git repo
+        let packagePath = PackagePath(path: packagesPath, package: package)
+        if package.version.isEmpty {
+            // we don't have a specific version, let's get the latest tag
+            standardOut <<< "🌱  Finding latest version of \(package.name)"
+            do {
+                let tagOutput = try SwiftCLI.capture(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
+
+                let tagReferences = tagOutput.stdout
+                if tagReferences.isEmpty {
+                    package.version = "master"
+                } else {
+                    let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
+                    let versions = Git.convertTagsToVersionMap(tags)
+                    if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
+                        package.version = tag
+                    } else {
+                        package.version = "master"
+                    }
+                }
+
+                standardOut <<< "🌱  Resolved latest version of \(package.name) to \(package.version)"
+            } catch {
+                throw MintError.repoNotFound(packagePath.gitPath)
+            }
+        }
+    }
+
+    public func run(package: PackageReference, arguments: [String] = []) throws {
+
+        try resolvePackage(package)
 
         // install the package if not installed already
         try install(package: package, force: false, link: false)
@@ -170,47 +215,9 @@ public class Mint {
 
     public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false) throws {
 
-        if package.version.isEmpty,
-            mintFilePath.exists,
-            let mintfile = try? Mintfile(path: mintFilePath) {
-            // set version to version from mintfile
-            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
-                package.version = mintFilePackage.version
-                package.repo = mintFilePackage.repo
-                standardOut <<< "🌱  Using \"\(package.repo)\" \"\(package.version)\" from Mintfile."
-            }
-        }
-
-        if !package.repo.contains("/") {
-            throw MintError.invalidRepo(package.repo)
-        }
+        try resolvePackage(package)
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-
-        if package.version.isEmpty {
-            // we don't have a specific version, let's get the latest tag
-            standardOut <<< "🌱  Finding latest version of \(package.name)"
-            do {
-                let tagOutput = try SwiftCLI.capture(bash: "git ls-remote --tags --refs \(packagePath.gitPath)")
-
-                let tagReferences = tagOutput.stdout
-                if tagReferences.isEmpty {
-                    package.version = "master"
-                } else {
-                    let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
-                    let versions = Git.convertTagsToVersionMap(tags)
-                    if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
-                        package.version = tag
-                    } else {
-                        package.version = "master"
-                    }
-                }
-
-                standardOut <<< "🌱  Resolved latest version of \(package.name) to \(package.version)"
-            } catch {
-                throw MintError.repoNotFound(packagePath.gitPath)
-            }
-        }
 
         let alreadyInstalled = packagePath.installPath.exists
         if !force && alreadyInstalled {

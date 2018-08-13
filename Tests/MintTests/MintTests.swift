@@ -41,6 +41,9 @@ class MintTests: XCTestCase {
         try mint.install(package: specificPackage)
         try checkInstalledVersion(package: specificPackage, executable: testCommand)
 
+        // install using simple name
+        try mint.install(package: PackageReference(repo: testRepoName, version: testVersion))
+
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
         XCTAssertEqual(mint.getLinkedPackages(), [:])
@@ -85,6 +88,9 @@ class MintTests: XCTestCase {
         let specificPackage = PackageReference(repo: testRepo, version: testVersion)
         try mint.run(package: specificPackage, arguments: [testCommand])
         try checkInstalledVersion(package: specificPackage, executable: testCommand)
+
+        // run using simple name
+        try mint.run(package: PackageReference(repo: testRepoName, version: testVersion), arguments: [])
 
         // run an already installed version
         try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: [testCommand])
@@ -133,8 +139,18 @@ class MintTests: XCTestCase {
     func testMintFileInstall() throws {
         mint.mintFilePath = simpleMintFileFixture.absolute()
 
-        let specificPackage = PackageReference(repo: testRepo)
+        let specificPackage = PackageReference(repo: testRepoName)
         try mint.install(package: specificPackage)
+        XCTAssertEqual(specificPackage.version, testVersion)
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
+    }
+
+    func testMintFileRun() throws {
+        mint.mintFilePath = simpleMintFileFixture.absolute()
+
+        let specificPackage = PackageReference(repo: testRepoName)
+        try mint.run(package: specificPackage, arguments: [])
+        XCTAssertEqual(specificPackage.version, testVersion)
         try checkInstalledVersion(package: specificPackage, executable: testCommand)
     }
 
@@ -142,10 +158,6 @@ class MintTests: XCTestCase {
 
         expectError(MintError.cloneError(url: "http://invaliddomain.com/invalid", version: testVersion)) {
             try mint.run(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion), arguments: ["invalid"])
-        }
-
-        expectError(MintError.invalidRepo("invalid repo")) {
-            try mint.install(package: PackageReference(repo: "invalid repo", version: testVersion), force: false)
         }
 
         expectError(MintError.invalidExecutable("invalidCommand")) {
