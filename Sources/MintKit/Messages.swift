@@ -1,10 +1,3 @@
-//
-//  Messages.swift
-//  MintKit
-//
-//  Created by Toshihiro Suzuki on 2018/07/29.
-//
-
 enum Message: CustomStringConvertible {
     case executableIsNonMintFileWarning(String)
     case executableIsNonMintSymlinkWarning(path: String, symlink: String)
