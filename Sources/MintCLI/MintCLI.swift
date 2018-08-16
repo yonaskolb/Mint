@@ -6,7 +6,7 @@ import SwiftCLI
 
 public class MintCLI {
 
-    public let version = "0.10.2"
+    public let version = "0.11.2"
 
     let mint: Mint
     let cli: CLI
@@ -14,21 +14,20 @@ public class MintCLI {
     public init() {
 
         var mintPath: Path = "/usr/local/lib/mint"
-        var installationPath: Path = "/usr/local/bin"
+        var linkPath: Path = "/usr/local/bin"
 
         if let path = ProcessInfo.processInfo.environment["MINT_PATH"], !path.isEmpty {
             mintPath = Path(path)
         }
-        if let path = ProcessInfo.processInfo.environment["MINT_INSTALL_PATH"], !path.isEmpty {
-            installationPath = Path(path)
+        if let path = ProcessInfo.processInfo.environment["MINT_LINK_PATH"], !path.isEmpty {
+            linkPath = Path(path)
         }
 
-        mint = Mint(path: mintPath, installationPath: installationPath)
+        mint = Mint(path: mintPath, linkPath: linkPath)
 
         cli = CLI(name: "mint", version: version, description: "Run and install Swift Package Manager executables", commands: [
             RunCommand(mint: mint),
             InstallCommand(mint: mint),
-            UpdateCommand(mint: mint),
             UninstallCommand(mint: mint),
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),

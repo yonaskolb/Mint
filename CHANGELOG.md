@@ -2,14 +2,55 @@
 
 ## Master
 
+## 0.11.2
+
+#### Added
+- Packages can now be referenced by name in `mint install` when already installed #100 @yonaskolb
+
+#### Fixed
+- Fixed packages from Mintfile not being read on `mint run` when specified by name #100 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.1...0.11.2)
+
+## 0.11.1
+
+#### Fixed
+- Fixed not being able to pass arguments to `mint run` @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.0...0.11.1)
+
+## 0.11.0
+
+#### Added
+- Added Linux support #82 @yonaskolb
+- Executable names are now automatically read from `Package.swift` #95 @yonaskolb
+- All executables in `Package.swift` are now installed #95 @yonaskolb
+- If multiple executables exist and one is not provided in `mint run` it will ask you which one to run #95 @yonaskolb
+
+#### Changed
+- **Breaking:** changed `MINT_INSTALL_PATH` env to `MINT_LINK_PATH` #97 @yonaskolb
+- **Breaking:** changed `--prevent-global` to `--no-link` #97 @yonaskolb
+- **Breaking:** replaced `mint update` with `mint install --force` #96 @yonaskolb
+- `--silent` now applies to `mint install` in addition to `mint run` @yonaskolb
+
+#### Removed
+- **Breaking**: Swift packages without executable products are no longer supported
+- **Breaking**: Older style quoted command invocations are no longer supported. eg `mint run realm/SwiftLint "swiftlint autocorrect"`
+
+#### Fixed
+- Fixed `Mintfile` output not adhering to `--silent` #85 @yutailang0119
+- Fixed installing nested resourcs in `Package.resources` #93 @toshi0383
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.10.2...0.11.0)
+
 ## 0.10.2
 
 #### Fixed
-- Don't overwrite install path of already installed version until after successful build
-- Fixed version number output
+- Don't overwrite install path of already installed version until after successful build @yonaskolb
+- Fixed version number output @yonaskolb
 
 #### Changed
-- Updated SwiftCLI 5.2.1 to allow nested help commands like `mint help install`
+- Updated SwiftCLI 5.2.1 to allow nested help commands like `mint help install` @yonaskolb
 
 [Commits](https://github.com/yonaskolb/Mint/compare/0.10.1...0.10.2)
 

@@ -4,12 +4,14 @@ import PathKit
 /// Contains all the paths for packages
 struct PackagePath {
 
-    let path: Path
-    let package: Package
+    var path: Path
+    var package: PackageReference
+    var executable: String?
 
-    init(path: Path, package: Package) {
+    init(path: Path, package: PackageReference, executable: String? = nil) {
         self.path = path
         self.package = package
+        self.executable = executable
     }
 
     var gitPath: String { return PackagePath.gitURLFromString(package.repo) }
@@ -25,8 +27,18 @@ struct PackagePath {
 
     var packagePath: Path { return path + repoPath }
     var installPath: Path { return packagePath + "build" + package.version }
-    var commandPath: Path { return installPath + package.name }
     var manpagesPath: Path { return installPath + "share/man" }
+    var executablePath: Path { return installPath + (executable ?? package.name) }
+
+    func getExecutables() throws -> [String] {
+        return try installPath.children()
+            .filter { $0.isFile && !$0.lastComponent.hasPrefix(".") && $0.extension == nil }
+            .map { $0.lastComponent }
+    }
+
+    var commandVersion: String {
+        return "\(executable ?? package.name) \(package.version)"
+    }
 
     static func gitURLFromString(_ string: String) -> String {
         if let url = URL(string: string), url.scheme != nil {

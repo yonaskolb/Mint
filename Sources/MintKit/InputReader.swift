@@ -1,20 +1,21 @@
 import Foundation
+import SwiftCLI
 
-struct Question {
+struct InputReader {
 
-    let printer: (String) -> Void
-    init(printer: @escaping (String) -> Void = { print($0) }) {
-        self.printer = printer
+    let standardOut: WritableStream
+    init(standardOut: WritableStream = WriteStream.stdout) {
+        self.standardOut = standardOut
     }
 
     func ask(_ question: String, answers: [String]) -> String {
-        printer(question)
+        standardOut <<< question
 
         func ask() -> String {
             guard let answer = readLine() else { return "" }
             let lowercasedAnswers = answers.map { $0.lowercased() }
             if !lowercasedAnswers.contains(answer.lowercased()) {
-                print("You must respond with one of the following:\n\(answers.joined(separator: "\n"))")
+                standardOut <<< "You must respond with one of the following:\n\(answers.joined(separator: "\n"))"
                 return ask()
             }
             return answer
