@@ -268,29 +268,7 @@ public class Mint {
             }
         }
 
-        // copy manpages
-        do {
-            let manpages = Path("\(packageCheckoutPath)/docs/man/").glob("*")
-            if !manpages.isEmpty {
-                let allFiles = try manpages
-                    .flatMap { $0.isDirectory ? try $0.recursiveChildren() : [$0] }
-                    .map { $0.lastComponent }
-                    .joined(separator: ", ")
-
-                standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
-
-                if !packagePath.manpagesPath.exists {
-                    try packagePath.manpagesPath.mkpath()
-                }
-
-                for manpage in manpages {
-                    let dest = packagePath.manpagesPath + manpage.lastComponent
-
-                    // Path#copy(_:) fails if the dest already exists.
-                    try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
-                }
-            }
-        }
+        try installManPages(packagePath: packagePath)
 
         try addPackage(git: packagePath.gitPath, path: packagePath.packagePath)
 
@@ -300,6 +278,32 @@ public class Mint {
         }
 
         try? packageCheckoutPath.delete()
+    }
+
+    private func installManPages(packagePath: PackagePath) throws {
+        let package = packagePath.package
+        let checkoutPath = Path.temporary + "mint"
+        let packageCheckoutPath = checkoutPath + packagePath.repoPath
+        let manpages = Path("\(packageCheckoutPath)/docs/man/").glob("*")
+        if !manpages.isEmpty {
+            let allFiles = try manpages
+                .flatMap { $0.isDirectory ? try $0.recursiveChildren() : [$0] }
+                .map { $0.lastComponent }
+                .joined(separator: ", ")
+
+            standardOut <<< "🌱  Copying manpages for \(package.name): \(allFiles) ..."
+
+            if !packagePath.manpagesPath.exists {
+                try packagePath.manpagesPath.mkpath()
+            }
+
+            for manpage in manpages {
+                let dest = packagePath.manpagesPath + manpage.lastComponent
+
+                // Path#copy(_:) fails if the dest already exists.
+                try SwiftCLI.run(bash: "cp -R \"\(manpage)\" \"\(dest)\"")
+            }
+        }
     }
 
     private func buildPackage(name: String, path: Path) throws {
