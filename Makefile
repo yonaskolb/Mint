@@ -28,6 +28,7 @@ publish: zip_binary bump_brew
 	echo "published $(VERSION)"
 
 bump_brew:
+	brew update
 	brew bump-formula-pr --url=$(RELEASE_TAR) Mint
 
 zip_binary: build
