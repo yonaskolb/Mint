@@ -173,7 +173,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
 - mint install [Carthage/Carthage](https://github.com/Carthage/Carthage)
 - mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
-- mint install [toshi0383/cmdshelf](https://github.com/toshi0383/cmdshelf)
 - mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
 - mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer)
 
