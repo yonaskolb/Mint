@@ -175,5 +175,7 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
 - mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
 - mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer)
+- mint install [SwiftGen/SwiftGen](https://github.com/SwiftGen/SwiftGen)
+- mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting)
 
 Feel free to add your own!
