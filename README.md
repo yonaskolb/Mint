@@ -167,13 +167,16 @@ If this file is found in you repo, then all those directories will be copied int
 
 ## A list of popular Mint compatible packages 🌱
 
-- mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
-- mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
-- mint install [Carthage/Carthage](https://github.com/Carthage/Carthage)
-- mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
-- mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
 - mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer)
+- mint install [Carthage/Carthage](https://github.com/Carthage/Carthage)
+- mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
+- mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
+- mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
+- mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
+- mint install [nicklockwood/SwiftFormat](https://github.com/nicklockwood/SwiftFormat)
+- mint install [SwiftGen/SwiftGen](https://github.com/SwiftGen/SwiftGen)
+- mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
+- mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
+
 
 Feel free to add your own!
