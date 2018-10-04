@@ -177,6 +177,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [SwiftGen/SwiftGen](https://github.com/SwiftGen/SwiftGen)
 - mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
 - mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-
+- mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting)
 
 Feel free to add your own!
