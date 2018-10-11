@@ -391,7 +391,7 @@ public class Mint {
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
         if let warning = installStatus.warning {
-            let ok = inputReader.confirmation("🌱  \(warning)\nOvewrite it with Mint's symlink?".yellow)
+            let ok = inputReader.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
             if !ok {
                 return
             }
