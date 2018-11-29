@@ -14,6 +14,6 @@ class RunCommand: PackageCommand {
     }
 
     override func execute(package: PackageReference) throws {
-        try mint.run(package: package, arguments: arguments.value)
+        try mint.run(package: package, arguments: arguments.value, swiftCompilerFlags: swiftCompilerFlags.values, cCompilerFlags: cCompilerFlags.values, linkerFlags: linkerFlags.values)
     }
 }

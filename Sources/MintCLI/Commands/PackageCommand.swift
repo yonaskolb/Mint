@@ -7,6 +7,9 @@ class PackageCommand: MintfileCommand {
 
     var package = Parameter()
     var silent = Flag("-s", "--silent", description: "Silences any output from Mint itself")
+    var swiftCompilerFlags = VariadicKey<String>("--Xswiftc", description: "Flag passed through to all Swift compiler invocations")
+    var cCompilerFlags = VariadicKey<String>("--Xcc", description: "Flag passed through to all C compiler invocations")
+    var linkerFlags = VariadicKey<String>("--Xlinker", description: "Flags passed through to all linker invocations")
 
     init(mint: Mint, name: String, description: String, parameterDescription: String? = nil) {
         var longDescription = """

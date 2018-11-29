@@ -18,6 +18,6 @@ class InstallCommand: PackageCommand {
 
     override func execute(package: PackageReference) throws {
         let link = !noLink.value
-        try mint.install(package: package, executable: executable.value, force: force.value, link: link)
+        try mint.install(package: package, executable: executable.value, force: force.value, link: link, swiftCompilerFlags: swiftCompilerFlags.values, cCompilerFlags: cCompilerFlags.values, linkerFlags: linkerFlags.values)
     }
 }

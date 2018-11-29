@@ -173,12 +173,12 @@ public class Mint {
         }
     }
 
-    public func run(package: PackageReference, arguments: [String] = []) throws {
+    public func run(package: PackageReference, arguments: [String] = [], swiftCompilerFlags: [String] = [], cCompilerFlags: [String] = [], linkerFlags: [String] = []) throws {
 
         try resolvePackage(package)
 
         // install the package if not installed already
-        try install(package: package, force: false, link: false)
+        try install(package: package, force: false, link: false, swiftCompilerFlags: swiftCompilerFlags, cCompilerFlags: cCompilerFlags, linkerFlags: linkerFlags)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -213,7 +213,7 @@ public class Mint {
         }
     }
 
-    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false) throws {
+    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false, swiftCompilerFlags: [String] = [], cCompilerFlags: [String] = [], linkerFlags: [String] = []) throws {
 
         try resolvePackage(package)
 
@@ -271,7 +271,7 @@ public class Mint {
 
         standardOut <<< "🌱  Building \(spmPackage.name) Package with SPM..."
 
-        try buildPackage(name: package.name, path: packageCheckoutPath)
+        try buildPackage(name: package.name, path: packageCheckoutPath, swiftCompilerFlags: swiftCompilerFlags, cCompilerFlags: cCompilerFlags, linkerFlags: linkerFlags)
 
         standardOut <<< "🌱  Installing \(spmPackage.name)..."
 
@@ -324,14 +324,23 @@ public class Mint {
         }
     }
 
-    private func buildPackage(name: String, path: Path) throws {
-
+    private func buildPackage(name: String, path: Path, swiftCompilerFlags: [String], cCompilerFlags: [String], linkerFlags: [String]) throws {
+        
         var command = "swift build -c release"
         #if os(macOS)
             let osVersion = ProcessInfo.processInfo.operatingSystemVersion
             let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
             command += " -Xswiftc -static-stdlib -Xswiftc -target -Xswiftc \(target)"
         #endif
+        for swiftCompilerFlag in swiftCompilerFlags {
+            command += " -Xswiftc \(swiftCompilerFlag)"
+        }
+        for cCompilerFlag in cCompilerFlags {
+            command += " -Xcc \(cCompilerFlag)"
+        }
+        for linkerFlag in linkerFlags {
+            command += " -Xlinker \(linkerFlag)"
+        }
 
 //        let buildSteps = [
 //            "Fetching": "Fetching Dependencies",
