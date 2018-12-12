@@ -260,6 +260,8 @@ public class Mint {
             throw MintError.cloneError(url: packagePath.gitPath, version: package.version)
         }
 
+        standardOut <<< "🌱  Resolving package..."
+
         let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
 
         let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
@@ -267,7 +269,7 @@ public class Mint {
             throw MintError.missingExecutable
         }
 
-        standardOut <<< "🌱  Building \(spmPackage.name) Package with SPM..."
+        standardOut <<< "🌱  Building \(spmPackage.name)..."
 
         try buildPackage(name: package.name, path: packageCheckoutPath)
 
