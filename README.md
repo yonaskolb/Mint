@@ -146,8 +146,24 @@ Mint works on Linux but has some limitations:
 - Linux is case sensitive so you must specify the correct case for repo urls as well as executables.
 
 ## Support
-If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! You can add this to the `Installing` section in your readme:
+If your Swift command line tool builds with the Swift Package Manager than it will automatically install and run with mint! 
 
+Make sure you have defined an `executable` product type in the `products` list within your `Package.swift`.
+
+```swift
+let package = Package(
+    name: "Foo",
+    products: [
+        .executable(name: "foo", targets: ["Foo"]),
+    ],
+    targets: [
+      .target(name: "Foo"),
+      ...
+    ]
+)
+```
+
+You can then add this to the `Installing` section in your readme:
 ````
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
