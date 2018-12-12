@@ -260,9 +260,7 @@ public class Mint {
             throw MintError.cloneError(url: packagePath.gitPath, version: package.version)
         }
 
-        guard let spmPackage = try? SwiftPackage(directory: packageCheckoutPath) else {
-            throw MintError.packageFileNotFound
-        }
+        let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
 
         let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
         guard !executables.isEmpty else {
