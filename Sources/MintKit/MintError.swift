@@ -4,27 +4,25 @@ import SwiftCLI
 public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError {
     case packageNotFound(String)
     case repoNotFound(String)
-    case buildError(String)
-    case missingExecutable
+    case missingExecutable(PackageReference)
     case invalidExecutable(String)
-    case cloneError(url: String, version: String)
+    case cloneError(PackageReference)
     case mintfileNotFound(String)
-    case packageDumpParsingError(String)
-    case packageDecodingError(Error)
-    case packageError(String)
+    case packageResolveError(PackageReference)
+    case packageBuildError(PackageReference)
+    case packageReadError( String)
 
     public var description: String {
         switch self {
-        case let .packageNotFound(package): return "\(package.quoted) package not found"
-        case let .repoNotFound(repo): return "Git repo not found at \(repo.quoted)"
-        case let .cloneError(url, version): return "Couldn't clone \(url) \(version)"
-        case let .buildError(error): return error
-        case let .mintfileNotFound(path): return "\(path) not found"
-        case let .invalidExecutable(executable): return "Couldn't find executable \(executable.quoted)"
-        case .missingExecutable: return "Executable product not found"
-        case let .packageDumpParsingError(package): return "Package dump parsing error:\n\(package)"
-        case let .packageDecodingError(error): return "Couldn't decode Package json:\n\(error)"
-        case let .packageError(error): return "Package error:\n\(error)"
+        case .packageNotFound(let package): return "\(package.quoted) package not found"
+        case .repoNotFound(let repo): return "Git repo not found at \(repo.quoted)"
+        case .cloneError(let package): return "Couldn't clone \(package.gitPath) \(package.version)"
+        case .mintfileNotFound(let path): return "\(path) not found"
+        case .invalidExecutable(let executable): return "Couldn't find executable \(executable.quoted)"
+        case .missingExecutable(let package): return "Executable product not found in \(package.namedVersion)"
+        case .packageResolveError(let package): return "Failed to resolve \(package.namedVersion) with SPM"
+        case .packageBuildError(let package): return "Failed to build \(package.namedVersion) with SPM"
+        case .packageReadError(let error): return "Failed to read Package.swift file:\n\(error)"
         }
     }
 

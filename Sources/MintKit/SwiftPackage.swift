@@ -15,18 +15,18 @@ struct SwiftPackage: Decodable {
         } catch let error as CaptureError {
             let captureResult = error.captured
             let message = captureResult.stderr.isEmpty ? captureResult.stdout : captureResult.stderr
-            throw MintError.packageError(message)
+            throw MintError.packageReadError("Couldn't dump package:\n\(message)")
         }
 
         guard let json = content.index(of: "{"),
             let data = content[json...].data(using: .utf8) else {
-            throw MintError.packageDumpParsingError(content)
+            throw MintError.packageReadError("Couldn't parse package dump:\n\(content)")
         }
 
         do {
             self = try JSONDecoder().decode(SwiftPackage.self, from: data)
         } catch {
-            throw MintError.packageDecodingError(error)
+            throw MintError.packageReadError("Couldn't decode package dump:\n\(error)")
         }
     }
 

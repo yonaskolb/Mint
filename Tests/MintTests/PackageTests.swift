@@ -14,8 +14,8 @@ class PackageTests: XCTestCase {
         XCTAssertEqual(testMint.path, "/testPath/mint")
         XCTAssertEqual(testMint.packagesPath, "/testPath/mint/packages")
         XCTAssertEqual(testMint.linkPath, "/testPath/mint-installs")
-        XCTAssertEqual(packagePath.gitPath, "https://github.com/yonaskolb/mint.git")
-        XCTAssertEqual(packagePath.repoPath, "github.com_yonaskolb_mint")
+        XCTAssertEqual(package.gitPath, "https://github.com/yonaskolb/mint.git")
+        XCTAssertEqual(package.repoPath, "github.com_yonaskolb_mint")
         XCTAssertEqual(packagePath.packagePath, "/testPath/mint/packages/github.com_yonaskolb_mint")
         XCTAssertEqual(packagePath.installPath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0")
         XCTAssertEqual(packagePath.executablePath, "/testPath/mint/packages/github.com_yonaskolb_mint/build/1.2.0/mint")
@@ -36,7 +36,7 @@ class PackageTests: XCTestCase {
         ]
 
         for (url, expected) in urls {
-            XCTAssertEqual(PackagePath.gitURLFromString(url), expected)
+            XCTAssertEqual(PackageReference(repo: url).gitPath, expected)
         }
     }
 
