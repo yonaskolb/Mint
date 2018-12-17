@@ -156,8 +156,8 @@ class MintTests: XCTestCase {
 
     func testMintErrors() {
 
-        expectError(MintError.cloneError(url: "http://invaliddomain.com/invalid", version: testVersion)) {
-            try mint.run(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion), arguments: ["invalid"])
+        expectError(MintError.cloneError(PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion))) {
+            try mint.install(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion))
         }
 
         expectError(MintError.invalidExecutable("invalidCommand")) {
@@ -171,6 +171,22 @@ class MintTests: XCTestCase {
         expectError(MintError.mintfileNotFound("invalid")) {
             mint.mintFilePath = "invalid"
             try mint.bootstrap()
+        }
+
+        expectError(MintError.missingExecutable(PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))
+        }
+
+        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_package"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_package"))
+        }
+
+        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_dependency"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_dependency"))
+        }
+
+        expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))
         }
     }
 }

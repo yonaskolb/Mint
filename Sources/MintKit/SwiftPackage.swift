@@ -9,14 +9,25 @@ struct SwiftPackage: Decodable {
 
     init(directory: Path) throws {
 
-        let content = try capture("swift", arguments: ["package", "dump-package"], directory: directory.string).stdout
+        let content: String
+        do {
+            content = try capture("swift", arguments: ["package", "dump-package"], directory: directory.string).stdout
+        } catch let error as CaptureError {
+            let captureResult = error.captured
+            let message = captureResult.stderr.isEmpty ? captureResult.stdout : captureResult.stderr
+            throw MintError.packageReadError("Couldn't dump package:\n\(message)")
+        }
 
         guard let json = content.index(of: "{"),
             let data = content[json...].data(using: .utf8) else {
-            throw MintError.packageFileNotFound
+            throw MintError.packageReadError("Couldn't parse package dump:\n\(content)")
         }
 
-        self = try JSONDecoder().decode(SwiftPackage.self, from: data)
+        do {
+            self = try JSONDecoder().decode(SwiftPackage.self, from: data)
+        } catch {
+            throw MintError.packageReadError("Couldn't decode package dump:\n\(error)")
+        }
     }
 
     struct Product: Decodable {

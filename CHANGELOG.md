@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.11.3
+
+#### Changed
+- Improved output #116 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.2...0.11.3)
+
 ## 0.11.2
 
 #### Added
