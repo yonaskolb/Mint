@@ -60,5 +60,7 @@ class PackageTests: XCTestCase {
         XCTAssertEqual(PackageReference(package: "https://mycustomdomain.com/package.git@0.0.1"), PackageReference(repo: "https://mycustomdomain.com/package.git", version: "0.0.1"))
         XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git"))
         XCTAssertEqual(PackageReference(package: "git@github.com:yonaskolb/Mint.git@0.0.1"), PackageReference(repo: "git@github.com:yonaskolb/Mint.git", version: "0.0.1"))
+        XCTAssertEqual(PackageReference(package: "ssh://git@server.com/user/project.git"), PackageReference(repo: "ssh://git@server.com/user/project.git"))
+        XCTAssertEqual(PackageReference(package: "ssh://git@server.com/user/project.git@0.1"), PackageReference(repo: "ssh://git@server.com/user/project.git", version: "0.1"))
     }
 }
