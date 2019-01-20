@@ -17,13 +17,8 @@ public class PackageReference {
         let repo: String
         let version: String
         if packageParts.count == 3 {
-            if packageParts[0].contains("ssh://") {
-                repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-                version = packageParts[2]
-            } else {
-                repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-                version = packageParts[2]
-            }
+            repo = [packageParts[0], packageParts[1]].joined(separator: "@")
+            version = packageParts[2]
         } else if packageParts.count == 2 {
             if packageParts[1].contains(":") {
                 repo = [packageParts[0], packageParts[1]].joined(separator: "@")

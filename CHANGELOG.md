@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.11.4
+
+#### Added
+- SSH packages not stored in Github are supported
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.3...0.11.4)
+
 ## 0.11.3
 
 #### Changed
