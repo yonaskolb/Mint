@@ -23,6 +23,9 @@ public class PackageReference {
             if packageParts[1].contains(":") {
                 repo = [packageParts[0], packageParts[1]].joined(separator: "@")
                 version = ""
+            } else if packageParts[0].contains("ssh://") {
+                repo = [packageParts[0], packageParts[1]].joined(separator: "@")
+                version = ""
             } else {
                 repo = packageParts[0]
                 version = packageParts[1]
