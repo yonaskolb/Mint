@@ -247,6 +247,7 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
 
+        let swiftPackagePath = packageCheckoutPath + package.packagePath
         let cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
         try runPackageCommand(name: "Cloning \(package.namedVersion)",
                               command: cloneCommand,
@@ -255,10 +256,11 @@ public class Mint {
 
         try runPackageCommand(name: "Resolving package",
                               command: "swift package resolve",
-                              directory: packageCheckoutPath,
+                              directory: swiftPackagePath,
                               error: .packageResolveError(package))
 
-        let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
+        
+        let spmPackage = try SwiftPackage(directory: swiftPackagePath)
 
         let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
         guard !executables.isEmpty else {
@@ -274,7 +276,7 @@ public class Mint {
 
         try runPackageCommand(name: "Building package",
                               command: buildCommand,
-                              directory: packageCheckoutPath,
+                              directory: swiftPackagePath,
                               stdOutOnError: true,
                               error: .packageBuildError(package))
 

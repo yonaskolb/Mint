@@ -4,14 +4,19 @@ import PathKit
 public class PackageReference {
     public var repo: String
     public var version: String
+    public private(set) var packagePath: String
 
-    public init(repo: String, version: String = "") {
+    public init(repo: String, version: String = "", packagePath: String = ".") {
         self.repo = repo
         self.version = version
+        self.packagePath = packagePath
     }
 
     public convenience init(package: String) {
-        let packageParts = package.components(separatedBy: "@")
+        let pathComponents = package.components(separatedBy: "=>")
+        let packagePath = pathComponents.count == 2 ? pathComponents[1] : "."
+        let repoAndVersionPackage = pathComponents.count == 2 ? pathComponents[0] : package
+        let packageParts = repoAndVersionPackage.components(separatedBy: "@")
             .map { $0.trimmingCharacters(in: .whitespaces) }
 
         let repo: String
@@ -31,10 +36,10 @@ public class PackageReference {
                 version = packageParts[1]
             }
         } else {
-            repo = package
+            repo = repoAndVersionPackage
             version = ""
         }
-        self.init(repo: repo, version: version)
+        self.init(repo: repo, version: version, packagePath: packagePath)
     }
 
     public var namedVersion: String {
