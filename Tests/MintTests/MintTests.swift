@@ -68,7 +68,7 @@ class MintTests: XCTestCase {
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages[testRepo, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         // uninstall
@@ -106,7 +106,7 @@ class MintTests: XCTestCase {
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages[testRepo, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         // uninstall
@@ -130,7 +130,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(mint.getLinkedPackages(), [:])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
+        XCTAssertEqual(installedPackages["yonaskolb/SimplePackage", default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)

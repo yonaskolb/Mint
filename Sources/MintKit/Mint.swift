@@ -113,7 +113,12 @@ public class Mint {
                 .filter { !$0.lastComponent.hasPrefix(".") }
                 .sorted()
                 .map { $0.lastComponent }
-            let packageName = String(packagePath.lastComponent.split(separator: "_").last!)
+            let packageName: String = {
+                var packageInfo = packagePath.lastComponent.split(separator: "_")
+                let packageName = packageInfo.popLast()!
+                let authorName = packageInfo.last.flatMap { $0 + "/" } ?? ""
+                return String(authorName + packageName)
+            }()
             var package = "  \(packageName)"
             for version in versions {
                 package += "\n    - \(version)"
