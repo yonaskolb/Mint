@@ -19,4 +19,5 @@ workflows:
   workflow:
     jobs:
       - macOS_swift_5.0
-      - linux_swift_5.0
+      # Linux disabled for now
+      #- linux_swift_5.0
