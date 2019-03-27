@@ -31,16 +31,40 @@ struct SwiftPackage: Decodable {
     }
 
     struct Product: Decodable {
+        
+        #if swift(>=5.0)
+        
+        struct ProductType: Decodable {
+            let executable: String?
+            let library:[String]?
+        }
+        
+        let name: String
+        let type: ProductType
+
+        enum CodingKeys: String, CodingKey {
+            case name
+            case type
+        }
+
+        var isExecutable: Bool {
+            return (type.library ?? []).count == 0
+        }
+        
+        #else
+        
         let name: String
         let type: String
-
+        
         enum CodingKeys: String, CodingKey {
             case name
             case type = "product_type"
         }
-
+        
         var isExecutable: Bool {
             return type == "executable"
         }
+        
+        #endif
     }
 }
