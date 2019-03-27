@@ -2,7 +2,7 @@ import Foundation
 
 public extension String {
 
-    public var quoted: String {
+    var quoted: String {
         return "\"\(self)\""
     }
 }

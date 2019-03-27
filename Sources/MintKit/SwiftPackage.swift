@@ -18,7 +18,7 @@ struct SwiftPackage: Decodable {
             throw MintError.packageReadError("Couldn't dump package:\n\(message)")
         }
 
-        guard let json = content.index(of: "{"),
+        guard let json = content.firstIndex(of: "{"),
             let data = content[json...].data(using: .utf8) else {
             throw MintError.packageReadError("Couldn't parse package dump:\n\(content)")
         }
