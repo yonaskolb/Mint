@@ -269,7 +269,7 @@ public class Mint {
         #if os(macOS)
             let osVersion = ProcessInfo.processInfo.operatingSystemVersion
             let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-            buildCommand += " -Xswiftc -static-stdlib -Xswiftc -target -Xswiftc \(target)"
+            buildCommand += " -Xswiftc -target -Xswiftc \(target)"
         #endif
 
         try runPackageCommand(name: "Building package",
