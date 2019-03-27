@@ -2,6 +2,12 @@
 
 ## Master
 
+#### Fixed
+- Fixed building packages when running in Swift 5 #130 #131 @stefanomondino @yonaskolb
+
+#### Changed
+- Updated to Swift 5 and dropped Swift 4.2 #131 @yonaskolb
+
 ## 0.11.4
 
 #### Added
