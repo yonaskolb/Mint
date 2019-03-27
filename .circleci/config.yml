@@ -1,15 +1,15 @@
 version: 2
 jobs:
-  macOS_swift_4.1:
+  macOS_swift_5.0:
     macos:
-      xcode: "9.3.0"
+      xcode: "10.2.0"
     steps:
       - checkout
       - run: swift build
       - run: swift test
-  linux_swift_4.1:
+  linux_swift_5.0:
     docker:
-      - image: norionomura/swift:41
+      - image: norionomura/swift:50
     steps:
       - checkout
       - run: swift build
@@ -18,5 +18,5 @@ workflows:
   version: 2
   workflow:
     jobs:
-      - macOS_swift_4.1
-      - linux_swift_4.1
+      - macOS_swift_5.0
+      - linux_swift_5.0
