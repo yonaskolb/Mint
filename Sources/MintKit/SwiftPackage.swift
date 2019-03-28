@@ -35,39 +35,30 @@ struct SwiftPackage: Decodable {
         let name: String
         let isExecutable: Bool
 
-        #if swift(>=5.0)
-
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            name = try container.decode(String.self, forKey: .name)
-            let typeContainer = try container.nestedContainer(keyedBy: ProductCodingKeys.self, forKey: .type)
-            isExecutable = typeContainer.contains(.executable)
-        }
-
-        enum ProductCodingKeys: String, CodingKey {
-            case executable
-            case library
-        }
-        
         enum CodingKeys: String, CodingKey {
             case name
             case type
+            case productType = "product_type"
         }
-
-        #else
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             name = try container.decode(String.self, forKey: .name)
-            let type = try container.decode(String.self, forKey: .type)
-            isExecutable = type == "executable"
-        }
+            if container.contains(.productType) {
+                // <= Swift 4.2
+                let type = try container.decode(String.self, forKey: .productType)
+                isExecutable = type == "executable"
+            } else {
+                // > Swift 5.0
 
-        enum CodingKeys: String, CodingKey {
-            case name
-            case type = "product_type"
-        }
+                enum ProductCodingKeys: String, CodingKey {
+                    case executable
+                    case library
+                }
 
-        #endif
+                let typeContainer = try container.nestedContainer(keyedBy: ProductCodingKeys.self, forKey: .type)
+                isExecutable = typeContainer.contains(.executable)
+            }
+        }
     }
 }
