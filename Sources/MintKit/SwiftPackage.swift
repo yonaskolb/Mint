@@ -18,7 +18,7 @@ struct SwiftPackage: Decodable {
             throw MintError.packageReadError("Couldn't dump package:\n\(message)")
         }
 
-        guard let json = content.index(of: "{"),
+        guard let json = content.firstIndex(of: "{"),
             let data = content[json...].data(using: .utf8) else {
             throw MintError.packageReadError("Couldn't parse package dump:\n\(content)")
         }
@@ -31,40 +31,34 @@ struct SwiftPackage: Decodable {
     }
 
     struct Product: Decodable {
-        
-        #if swift(>=5.0)
-        
-        struct ProductType: Decodable {
-            let executable: String?
-            let library:[String]?
-        }
-        
+
         let name: String
-        let type: ProductType
+        let isExecutable: Bool
 
         enum CodingKeys: String, CodingKey {
             case name
             case type
+            case productType = "product_type"
         }
 
-        var isExecutable: Bool {
-            return (type.library ?? []).count == 0
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            name = try container.decode(String.self, forKey: .name)
+            if container.contains(.productType) {
+                // <= Swift 4.2
+                let type = try container.decode(String.self, forKey: .productType)
+                isExecutable = type == "executable"
+            } else {
+                // > Swift 5.0
+
+                enum ProductCodingKeys: String, CodingKey {
+                    case executable
+                    case library
+                }
+
+                let typeContainer = try container.nestedContainer(keyedBy: ProductCodingKeys.self, forKey: .type)
+                isExecutable = typeContainer.contains(.executable)
+            }
         }
-        
-        #else
-        
-        let name: String
-        let type: String
-        
-        enum CodingKeys: String, CodingKey {
-            case name
-            case type = "product_type"
-        }
-        
-        var isExecutable: Bool {
-            return type == "executable"
-        }
-        
-        #endif
     }
 }
