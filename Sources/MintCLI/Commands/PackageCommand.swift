@@ -33,6 +33,5 @@ class PackageCommand: MintfileCommand {
         try execute(package: package)
     }
 
-    func execute(package: PackageReference) throws {
-    }
+    func execute(package: PackageReference) throws {}
 }

@@ -30,7 +30,8 @@ public class Mint {
         linkPath: Path,
         mintFilePath: Path = "Mintfile",
         standardOut: WritableStream = WriteStream.stdout,
-        standardError: WritableStream = WriteStream.stderr) {
+        standardError: WritableStream = WriteStream.stderr
+    ) {
         self.standardOut = standardOut
         self.standardError = standardError
         self.path = path.absolute()
@@ -225,7 +226,7 @@ public class Mint {
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
 
         let alreadyInstalled = packagePath.installPath.exists
-        if !force && alreadyInstalled {
+        if !force, alreadyInstalled {
             output("\(packagePath.commandVersion) already installed".green)
             if link {
                 if let executable = executable {

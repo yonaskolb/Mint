@@ -17,6 +17,5 @@ class MintCommand: Command {
         self.longDescription = longDescription
     }
 
-    func execute() throws {
-    }
+    func execute() throws {}
 }
