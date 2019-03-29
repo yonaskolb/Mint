@@ -2,11 +2,15 @@
 
 ## Master
 
+## 0.12.0
+
 #### Fixed
 - Fixed building packages when running in Swift 5 #130 #131 @stefanomondino @yonaskolb
 
 #### Changed
 - Updated to Swift 5 and dropped Swift 4.2 #131 @yonaskolb
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.11.4...0.12.0)
 
 ## 0.11.4
 
