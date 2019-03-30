@@ -32,7 +32,7 @@ Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 > Mint: a place where something is produced or manufactured
 
 ## Installing
-Make sure Xcode 9.2 is installed first.
+Make sure Xcode 10.2 is installed first.
 
 ### Homebrew
 
