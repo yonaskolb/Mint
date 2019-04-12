@@ -194,5 +194,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
 - mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
 - mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting)
+- mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift)
 
 Feel free to add your own!
