@@ -31,6 +31,8 @@ public class MintCLI {
             UninstallCommand(mint: mint),
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),
+            OutdatedCommand(mint: mint),
+            UpdateCommand(mint: mint)
         ])
     }
 
