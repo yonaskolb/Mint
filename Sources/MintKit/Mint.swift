@@ -388,7 +388,7 @@ public class Mint {
         output(confirmation.green)
     }
 
-    public func bootstrap() throws {
+    public func bootstrap(link: Bool = false) throws {
 
         let mintFile = try Mintfile(path: mintFilePath)
 
@@ -401,7 +401,7 @@ public class Mint {
 
         output("Found \(packageCount) in \(mintFilePath.string)")
         for package in mintFile.packages {
-            try install(package: package, force: false, link: false)
+            try install(package: package, force: false, link: link)
         }
         output("Installed \(packageCount) from \(mintFilePath.string)".green)
     }

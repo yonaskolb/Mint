@@ -136,6 +136,26 @@ class MintTests: XCTestCase {
         try checkInstalledVersion(package: package, executable: testCommand)
     }
 
+    func testBootstrapCommandLinkingGlobally() throws {
+        mint.mintFilePath = simpleMintFileFixture.absolute()
+
+        try mint.bootstrap(link: true)
+
+        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
+
+        let globalPath = mint.linkPath + testCommand
+
+        // check that is globally installed
+        XCTAssertTrue(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: package.version])
+
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
+        XCTAssertEqual(installedPackages.count, 1)
+
+        try checkInstalledVersion(package: package, executable: testCommand)
+    }
+
     func testMintFileInstall() throws {
         mint.mintFilePath = simpleMintFileFixture.absolute()
 

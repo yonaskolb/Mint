@@ -93,7 +93,7 @@ Run `mint help` to see usage instructions.
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
-- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile) without linking them globally
+- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally
 
 **Package reference**
 
@@ -129,10 +129,16 @@ Then you can simply run a package with:
 mint run xcodegen
 ```
 
-Or install all the packages in one go with:
+Or install all the packages (without linking them globally) in one go with:
 
 ```sh
 mint bootstrap
+```
+
+If you prefer to link them globally, do such with:
+
+```sh
+mint bootstrap --link
 ```
 
 ### Advanced
