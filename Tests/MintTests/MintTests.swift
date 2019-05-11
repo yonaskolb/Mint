@@ -130,7 +130,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(mint.getLinkedPackages(), [:])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
+        XCTAssertEqual(installedPackages[package.name, default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)
@@ -145,12 +145,12 @@ class MintTests: XCTestCase {
 
         let globalPath = mint.linkPath + testCommand
 
-        // check that is globally installed
+        // Check that is globally installed
         XCTAssertTrue(globalPath.exists)
         XCTAssertEqual(mint.getLinkedPackages(), [testCommand: package.version])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages["SimplePackage", default: []], [package.version])
+        XCTAssertEqual(installedPackages[package.name, default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)
