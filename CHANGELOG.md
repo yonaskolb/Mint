@@ -2,6 +2,10 @@
 
 ## Master
 
+#### Added
+
+- Added the `--link` (or `-l`) flag to the `bootstrap` option, to optionally link the packages of a `Mintfile` globally [#137](https://github.com/yonaskolb/Mint/pull/137) @acecilia
+
 ## 0.12.0
 
 #### Fixed
