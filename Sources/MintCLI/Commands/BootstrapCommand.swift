@@ -14,6 +14,6 @@ class BootstrapCommand: MintfileCommand {
 
     override func execute() throws {
         try super.execute()
-        try mint.bootstrap()
+        try mint.bootstrap(link: link.value)
     }
 }
