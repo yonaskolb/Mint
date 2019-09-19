@@ -188,25 +188,25 @@ public class Mint {
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
-        if let packageExecutable = arguments.first {
-            packagePath.executable = packageExecutable
-            if !packagePath.executablePath.exists {
-                throw MintError.invalidExecutable(packageExecutable)
-            }
-        } else {
-            let executables = try packagePath.getExecutables()
-            switch executables.count {
-            case 0:
-                throw MintError.missingExecutable(package)
-            case 1:
-                packagePath.executable = executables[0]
-            default:
-                packagePath.executable = inputReader.ask("There are multiple executables, which one would you like to run?", answers: executables)
-            }
+        let executables = try packagePath.getExecutables()
+        let executable: String
+        switch executables.count {
+        case 0:
+          throw MintError.missingExecutable(package)
+        case 1:
+          executable = executables[0]
+        default:
+          executable = inputReader.ask("There are multiple executables, which one would you like to run?", answers: executables)
         }
-        output("Running \(packagePath.executable ?? "") \(package.version)...")
 
-        let arguments = arguments.isEmpty ? [] : Array(arguments.dropFirst())
+        packagePath.executable = executable
+
+        // Is this actually possible since we're using "packagePath.getExecutables()"?
+        guard packagePath.executablePath.exists else {
+          throw MintError.invalidExecutable(executable)
+        }
+
+        output("Running \(executable) \(package.version)...")
 
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
