@@ -248,7 +248,17 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
 
-        let cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
+        let cloneCommand: String
+
+        switch package.version {
+        case .branch(name: let name), .tag(name: let name):
+            cloneCommand = "git clone --depth 1 -b \(name) \(package.gitPath) \(package.repoPath)"
+        case .commit(hash: let hash):
+            cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && git checkout \(hash)"
+        case .unspecified:
+            cloneCommand = "git clone --depth 1 \(package.gitPath) \(package.repoPath)"
+        }
+
         try runPackageCommand(name: "Cloning \(package.namedVersion)",
                               command: cloneCommand,
                               directory: checkoutPath,
