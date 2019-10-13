@@ -154,7 +154,7 @@ public class Mint {
             }
         }
 
-        // resove latest version from git repo
+        // resolve latest version from git repo
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
             output("Finding latest version of \(package.name)")
