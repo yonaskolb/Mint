@@ -16,12 +16,12 @@ class MintfileTests: XCTestCase {
         XCTAssertEqual(
             mintfile.packages,
             [
-                PackageReference(repo: "yonaskolb/xcodegen", version: "1.8.0"),
-                PackageReference(repo: "realm/SwiftLint", version: "0.25.0"),
+                PackageReference(repo: "yonaskolb/xcodegen", version: PackageReference.Revision.branch(name: "1.8.0")),
+                PackageReference(repo: "realm/SwiftLint", version: PackageReference.Revision.branch(name: "0.25.0")),
             ]
         )
 
-        let expectedPackage = PackageReference(repo: "realm/SwiftLint", version: "0.25.0")
+        let expectedPackage = PackageReference(repo: "realm/SwiftLint", version: PackageReference.Revision.branch(name: "0.25.0"))
         XCTAssertEqual(mintfile.package(for: "realm/SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SwiftLint"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "realm/swiftLint"), expectedPackage)
@@ -36,12 +36,12 @@ class MintfileTests: XCTestCase {
         XCTAssertEqual(
             mintfile.packages,
             [
-                PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0"),
-                PackageReference(repo: "yonaskolb/Mint", version: "0.9.1"),
+                PackageReference(repo: "yonaskolb/SimplePackage", version: PackageReference.Revision.branch(name: "4.0.0")),
+                PackageReference(repo: "yonaskolb/Mint", version: PackageReference.Revision.branch(name: "0.9.1")),
             ]
         )
 
-        let expectedPackage = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
+        let expectedPackage = PackageReference(repo: "yonaskolb/SimplePackage", version: PackageReference.Revision.branch(name: "4.0.0"))
         XCTAssertEqual(mintfile.package(for: "yonaskolb/SimplePackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "SimplePackage"), expectedPackage)
         XCTAssertEqual(mintfile.package(for: "yonaskolb/Simplepackage"), expectedPackage)
