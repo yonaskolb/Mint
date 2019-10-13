@@ -66,8 +66,8 @@ public class PackageReference {
             version = Revision(versionString: packageParts[2])
         } else if packageParts.count == 2 {
             if packageParts[1].contains(":") {
-                repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-                version = .unspecified
+                repo = packageParts[0]
+                version = Revision(versionString: packageParts[1])
             } else if packageParts[0].contains("ssh://") {
                 repo = [packageParts[0], packageParts[1]].joined(separator: "@")
                 version = .unspecified
