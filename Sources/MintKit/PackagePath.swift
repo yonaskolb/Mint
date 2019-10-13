@@ -15,7 +15,7 @@ struct PackagePath {
     }
 
     var packagePath: Path { return path + package.repoPath }
-    var installPath: Path { return packagePath + "build" + package.version }
+    var installPath: Path { return packagePath + "build" + package.version.string }
     var executablePath: Path { return installPath + (executable ?? package.name) }
 
     func getExecutables() throws -> [String] {

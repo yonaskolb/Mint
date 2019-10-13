@@ -3,9 +3,54 @@ import PathKit
 
 public class PackageReference {
     public var repo: String
-    public var version: String
+    public var version: Revision
 
-    public init(repo: String, version: String = "") {
+    public enum Revision: Equatable {
+        case tag(name: String)
+        case branch(name: String)
+        case commit(hash: String)
+        case unspecified
+
+        var string: String {
+            switch self {
+            case .tag(name: let name), .branch(name: let name), .commit(hash: let name):
+                return name
+            case .unspecified:
+                return ""
+            }
+        }
+
+        init(versionString: String) {
+            let parts = versionString.split(separator: ":")
+
+            if parts.count == 1 {
+                self = .branch(name: versionString)
+            } else if parts.count == 2 {
+                let name = String(parts[1])
+                switch parts[0] {
+                case "tag":
+                    self = .tag(name: name)
+                case "commit":
+                    self = .commit(hash: name)
+                default:
+                    self = .unspecified
+                }
+            } else {
+                self = .unspecified
+            }
+        }
+
+        var isSpecified: Bool {
+            switch self {
+            case .unspecified:
+                return false
+            default:
+                return true
+            }
+        }
+    }
+
+    public init(repo: String, version: Revision = .unspecified) {
         self.repo = repo
         self.version = version
     }
@@ -15,24 +60,24 @@ public class PackageReference {
             .map { $0.trimmingCharacters(in: .whitespaces) }
 
         let repo: String
-        let version: String
+        let version: Revision
         if packageParts.count == 3 {
             repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-            version = packageParts[2]
+            version = Revision(versionString: packageParts[2])
         } else if packageParts.count == 2 {
             if packageParts[1].contains(":") {
                 repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-                version = ""
+                version = .unspecified
             } else if packageParts[0].contains("ssh://") {
                 repo = [packageParts[0], packageParts[1]].joined(separator: "@")
-                version = ""
+                version = .unspecified
             } else {
                 repo = packageParts[0]
-                version = packageParts[1]
+                version = Revision(versionString: packageParts[1])
             }
         } else {
             repo = package
-            version = ""
+            version = .unspecified
         }
         self.init(repo: repo, version: version)
     }
@@ -73,6 +118,6 @@ public class PackageReference {
 
 extension PackageReference: Equatable {
     public static func == (lhs: PackageReference, rhs: PackageReference) -> Bool {
-        return lhs.repo == rhs.repo && lhs.version == rhs.version
+        return lhs.repo == rhs.repo && lhs.version.string == rhs.version.string
     }
 }

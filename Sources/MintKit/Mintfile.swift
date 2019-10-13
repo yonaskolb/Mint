@@ -37,7 +37,7 @@ public struct Mintfile {
 
         // Print warning for empty version
         packages
-            .filter { $0.version.isEmpty }
+            .filter { $0.version == .unspecified }
             .forEach { print("🌱  MINTFILE: repository \($0.repo) has no defined version. Specify a version using <Repo>@<Commitish>.") }
 
         // Print warning for multiple definitions
@@ -46,7 +46,7 @@ public struct Mintfile {
             .mapValues { $0.map { $0.version } }
 
         duplicates.forEach { repo, versions in
-            print("🌱  MINTFILE: repository \"\(repo)\" defined multiple times with versions \(versions.joined(separator: ", ")).")
+            print("🌱  MINTFILE: repository \"\(repo)\" defined multiple times with versions \(versions.map{ $0.string }.joined(separator: ", ")).")
         }
     }
 }

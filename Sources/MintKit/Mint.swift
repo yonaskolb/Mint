@@ -133,11 +133,11 @@ public class Mint {
     func resolvePackage(_ package: PackageReference) throws {
 
         // resolve version from MintFile
-        if package.version.isEmpty,
+        if !package.version.isSpecified,
             mintFilePath.exists,
             let mintfile = try? Mintfile(path: mintFilePath) {
             // set version to version from mintfile
-            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
+            if let mintFilePackage = mintfile.package(for: package.repo), mintFilePackage.version.isSpecified {
                 package.version = mintFilePackage.version
                 package.repo = mintFilePackage.repo
                 output("Using \(package.repo) \(package.version) from Mintfile.")
@@ -155,7 +155,7 @@ public class Mint {
         }
 
         // resove latest version from git repo
-        if package.version.isEmpty {
+        if !package.version.isSpecified {
             // we don't have a specific version, let's get the latest tag
             output("Finding latest version of \(package.name)")
             do {
@@ -163,14 +163,14 @@ public class Mint {
 
                 let tagReferences = tagOutput.stdout
                 if tagReferences.isEmpty {
-                    package.version = "master"
+                    package.version = .branch(name: "master")
                 } else {
                     let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
                     let versions = Git.convertTagsToVersionMap(tags)
                     if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
-                        package.version = tag
+                        package.version = .tag(name: tag)
                     } else {
-                        package.version = "master"
+                        package.version = .branch(name: "master")
                     }
                 }
             } catch {
@@ -381,7 +381,7 @@ public class Mint {
             return
         }
         var confirmation = "Linked \(packagePath.commandVersion) to \(linkPath.string)"
-        if case let .mint(previousVersion) = installStatus.status, packagePath.package.version != previousVersion {
+        if case let .mint(previousVersion) = installStatus.status, packagePath.package.version.string != previousVersion {
             confirmation += ", replacing version \(previousVersion)"
         }
 
