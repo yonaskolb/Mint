@@ -2,7 +2,6 @@ import Foundation
 import PathKit
 import Rainbow
 import SwiftCLI
-import Utility
 
 public class Mint {
 
@@ -164,7 +163,7 @@ public class Mint {
                     package.version = "master"
                 } else {
                     let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
-                    let versions = Git.convertTagsToVersionMap(tags)
+                    let versions = convertTagsToVersionMap(tags)
                     if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
                         package.version = tag
                     } else {

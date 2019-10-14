@@ -11,13 +11,13 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/kylef/PathKit.git", from: "1.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.1.0"),
-        .package(url: "https://github.com/apple/swift-package-manager.git", .exact("0.2.0")),
         .package(url: "https://github.com/jakeheis/SwiftCLI.git", from: "5.3.0"),
+        .package(url: "https://github.com/mxcl/Version.git", from: "1.1.0")
     ],
     targets: [
         .target(name: "Mint", dependencies: ["MintCLI"]),
         .target(name: "MintCLI", dependencies: ["Rainbow", "SwiftCLI", "MintKit"]),
-        .target(name: "MintKit", dependencies: ["Rainbow", "PathKit", "Utility", "SwiftCLI"]),
+        .target(name: "MintKit", dependencies: ["Rainbow", "PathKit", "Version", "SwiftCLI"]),
         .testTarget(name: "MintTests", dependencies: ["MintKit"]),
     ]
 )
