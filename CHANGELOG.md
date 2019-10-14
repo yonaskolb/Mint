@@ -2,9 +2,18 @@
 
 ## Master
 
-#### Added
+## 0.13.0
 
+#### Added
 - Added the `--link` (or `-l`) flag to the `bootstrap` option, to optionally link the packages of a `Mintfile` globally [#137](https://github.com/yonaskolb/Mint/pull/137) @acecilia
+
+#### Fixed
+- Fixed list of executables not showing when asking for to disambiguate between them [#149](https://github.com/yonaskolb/Mint/pull/149) @yonaskolb
+
+#### Internal
+- Updated dependencies and removed SwiftPM dependency
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.12.0...0.13.0)
 
 ## 0.12.0
 
