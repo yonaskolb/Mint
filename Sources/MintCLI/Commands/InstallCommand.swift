@@ -1,7 +1,6 @@
 import Foundation
 import MintKit
 import SwiftCLI
-import Utility
 
 class InstallCommand: PackageCommand {
 

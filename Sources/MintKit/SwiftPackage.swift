@@ -11,7 +11,7 @@ struct SwiftPackage: Decodable {
 
         let content: String
         do {
-            content = try capture("swift", arguments: ["package", "dump-package"], directory: directory.string).stdout
+            content = try Task.capture("swift", arguments: ["package", "dump-package"], directory: directory.string).stdout
         } catch let error as CaptureError {
             let captureResult = error.captured
             let message = captureResult.stderr.isEmpty ? captureResult.stdout : captureResult.stderr
