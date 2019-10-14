@@ -9,10 +9,10 @@ let package = Package(
         .library(name: "MintKit", targets: ["MintKit"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/kylef/PathKit.git", from: "0.9.0"),
+        .package(url: "https://github.com/kylef/PathKit.git", from: "1.0.0"),
         .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.1.0"),
         .package(url: "https://github.com/apple/swift-package-manager.git", .exact("0.2.0")),
-        .package(url: "https://github.com/jakeheis/SwiftCLI", from: "5.0.0"),
+        .package(url: "https://github.com/jakeheis/SwiftCLI.git", from: "5.3.0"),
     ],
     targets: [
         .target(name: "Mint", dependencies: ["MintCLI"]),
