@@ -1,29 +1,33 @@
 import Foundation
 import SwiftCLI
 
-struct InputReader {
+extension Input {
 
-    let standardOut: WritableStream
-    init(standardOut: WritableStream = WriteStream.stdout) {
-        self.standardOut = standardOut
-    }
+    static func readOption(options: [String], prompt: String) -> String {
+        let optionsString = options.enumerated()
+            .map { "  \($0.offset + 1). \($0.element)" }
+            .joined(separator: "\n")
 
-    func ask(_ question: String, answers: [String]) -> String {
-        standardOut <<< question
+        let prompt = "\(prompt)\n\(optionsString)\n"
 
-        func ask() -> String {
-            guard let answer = readLine() else { return "" }
-            let lowercasedAnswers = answers.map { $0.lowercased() }
-            if !lowercasedAnswers.contains(answer.lowercased()) {
-                standardOut <<< "You must respond with one of the following:\n\(answers.joined(separator: "\n"))"
-                return ask()
+        let validation: Validation<String> = .custom("Couldn't parse option") { input in
+            if let index = Int(input), index > 0, index <= options.count {
+                return true
             }
-            return answer
+            return options.contains(input)
         }
-        return ask()
+
+        let value = Input.readObject(prompt: prompt, secure: false, validation: [validation])
+        if options.contains(value) {
+            return value
+        } else if let index = Int(value) {
+            return options[index - 1]
+        } else {
+            return value
+        }
     }
 
-    func confirmation(_ question: String) -> Bool {
-        return ask("\(question) (y/n)", answers: ["y", "n"]) == "y"
+    static func confirmation(_ question: String) -> Bool {
+        return readBool(prompt: "\(question) (y/n)")
     }
 }

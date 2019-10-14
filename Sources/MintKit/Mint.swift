@@ -23,21 +23,19 @@ public class Mint {
 
     public var verbose = false
     public var runAsNewProcess = true
-    var inputReader: InputReader
 
     public init(
         path: Path,
         linkPath: Path,
         mintFilePath: Path = "Mintfile",
-        standardOut: WritableStream = WriteStream.stdout,
-        standardError: WritableStream = WriteStream.stderr
+        standardOut: WritableStream = Term.stdout,
+        standardError: WritableStream = Term.stderr
     ) {
         self.standardOut = standardOut
         self.standardError = standardError
         self.path = path.absolute()
         self.linkPath = linkPath.absolute()
         self.mintFilePath = mintFilePath
-        inputReader = InputReader(standardOut: standardOut)
     }
 
     func output(_ string: String) {
@@ -159,7 +157,7 @@ public class Mint {
             // we don't have a specific version, let's get the latest tag
             output("Finding latest version of \(package.name)")
             do {
-                let tagOutput = try SwiftCLI.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
+                let tagOutput = try Task.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
 
                 let tagReferences = tagOutput.stdout
                 if tagReferences.isEmpty {
@@ -201,7 +199,7 @@ public class Mint {
             case 1:
                 packagePath.executable = executables[0]
             default:
-                packagePath.executable = inputReader.ask("There are multiple executables, which one would you like to run?", answers: executables)
+                packagePath.executable = Input.readOption(options: executables, prompt: "There are multiple executables, which one would you like to run?")
             }
         }
         output("Running \(packagePath.executable ?? "") \(package.version)...")
@@ -293,7 +291,7 @@ public class Mint {
                 standardOut.print("Copying \(executablePath.string) to \(destinationPackagePath.executablePath)")
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try SwiftCLI.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
+            try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
         }
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
@@ -308,7 +306,7 @@ public class Mint {
                 if resourcePath.exists {
                     let filename = String(resource.split(separator: "/").last!)
                     let dest = packagePath.installPath + filename
-                    try SwiftCLI.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
+                    try Task.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
                 } else {
                     output("resource \(resource) doesn't exist".yellow)
                 }
@@ -335,9 +333,9 @@ public class Mint {
         output(name)
         do {
             if verbose {
-                try SwiftCLI.run(bash: command, directory: directory.string)
+                try Task.run(bash: command, directory: directory.string)
             } else {
-                _ = try SwiftCLI.capture(bash: command, directory: directory.string)
+                _ = try Task.capture(bash: command, directory: directory.string)
             }
         } catch {
             if let error = error as? CaptureError, !verbose {
@@ -365,7 +363,7 @@ public class Mint {
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
         if let warning = installStatus.warning {
-            let ok = inputReader.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
+            let ok = Input.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
             if !ok {
                 return
             }
@@ -375,7 +373,7 @@ public class Mint {
         try? installPath.parent().mkpath()
 
         do {
-            try SwiftCLI.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
+            try Task.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
         } catch {
             errorOutput("Could not link \(packagePath.commandVersion) to \(installPath.string)".red)
             return
@@ -443,7 +441,7 @@ public class Mint {
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
         if let warning = installStatus.warning {
-            let ok = inputReader.confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
+            let ok = Input.confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
             if !ok {
                 return
             }

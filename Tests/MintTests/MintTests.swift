@@ -28,7 +28,7 @@ class MintTests: XCTestCase {
     func checkInstalledVersion(package: PackageReference, executable: String, file: StaticString = #file, line: UInt = #line) throws {
         let packagePath = PackagePath(path: mint.packagesPath, package: package, executable: executable)
         XCTAssertTrue(packagePath.executablePath.exists)
-        let output = try capture(packagePath.executablePath.string, "--version")
+        let output = try Task.capture(packagePath.executablePath.string, "--version")
         XCTAssertEqual(output.stdout, package.version, file: file, line: line)
     }
 
@@ -50,7 +50,7 @@ class MintTests: XCTestCase {
         // install already installed version globally
         try mint.install(package: PackageReference(repo: testRepo, version: testVersion), link: true)
         XCTAssertTrue(globalPath.exists)
-        let globalOutput = try capture(globalPath.string)
+        let globalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
 
         XCTAssertEqual(mint.getLinkedPackages(), [testCommand: testVersion])
@@ -62,7 +62,7 @@ class MintTests: XCTestCase {
         try checkInstalledVersion(package: latestPackage, executable: testCommand)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
-        let latestGlobalOutput = try capture(globalPath.string)
+        let latestGlobalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
         XCTAssertEqual(mint.getLinkedPackages(), [testCommand: latestVersion])
 
