@@ -11,6 +11,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
     case packageResolveError(PackageReference)
     case packageBuildError(PackageReference)
     case packageReadError(String)
+    case couldNotOverwriteMintfile(String)
 
     public var description: String {
         switch self {
@@ -23,6 +24,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .packageResolveError(package): return "Failed to resolve \(package.namedVersion) with SPM"
         case let .packageBuildError(package): return "Failed to build \(package.namedVersion) with SPM"
         case let .packageReadError(error): return "Failed to read Package.swift file:\n\(error)"
+        case let .couldNotOverwriteMintfile(path): return "Existing Mintfile found in \(path). If you want to overwrite its contents use the force option."
         }
     }
 

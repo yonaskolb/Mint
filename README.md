@@ -89,11 +89,11 @@ Until 1.0 is reached, minor versions will be breaking.
 
 Run `mint help` to see usage instructions.
 
-- **install**: Installs a package, so it can be run with `run` later, and also links that version globally
+- **install**: Installs a package, so it can be run with `run` later, and also links that version globally.
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
 - **list**: Lists all currently installed packages and versions.
 - **uninstall**: Uninstalls a package by name.
-- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally
+- **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally.
 
 **Package reference**
 
@@ -145,6 +145,7 @@ mint bootstrap --link
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
 - You can set `MINT_PATH` and `MINT_LINK_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
 - You can use `mint install --force` to reinstall a package even if it's already installed. This shouldn't be required unless you are pointing at a branch and want to update it.
+- You can use `mint list --dump` to create a [Mintfile](#mintfile) with the currently installed packages and versions. 
 
 ### Linux
 Mint works on Linux but has some limitations:

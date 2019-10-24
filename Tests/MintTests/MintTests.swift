@@ -155,6 +155,45 @@ class MintTests: XCTestCase {
 
         try checkInstalledVersion(package: package, executable: testCommand)
     }
+    
+    func testListCommandDumpFunctionality() throws {
+        // Sample Packages
+        let samplePackages = [PackageReference(repo: "https://github.com/yonaskolb/SimplePackage.git", version: "4.0.0")]
+        
+        // Installing the sample packages
+        try samplePackages.forEach { (package) in
+            try mint.install(package: package)
+        }
+        // Changing the export path for the dump
+        let dumpTemporaryPath = Path(Path.temporary.string + "./mint/tests")
+        try dumpTemporaryPath.mkpath()
+        mint.mintFilePath = dumpTemporaryPath + "./MintfileDump"
+        
+        // Making sure there isn't a Mintfile in the path
+        XCTAssertFalse(mint.mintFilePath.exists)
+        try? mint.mintFilePath.delete()
+        
+        // Dump
+        try mint.dump(force: false)
+        
+        // Checking that the Mintfile was created
+        let mintfile = try Mintfile(path: mint.mintFilePath)
+        
+        // Checking Mintfile Contents
+        XCTAssertTrue(mintfile.packages.count == samplePackages.count)
+        mintfile.packages.forEach { (package) in
+            XCTAssertTrue(samplePackages.contains(package))
+        }
+        
+        // Asserting that calling dump without force param, when the Mintfile
+        // already exists throws an error
+        expectError(MintError.couldNotOverwriteMintfile(mint.mintFilePath.string)) {
+            try mint.dump(force: false)
+        }
+        // Not throwing when force is enabled since it's going to
+        // overwrite the file
+        XCTAssertNoThrow(try mint.dump(force: true))
+    }
 
     func testMintFileInstall() throws {
         mint.mintFilePath = simpleMintFileFixture.absolute()

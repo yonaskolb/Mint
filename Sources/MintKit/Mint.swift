@@ -403,6 +403,46 @@ public class Mint {
         output("Installed \(packageCount) from \(mintFilePath.string)".green)
     }
 
+    public func dump(force: Bool) throws {
+        guard mintFilePath.absolute().exists == false || force else {
+            throw MintError.couldNotOverwriteMintfile(mintFilePath.string)
+        }
+
+        guard packagesPath.exists else {
+            output("No mint packages installed")
+            return
+        }
+
+        var packagesToExport: [String] = []
+
+        let packages: [Path] = try packagesPath.children().filter { $0.isDirectory }
+
+        let metadata = try readMetadata()
+
+        // find packages
+        try packages.forEach { (packagePath) in
+            let packagePathName = packagePath.lastComponent
+            let package = metadata.packages.first { $0.value == packagePathName }!
+            let packageRepo = package.key
+
+            let versions = try (packagePath + "build")
+                .children()
+                .filter { !$0.lastComponent.hasPrefix(".") }
+                .sorted()
+                .map { $0.lastComponent }
+
+            for version in versions {
+                packagesToExport.append("\(packageRepo)@\(version)")
+            }
+        }
+
+        packagesToExport = packagesToExport.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+
+        try mintFilePath.write(packagesToExport.joined(separator:"\n") + "\n")
+
+        output("Exported \(packagesToExport.count) packages in the Mintfile".green)
+    }
+
     public func uninstall(name: String) throws {
 
         // find packages

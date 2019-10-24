@@ -7,6 +7,7 @@ extension MintTests {
         ("testMintErrors", testMintErrors),
         ("testMintFileInstall", testMintFileInstall),
         ("testRunCommand", testRunCommand),
+        ("testListCommandDumpFunctionality", testListCommandDumpFunctionality),
     ]
 }
 
