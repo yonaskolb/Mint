@@ -33,6 +33,7 @@ class PackageTests: XCTestCase {
             "https://mycustomdomain.com/package": "https://mycustomdomain.com/package",
             "https://mycustomdomain.com/package.git": "https://mycustomdomain.com/package.git",
             "git@github.com:yonaskolb/Mint.git": "git@github.com:yonaskolb/Mint.git",
+            "mac-cain13/R.swift": "https://github.com/mac-cain13/R.swift.git",
         ]
 
         for (url, expected) in urls {

@@ -53,7 +53,7 @@ public class PackageReference {
                 return repo
             } else if repo.contains("github.com") {
                 return "https://\(repo).git"
-            } else if repo.contains(".") {
+            } else if repo.components(separatedBy: "/").first!.contains(".") {
                 return "https://\(repo)"
             } else {
                 return "https://github.com/\(repo).git"
