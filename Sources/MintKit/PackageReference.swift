@@ -42,7 +42,7 @@ public class PackageReference {
     }
 
     public var name: String {
-        return repo.components(separatedBy: "/").last!.components(separatedBy: ".").first!
+        return repo.components(separatedBy: "/").last!.replacingOccurrences(of: ".git", with: "")
     }
 
     public var gitPath: String {

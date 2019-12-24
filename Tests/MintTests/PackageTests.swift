@@ -41,6 +41,29 @@ class PackageTests: XCTestCase {
         }
     }
 
+    func testPackageNames() {
+
+        let urls: [String: String] = [
+            "yonaskolb/mint": "mint",
+            "github.com/yonaskolb/mint": "mint",
+            "https://github.com/yonaskolb/mint": "mint",
+            "https://github.com/yonaskolb/mint.git": "mint",
+            "mycustomdomain.com/package": "package",
+            "mycustomdomain.com/package.git": "package",
+            "https://mycustomdomain.com/package": "package",
+            "https://mycustomdomain.com/package.git": "package",
+            "git@github.com:yonaskolb/Mint.git": "Mint",
+            "mac-cain13/R.swift": "R.swift",
+            "github.com/mac-cain13/R.swift": "R.swift",
+            "https://github.com/mac-cain13/R.swift.git": "R.swift",
+            "git@github.com:mac-cain13/R.swift.git": "R.swift",
+        ]
+
+        for (url, expected) in urls {
+            XCTAssertEqual(PackageReference(repo: url).name, expected)
+        }
+    }
+
     func testPackageReferenceInfo() {
 
         XCTAssertEqual(PackageReference(package: "yonaskolb/mint"), PackageReference(repo: "yonaskolb/mint"))
