@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.14.0
+
+#### Fixed
+- Fixed a bug that prevented the `Mintfile` from resolving a GitHub repository where the name contains a period [#153](https://github.com/yonaskolb/Mint/pull/153) @liamnichols
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.13.0...0.14.0)
+
 ## 0.13.0
 
 #### Added
