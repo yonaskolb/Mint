@@ -127,7 +127,7 @@ public class Mint {
         return versionsByPackage
     }
 
-    func resolvePackage(_ package: PackageReference) throws {
+    func resolvePackage(_ package: PackageReference, silent: Bool = false) throws {
 
         // resolve version from MintFile
         if package.version.isEmpty,
@@ -137,7 +137,9 @@ public class Mint {
             if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
                 package.version = mintFilePackage.version
                 package.repo = mintFilePackage.repo
-                output("Using \(package.repo) \(package.version) from Mintfile.")
+                if !silent {
+                    output("Using \(package.repo) \(package.version) from Mintfile.")
+                }
             }
         }
 
@@ -154,7 +156,9 @@ public class Mint {
         // resolve latest version from git repo
         if package.version.isEmpty {
             // we don't have a specific version, let's get the latest tag
-            output("Finding latest version of \(package.name)")
+            if !silent {
+                output("Finding latest version of \(package.name)")
+            }
             do {
                 let tagOutput = try Task.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
 
@@ -446,5 +450,53 @@ public class Mint {
             }
         }
         try? installPath.delete()
+    }
+    
+    @discardableResult
+    public func outdated(silent: Bool = false) throws -> [String : (oldVersion: String, newReference: PackageReference) ] {
+        guard packagesPath.exists else {
+            if !silent {
+                output("No mint packages installed")
+            }
+            return [:]
+        }
+
+        var outdatedPackageReferences: [String:  (oldVersion: String, newReference: PackageReference)] = [:]
+        let outdatedPackages: [String] = try getLinkedPackages().compactMap { (name, version) in
+            guard let gitRepo = try getPackageGit(name: name) else {
+                return nil
+            }
+            let reference = PackageReference(repo: gitRepo)
+            try resolvePackage(reference, silent: true)
+            if reference.version > version {
+                outdatedPackageReferences[name] =  (oldVersion: version, newReference: reference)
+                return "\(name): \(version) < \(reference.version)"
+            } else {
+                return nil
+            }
+        }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
+        
+        if outdatedPackages.isEmpty {
+            if !silent {
+                output("All packages are up to date")
+            }
+        } else {
+            if !silent {
+                output("Outdated mint packages:\n\(outdatedPackages.joined(separator: "\n"))")
+            }
+        }
+        return outdatedPackageReferences
+    }
+    
+    public func update() throws {
+        let outdatedPackages = try outdated(silent: true)
+        guard !outdatedPackages.isEmpty  else {
+            output("All packages are already up to date")
+            return
+        }
+        for (name, value) in outdatedPackages {
+            try install(package: value.newReference, executable: name, force: true, link: true)
+            output("Updated \(value.newReference.name) from version \(value.oldVersion) to \(value.newReference.version)")
+        }
     }
 }

@@ -10,6 +10,7 @@ class MintTests: XCTestCase {
                     standardOut: WriteStream.null,
                     standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
+    let gitTestRepo = "https://github.com/yonaskolb/SimplePackage.git"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = "4.0.0"
     let latestVersion = "5.0.0"
@@ -208,5 +209,31 @@ class MintTests: XCTestCase {
         expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))) {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))
         }
+    }
+    
+    func testOutdated() throws {
+        let specificPackage = PackageReference(repo: testRepo, version: testVersion)
+        let updatedPackage = PackageReference(repo: gitTestRepo, version: latestVersion)
+        try mint.install(package: specificPackage, link: true)
+        let outdatedResult = try mint.outdated()
+        XCTAssertEqual(outdatedResult.count, 1)
+        let result = outdatedResult["simplepackage"]!
+        XCTAssertEqual(result.oldVersion, testVersion)
+        XCTAssertEqual(result.newReference, updatedPackage)
+        
+        try mint.install(package: updatedPackage, force: true, link: true)
+        let outdatedResultAfterLatestInstallation = try mint.outdated()
+        XCTAssertEqual(outdatedResultAfterLatestInstallation.count, 0)
+    }
+    
+    func testUpdate() throws {
+        let specificPackage = PackageReference(repo: testRepo, version: testVersion)
+        try mint.install(package: specificPackage, link: true)
+        let outdatedResult = try mint.outdated()
+        XCTAssertEqual(outdatedResult.count, 1)
+        
+        try mint.update()
+        let outdatedResultAfterLatestInstallation = try mint.outdated()
+        XCTAssertEqual(outdatedResultAfterLatestInstallation.count, 0)
     }
 }
