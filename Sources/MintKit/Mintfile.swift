@@ -35,11 +35,6 @@ public struct Mintfile {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .map { PackageReference(package: String($0)) }
 
-        // Print warning for empty version
-        packages
-            .filter { $0.version.isEmpty }
-            .forEach { print("🌱  MINTFILE: repository \($0.repo) has no defined version. Specify a version using <Repo>@<Commitish>.") }
-
         // Print warning for multiple definitions
         let duplicates = Dictionary(grouping: packages, by: { $0.repo })
             .filter { $0.value.count > 1 }
