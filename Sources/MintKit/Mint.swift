@@ -182,7 +182,7 @@ public class Mint {
 
         try resolvePackage(package)
 
-        try install(package: package, beforeRun: true, force: false, link: false)
+        let installed = try install(package: package, beforeRun: true, force: false, link: false)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -203,7 +203,7 @@ public class Mint {
             }
         }
 
-        if verbose {
+        if verbose || installed {
             output("Running \(packagePath.executable ?? "") \(package.version)...")
         }
 
