@@ -180,6 +180,8 @@ public class Mint {
 
     public func run(package: PackageReference, arguments: [String] = []) throws {
 
+        let unknownVersion = package.version.isEmpty
+
         try resolvePackage(package)
 
         let installed = try install(package: package, beforeRun: true, force: false, link: false)
@@ -203,7 +205,7 @@ public class Mint {
             }
         }
 
-        if verbose || installed {
+        if verbose || installed || unknownVersion {
             output("Running \(packagePath.executable ?? "") \(package.version)...")
         }
 
