@@ -137,7 +137,9 @@ public class Mint {
             if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
                 package.version = mintFilePackage.version
                 package.repo = mintFilePackage.repo
-                output("Using \(package.repo) \(package.version) from Mintfile.")
+                if verbose {
+                    output("Using \(package.repo) \(package.version) from Mintfile.")
+                }
             }
         }
 
@@ -180,8 +182,7 @@ public class Mint {
 
         try resolvePackage(package)
 
-        // install the package if not installed already
-        try install(package: package, force: false, link: false)
+        try install(package: package, beforeRun: true, force: false, link: false)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -201,7 +202,10 @@ public class Mint {
                 packagePath.executable = Input.readOption(options: executables, prompt: "There are multiple executables, which one would you like to run?")
             }
         }
-        output("Running \(packagePath.executable ?? "") \(package.version)...")
+
+        if verbose {
+            output("Running \(packagePath.executable ?? "") \(package.version)...")
+        }
 
         let arguments = arguments.isEmpty ? [] : Array(arguments.dropFirst())
 
@@ -216,7 +220,9 @@ public class Mint {
         }
     }
 
-    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false) throws {
+    @discardableResult
+    /// returns if the package was installed
+    public func install(package: PackageReference, executable: String? = nil, beforeRun: Bool = false, force: Bool = false, link: Bool = false) throws -> Bool {
 
         try resolvePackage(package)
 
@@ -224,7 +230,9 @@ public class Mint {
 
         let alreadyInstalled = packagePath.installPath.exists
         if !force, alreadyInstalled {
-            output("\(packagePath.commandVersion) already installed".green)
+            if !beforeRun || verbose {
+                output("\(packagePath.commandVersion) already installed".green)
+            }
             if link {
                 if let executable = executable {
                     try linkPackage(package, executable: executable)
@@ -235,7 +243,7 @@ public class Mint {
                     }
                 }
             }
-            return
+            return false
         }
 
         let checkoutPath = Path.temporary + "mint"
@@ -326,6 +334,8 @@ public class Mint {
                 }
             }
         }
+
+        return true
     }
 
     private func runPackageCommand(name: String, command: String, directory: Path, stdOutOnError: Bool = false, error mintError: MintError) throws {
@@ -396,11 +406,21 @@ public class Mint {
 
         let packageCount = "\(mintFile.packages.count) \(mintFile.packages.count == 1 ? "package" : "packages")"
 
-        output("Found \(packageCount) in \(mintFilePath.string)")
-        for package in mintFile.packages {
-            try install(package: package, force: false, link: link)
+        if verbose {
+            output("Found \(packageCount) in \(mintFilePath.string)")
         }
-        output("Installed \(packageCount) from \(mintFilePath.string)".green)
+        var installCount = 0
+        for package in mintFile.packages {
+            let installed = try install(package: package, force: false, link: link)
+            if installed {
+                installCount += 1
+            }
+        }
+        if installCount == 0 {
+            output("\(packageCount) up to date".green)
+        } else {
+            output("Installed \(installCount)/\(packageCount)".green)
+        }
     }
 
     public func uninstall(name: String) throws {
