@@ -203,5 +203,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift)
 - mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky)
 - mint install [thii/xcbeautify](https://github.com/thii/xcbeautify)
+- mint install [mint run mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
 
 Feel free to add your own!
