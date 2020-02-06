@@ -178,13 +178,13 @@ public class Mint {
         }
     }
 
-    public func run(package: PackageReference, arguments: [String] = []) throws {
+    public func run(package: PackageReference, arguments: [String] = [], noInstall: Bool = false) throws {
 
         let unknownVersion = package.version.isEmpty
 
         try resolvePackage(package)
 
-        let installed = try install(package: package, beforeRun: true, force: false, link: false)
+        let installed = try install(package: package, beforeRun: true, force: false, link: false, noInstall: noInstall)
 
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -224,14 +224,19 @@ public class Mint {
 
     @discardableResult
     /// returns if the package was installed
-    public func install(package: PackageReference, executable: String? = nil, beforeRun: Bool = false, force: Bool = false, link: Bool = false) throws -> Bool {
+    public func install(package: PackageReference, executable: String? = nil, beforeRun: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false) throws -> Bool {
 
         try resolvePackage(package)
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
 
-        let alreadyInstalled = packagePath.installPath.exists
-        if !force, alreadyInstalled {
+        let isInstalled = packagePath.installPath.exists
+
+        if !isInstalled && noInstall {
+            throw MintError.packageNotInstalled(package)
+        }
+
+        if !force, isInstalled {
             if !beforeRun || verbose {
                 output("\(packagePath.commandVersion) already installed".green)
             }
