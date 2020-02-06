@@ -5,6 +5,9 @@
 #### Added
 - Added `--no-install` option to `mint run` [#160](https://github.com/yonaskolb/Mint/pull/160) @yonaskolb
 
+### Changed
+- Moved output of some commands to `--verbose` and tweaked output [#154](https://github.com/yonaskolb/Mint/pull/154) @yonaskolb
+
 #### Internal
 - Updated to SwiftCLI 6.0 [#157](https://github.com/yonaskolb/Mint/pull/157) @yonaskolb
 - Replace CircleCI with Github actions [#158](https://github.com/yonaskolb/Mint/pull/158) @yonaskolb
