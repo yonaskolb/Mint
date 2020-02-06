@@ -178,7 +178,7 @@ public class Mint {
         }
     }
 
-    public func run(package: PackageReference, arguments: [String] = [], noInstall: Bool = false) throws {
+    public func run(package: PackageReference, arguments: [String] = [], executable: String? = nil, noInstall: Bool = false) throws {
 
         let unknownVersion = package.version.isEmpty
 
@@ -186,30 +186,12 @@ public class Mint {
 
         let installed = try install(package: package, beforeRun: true, force: false, link: false, noInstall: noInstall)
 
-        var packagePath = PackagePath(path: packagesPath, package: package)
-
-        if let packageExecutable = arguments.first {
-            packagePath.executable = packageExecutable
-            if !packagePath.executablePath.exists {
-                throw MintError.invalidExecutable(packageExecutable)
-            }
-        } else {
-            let executables = try packagePath.getExecutables()
-            switch executables.count {
-            case 0:
-                throw MintError.missingExecutable(package)
-            case 1:
-                packagePath.executable = executables[0]
-            default:
-                packagePath.executable = Input.readOption(options: executables, prompt: "There are multiple executables, which one would you like to run?")
-            }
-        }
+        var arguments = arguments
+        let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
 
         if verbose || installed || unknownVersion {
             output("Running \(packagePath.executable ?? "") \(package.version)...")
         }
-
-        let arguments = arguments.isEmpty ? [] : Array(arguments.dropFirst())
 
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
@@ -220,6 +202,41 @@ public class Mint {
             let runTask = Task(executable: packagePath.executablePath.string, arguments: arguments)
             _ = runTask.runSync()
         }
+    }
+
+    func getPackagePath(for package: PackageReference, with arguments: inout [String], executable: String?) throws -> PackagePath {
+        var packagePath = PackagePath(path: packagesPath, package: package)
+
+        if let executable = executable {
+            packagePath.executable = executable
+            if !packagePath.executablePath.exists {
+                throw MintError.invalidExecutable(executable)
+            }
+            return packagePath
+        }
+
+        let executables = try packagePath.getExecutables()
+        switch executables.count {
+        case 0:
+            throw MintError.missingExecutable(package)
+        case 1:
+            packagePath.executable = executables[0]
+            if let firstArgument = arguments.first,
+                executables[0].lowercased() == firstArgument.lowercased() {
+                // the executable was part of the arguments, so let's drop it
+                arguments = Array(arguments.dropFirst())
+            }
+        default:
+            if let firstArgument = arguments.first?.lowercased(), let executable = executables.first(where: { $0.lowercased() == firstArgument }) {
+                // the first argument matched an executable. Let's use it and drop the first argument
+                packagePath.executable = executable
+                arguments = Array(arguments.dropFirst())
+                return packagePath
+            }
+
+            packagePath.executable = Input.readOption(options: executables, prompt: "There are multiple executables, which one would you like to run? In the future you can use the --executable argument")
+        }
+        return packagePath
     }
 
     @discardableResult

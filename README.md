@@ -96,12 +96,15 @@ Run `mint help` to see usage instructions.
 
 **Package reference**
 
-`run` and `install` commands require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`). This will do a lookup of all installed packages.
+`run` and `install` commands require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`) or in the Mintfile.
 An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
 
 #### Examples
 ```sh
-$ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
+$ mint run yonaskolb/XcodeGen@1.2.4 # run the only executable
+$ mint run yonaskolb/XcodeGen@1.2.4 --spec spec.yml # pass some arguments
+$ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # specify a specific executable
+$ mint run --executable xcodegen yonaskolb/XcodeGen@1.2.4 --spec spec.yml # specify a specific executable in case the first argument is the same name as the executable
 $ mint install yonaskolb/XcodeGen@1.2.4 --no-link # installs a certain version but doesn't link it globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint install yonaskolb/XcodeGen@master --force #reinstall the master branch
