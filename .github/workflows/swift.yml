@@ -8,7 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Resolve
-      run: swift resolve
+      run: swift package resolve
     - name: Build
       run: swift build
     - name: Run tests
