@@ -4,9 +4,10 @@ import SwiftCLI
 import XCTest
 
 class MintTests: XCTestCase {
-
-    let mint = Mint(path: Path.temporary + "mint",
-                    linkPath: Path.temporary + "mint-installs",
+    let mintPath = Path.temporary + "mint"
+    let linkPath = Path.temporary + "mint-installs"
+    lazy var mint = Mint(path: mintPath,
+                    linkPath: linkPath,
                     standardOut: WriteStream.null,
                     standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
@@ -114,6 +115,14 @@ class MintTests: XCTestCase {
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
+    }
+
+    func testWhichCommand() throws {
+
+        let package = PackageReference(repo: testRepo, version: testVersion)
+        try mint.install(package: package)
+        let executablePath = try mint.getExecutablePath(package: package, executable: nil)
+        XCTAssertEqual(executablePath.string, mintPath.description + "/packages/github.com_yonaskolb_SimplePackage/build/4.0.0/simplepackage")
     }
 
     func testBootstrapCommand() throws {

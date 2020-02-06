@@ -31,6 +31,7 @@ public class MintCLI {
             UninstallCommand(mint: mint),
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),
+            WhichCommand(mint: mint),
         ])
     }
 
