@@ -4,7 +4,7 @@ import SwiftCLI
 
 class RunCommand: PackageCommand {
 
-    var arguments = OptionalCollectedParameter()
+    @CollectedParam var arguments: [String]
 
     init(mint: Mint) {
         super.init(mint: mint,
@@ -14,6 +14,6 @@ class RunCommand: PackageCommand {
     }
 
     override func execute(package: PackageReference) throws {
-        try mint.run(package: package, arguments: arguments.value)
+        try mint.run(package: package, arguments: arguments)
     }
 }

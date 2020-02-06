@@ -5,8 +5,10 @@ import SwiftCLI
 
 class PackageCommand: MintfileCommand {
 
-    var package = Parameter()
-    var silent = Flag("-s", "--silent", description: "Silences any output from Mint itself")
+    @Param var package: String
+
+    @Flag("-s", "--silent", description: "Silences any output from Mint itself")
+    var silent: Bool
 
     init(mint: Mint, name: String, description: String, parameterDescription: String? = nil) {
         var longDescription = """
@@ -23,13 +25,13 @@ class PackageCommand: MintfileCommand {
     }
 
     override func execute() throws {
-        if silent.value {
+        if silent {
             mint.standardOut = WriteStream.null
         }
 
         try super.execute()
 
-        let package = PackageReference(package: self.package.value)
+        let package = PackageReference(package: self.package)
         try execute(package: package)
     }
 
