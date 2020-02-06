@@ -2,6 +2,9 @@
 
 ## Master
 
+#### Internal
+- Replace CircleCI with Github actions [#158](https://github.com/yonaskolb/Mint/pull/158) @yonaskolb
+
 ## 0.14.0
 
 #### Fixed
