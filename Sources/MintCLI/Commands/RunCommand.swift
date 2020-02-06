@@ -5,6 +5,8 @@ import SwiftCLI
 class RunCommand: PackageCommand {
 
     @CollectedParam var arguments: [String]
+    @Flag("-n", "--no-install", description: "If a package is not already installed this prevents Mint from installing it automatically. It will fail instead")
+    var noInstall: Bool
 
     init(mint: Mint) {
         super.init(mint: mint,
@@ -14,6 +16,6 @@ class RunCommand: PackageCommand {
     }
 
     override func execute(package: PackageReference) throws {
-        try mint.run(package: package, arguments: arguments)
+        try mint.run(package: package, arguments: arguments, noInstall: noInstall)
     }
 }

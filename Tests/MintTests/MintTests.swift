@@ -193,6 +193,10 @@ class MintTests: XCTestCase {
             try mint.bootstrap()
         }
 
+        expectError(MintError.packageNotInstalled(PackageReference(repo: testRepo, version: "0.0.1"))) {
+            try mint.run(package: PackageReference(repo: testRepo, version: "0.0.1"), noInstall: true)
+        }
+
         expectError(MintError.missingExecutable(PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))) {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))
         }
