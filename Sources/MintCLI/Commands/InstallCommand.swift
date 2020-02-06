@@ -4,9 +4,13 @@ import SwiftCLI
 
 class InstallCommand: PackageCommand {
 
-    let executable = OptionalParameter()
-    let noLink = Flag("-n", "--no-link", description: "Whether to prevent global linkage")
-    let force = Flag("-f", "--force", description: "Force a reinstall even if the package is already installed", defaultValue: false)
+    @Param var executable: String?
+
+    @Flag("-n", "--no-link", description: "Whether to prevent global linkage")
+    var noLink: Bool
+
+    @Flag("-f", "--force", description: "Force a reinstall even if the package is already installed")
+    var force: Bool
 
     init(mint: Mint) {
         super.init(mint: mint,
@@ -16,7 +20,7 @@ class InstallCommand: PackageCommand {
     }
 
     override func execute(package: PackageReference) throws {
-        let link = !noLink.value
-        try mint.install(package: package, executable: executable.value, force: force.value, link: link)
+        let link = !noLink
+        try mint.install(package: package, executable: executable, force: force, link: link)
     }
 }

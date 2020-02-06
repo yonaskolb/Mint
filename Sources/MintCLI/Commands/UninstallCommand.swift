@@ -4,7 +4,7 @@ import SwiftCLI
 
 class UninstallCommand: MintCommand {
 
-    var package = Parameter()
+    @Param var package: String
 
     init(mint: Mint) {
         super.init(mint: mint, name: "uninstall", description: "Uninstall a package by name")
@@ -12,7 +12,6 @@ class UninstallCommand: MintCommand {
 
     override func execute() throws {
         try super.execute()
-        let package = self.package.value
         try mint.uninstall(name: package)
     }
 }
