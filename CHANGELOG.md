@@ -3,6 +3,7 @@
 ## Master
 
 #### Internal
+- Updated to SwiftCLI 6.0 [#157](https://github.com/yonaskolb/Mint/pull/157) @yonaskolb
 - Replace CircleCI with Github actions [#158](https://github.com/yonaskolb/Mint/pull/158) @yonaskolb
 
 ## 0.14.0
