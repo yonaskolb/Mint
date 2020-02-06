@@ -5,7 +5,7 @@
 #### Added
 - Added `--no-install` option to `mint run` [#160](https://github.com/yonaskolb/Mint/pull/160) @yonaskolb
 
-### Changed
+#### Changed
 - Moved output of some commands to `--verbose` and tweaked output [#154](https://github.com/yonaskolb/Mint/pull/154) @yonaskolb
 
 #### Internal
