@@ -1,0 +1,15 @@
+name: Swift
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Resolve
+      run: swift resolve
+    - name: Build
+      run: swift build
+    - name: Run tests
+      run: swift test
