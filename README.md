@@ -206,5 +206,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky)
 - mint install [thii/xcbeautify](https://github.com/thii/xcbeautify)
 - mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
+- mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
 
 Feel free to add your own!
