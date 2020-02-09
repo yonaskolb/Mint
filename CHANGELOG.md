@@ -7,6 +7,7 @@
 
 #### Changed
 - Moved output of some commands to `--verbose` and tweaked output [#154](https://github.com/yonaskolb/Mint/pull/154) @yonaskolb
+- The executable no longer needs to be provided in `mint run` when passing arguments if there is only a single executable in the package `mint run realm/SwiftLint autocorrect` [#159](https://github.com/yonaskolb/Mint/pull/159) @yonaskolb
 
 #### Internal
 - Updated to SwiftCLI 6.0 [#157](https://github.com/yonaskolb/Mint/pull/157) @yonaskolb

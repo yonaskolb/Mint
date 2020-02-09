@@ -180,8 +180,8 @@ class MintTests: XCTestCase {
             try mint.install(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion))
         }
 
-        expectError(MintError.invalidExecutable("invalidCommand")) {
-            try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: ["invalidCommand"])
+        expectError(MintError.invalidExecutable("invalidExecutable")) {
+            try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: [], executable: "invalidExecutable")
         }
 
         expectError(MintError.packageNotFound("invalidPackage")) {
