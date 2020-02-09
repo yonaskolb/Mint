@@ -4,6 +4,7 @@
 
 #### Added
 - Added `--no-install` option to `mint run` [#160](https://github.com/yonaskolb/Mint/pull/160) @yonaskolb
+- Added `mint which` command for printing the path of an executable [#162](https://github.com/yonaskolb/Mint/pull/162) @yonaskolb
 
 #### Changed
 - Moved output of some commands to `--verbose` and tweaked output [#154](https://github.com/yonaskolb/Mint/pull/154) @yonaskolb
