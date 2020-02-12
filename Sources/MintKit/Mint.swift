@@ -204,6 +204,13 @@ public class Mint {
         }
     }
 
+    public func getExecutablePath(package: PackageReference, executable: String?) throws -> Path {
+        try resolvePackage(package)
+        var arguments: [String] = []
+        let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
+        return packagePath.executablePath
+    }
+
     func getPackagePath(for package: PackageReference, with arguments: inout [String], executable: String?) throws -> PackagePath {
         var packagePath = PackagePath(path: packagesPath, package: package)
 
@@ -213,6 +220,10 @@ public class Mint {
                 throw MintError.invalidExecutable(executable)
             }
             return packagePath
+        }
+
+        if !packagePath.installPath.exists {
+            throw MintError.packageNotInstalled(package)
         }
 
         let executables = try packagePath.getExecutables()
