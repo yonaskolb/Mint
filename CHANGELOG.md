@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.14.1
+
+#### Fixed
+- Fixed some verbose output being shown in non verbose states
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.14.0...0.14.1)
+
 ## 0.14.0
 
 #### Added
