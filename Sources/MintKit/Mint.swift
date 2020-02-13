@@ -127,7 +127,9 @@ public class Mint {
         return versionsByPackage
     }
 
-    func resolvePackage(_ package: PackageReference) throws {
+    /// return whether the version was resolved remotely
+    @discardableResult
+    func resolvePackage(_ package: PackageReference) throws -> Bool {
 
         // resolve version from MintFile
         if package.version.isEmpty,
@@ -175,21 +177,22 @@ public class Mint {
             } catch {
                 throw MintError.repoNotFound(package.gitPath)
             }
+            return true
+        } else {
+            return false
         }
     }
 
     public func run(package: PackageReference, arguments: [String] = [], executable: String? = nil, noInstall: Bool = false) throws {
 
-        let unknownVersion = package.version.isEmpty
-
-        try resolvePackage(package)
+        let resolvedVersionRemotely = try resolvePackage(package)
 
         let installed = try install(package: package, beforeRun: true, force: false, link: false, noInstall: noInstall)
 
         var arguments = arguments
         let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
 
-        if verbose || installed || unknownVersion {
+        if verbose || installed || resolvedVersionRemotely {
             output("Running \(packagePath.executable ?? "") \(package.version)...")
         }
 
