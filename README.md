@@ -91,6 +91,7 @@ Run `mint help` to see usage instructions.
 - **install**: Installs a package, so it can be run with `run` later, and also links that version globally
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
 - **list**: Lists all currently installed packages and versions.
+- **which**: Print the path to an installed package executable.
 - **uninstall**: Uninstalls a package by name.
 - **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally
 
