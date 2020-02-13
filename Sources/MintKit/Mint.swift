@@ -38,11 +38,11 @@ public class Mint {
     }
 
     func output(_ string: String) {
-        standardOut.print("🌱  \(string)")
+        standardOut.print("🌱 \(string)")
     }
 
     func errorOutput(_ string: String) {
-        standardError.print("🌱  \(string)")
+        standardError.print("🌱 \(string)")
     }
 
     public func closeStreams() {
