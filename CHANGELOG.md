@@ -2,22 +2,22 @@
 
 ## Master
 
+## 0.14.0
+
 #### Added
 - Added `--no-install` option to `mint run` [#160](https://github.com/yonaskolb/Mint/pull/160) @yonaskolb
 - Added `mint which` command for printing the path of an executable [#162](https://github.com/yonaskolb/Mint/pull/162) @yonaskolb
+- The executable no longer needs to be provided in `mint run` when passing arguments if there is only a single executable in the package eg: `mint run realm/SwiftLint autocorrect` [#159](https://github.com/yonaskolb/Mint/pull/159) @yonaskolb
 
 #### Changed
 - Moved output of some commands to `--verbose` and tweaked output [#154](https://github.com/yonaskolb/Mint/pull/154) @yonaskolb
-- The executable no longer needs to be provided in `mint run` when passing arguments if there is only a single executable in the package `mint run realm/SwiftLint autocorrect` [#159](https://github.com/yonaskolb/Mint/pull/159) @yonaskolb
+
+#### Fixed
+- Fixed a bug that prevented the `Mintfile` from resolving a GitHub repository where the name contains a period [#153](https://github.com/yonaskolb/Mint/pull/153) @liamnichols
 
 #### Internal
 - Updated to SwiftCLI 6.0 [#157](https://github.com/yonaskolb/Mint/pull/157) @yonaskolb
 - Replace CircleCI with Github actions [#158](https://github.com/yonaskolb/Mint/pull/158) @yonaskolb
-
-## 0.14.0
-
-#### Fixed
-- Fixed a bug that prevented the `Mintfile` from resolving a GitHub repository where the name contains a period [#153](https://github.com/yonaskolb/Mint/pull/153) @liamnichols
 
 [Commits](https://github.com/yonaskolb/Mint/compare/0.13.0...0.14.0)
 

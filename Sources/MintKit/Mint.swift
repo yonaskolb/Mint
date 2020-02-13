@@ -260,7 +260,7 @@ public class Mint {
 
         let isInstalled = packagePath.installPath.exists
 
-        if !isInstalled && noInstall {
+        if !isInstalled, noInstall {
             throw MintError.packageNotInstalled(package)
         }
 

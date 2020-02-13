@@ -7,9 +7,9 @@ class MintTests: XCTestCase {
     let mintPath = Path.temporary + "mint"
     let linkPath = Path.temporary + "mint-installs"
     lazy var mint = Mint(path: mintPath,
-                    linkPath: linkPath,
-                    standardOut: WriteStream.null,
-                    standardError: WriteStream.null)
+                         linkPath: linkPath,
+                         standardOut: WriteStream.null,
+                         standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = "4.0.0"
