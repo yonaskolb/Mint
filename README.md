@@ -8,7 +8,7 @@
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/SwiftLint@0.22.0 swiftlint
+$ mint run realm/SwiftLint@0.22.0
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
 
