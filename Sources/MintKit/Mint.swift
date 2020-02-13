@@ -187,7 +187,7 @@ public class Mint {
 
         let resolvedVersionRemotely = try resolvePackage(package)
 
-        let installed = try install(package: package, beforeRun: true, force: false, link: false, noInstall: noInstall)
+        let installed = try install(package: package, beforeOtherCommand: true, force: false, link: false, noInstall: noInstall)
 
         var arguments = arguments
         let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
@@ -255,7 +255,7 @@ public class Mint {
 
     @discardableResult
     /// returns if the package was installed
-    public func install(package: PackageReference, executable: String? = nil, beforeRun: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false) throws -> Bool {
+    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false) throws -> Bool {
 
         try resolvePackage(package)
 
@@ -268,7 +268,7 @@ public class Mint {
         }
 
         if !force, isInstalled {
-            if !beforeRun || verbose {
+            if !beforeOtherCommand || verbose {
                 output("\(packagePath.commandVersion) already installed".green)
             }
             if link {
@@ -449,7 +449,7 @@ public class Mint {
         }
         var installCount = 0
         for package in mintFile.packages {
-            let installed = try install(package: package, force: false, link: link)
+            let installed = try install(package: package, beforeOtherCommand: true, force: false, link: link)
             if installed {
                 installCount += 1
             }
