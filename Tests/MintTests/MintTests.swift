@@ -130,7 +130,7 @@ class MintTests: XCTestCase {
 
         try mint.bootstrap()
 
-        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: PackageReference.Revision.branch(name: "4.0.0"))
+        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
 
         let globalPath = mint.linkPath + testCommand
 
@@ -150,7 +150,7 @@ class MintTests: XCTestCase {
 
         try mint.bootstrap(link: true)
 
-        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: PackageReference.Revision.branch(name: "4.0.0"))
+        let package = PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0")
 
         let globalPath = mint.linkPath + testCommand
 
