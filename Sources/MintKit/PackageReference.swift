@@ -5,7 +5,9 @@ public class PackageReference {
     public var repo: String
     public var version: Revision
 
-    public enum Revision: Equatable {
+    public enum Revision: Equatable, ExpressibleByStringLiteral {
+        public typealias StringLiteralType = String
+
         case tag(name: String)
         case branch(name: String)
         case commit(hash: String)
@@ -20,11 +22,11 @@ public class PackageReference {
             }
         }
 
-        init(versionString: String) {
-            let parts = versionString.split(separator: ":")
+        public init(stringLiteral value: String) {
+            let parts = value.split(separator: ":")
 
             if parts.count == 1 {
-                self = .branch(name: versionString)
+                self = .branch(name: value)
             } else if parts.count == 2 {
                 let name = String(parts[1])
                 switch parts[0] {
@@ -38,6 +40,10 @@ public class PackageReference {
             } else {
                 self = .unspecified
             }
+        }
+
+        init(versionString: String) {
+            self.init(stringLiteral: versionString)
         }
 
         var isSpecified: Bool {
