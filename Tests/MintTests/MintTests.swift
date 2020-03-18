@@ -210,16 +210,16 @@ class MintTests: XCTestCase {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))
         }
 
-        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "invalid_package")))) {
-            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "invalid_package")))
+        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_package"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_package"))
         }
 
-        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "invalid_dependency")))) {
-            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "invalid_dependency")))
+        expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_dependency"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_dependency"))
         }
 
-        expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "compile_error")))) {
-            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "compile_error")))
+        expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))
         }
     }
 }
