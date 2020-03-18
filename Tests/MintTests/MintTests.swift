@@ -12,8 +12,8 @@ class MintTests: XCTestCase {
                          standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
-    let testVersion = PackageReference.Revision.tag(name: "4.0.0")
-    let latestVersion = PackageReference.Revision.tag(name: "5.0.0")
+    let testVersion = PackageReference.Revision.tag("4.0.0")
+    let latestVersion = PackageReference.Revision.tag("5.0.0")
     let testCommand = "simplepackage"
     let testRepoName = "SimplePackage"
 

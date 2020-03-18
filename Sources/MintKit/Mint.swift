@@ -164,14 +164,14 @@ public class Mint {
 
                 let tagReferences = tagOutput.stdout
                 if tagReferences.isEmpty {
-                    package.version = .branch(name: "master")
+                    package.version = .branch("master")
                 } else {
                     let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
                     let versions = convertTagsToVersionMap(tags)
                     if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
-                        package.version = .tag(name: tag)
+                        package.version = .tag(tag)
                     } else {
-                        package.version = .branch(name: "master")
+                        package.version = .branch("master")
                     }
                 }
             } catch {

@@ -8,9 +8,9 @@ public class PackageReference {
     public enum Revision: Equatable, ExpressibleByStringLiteral {
         public typealias StringLiteralType = String
 
-        case tag(name: String)
-        case branch(name: String)
-        case commit(hash: String)
+        case tag(String)
+        case branch(String)
+        case commit(String)
         case unspecified
         case unknown
 
@@ -27,14 +27,16 @@ public class PackageReference {
             let parts = value.split(separator: ":")
 
             if parts.count == 1 {
-                self = .branch(name: value)
+                self = .branch(value)
             } else if parts.count == 2 {
                 let name = String(parts[1])
                 switch parts[0] {
                 case "tag":
-                    self = .tag(name: name)
+                    self = .tag(name)
                 case "commit":
-                    self = .commit(hash: name)
+                    self = .commit(name)
+                case "branch":
+                    self = .branch(name)
                 default:
                     self = .unknown
                 }
