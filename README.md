@@ -3,13 +3,12 @@
 [![SPM](https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=for-the-badge)](https://swift.org/package-manager)
 ![Platforms](https://img.shields.io/badge/Platforms-macOS_Linux-blue.svg?style=for-the-badge)
 [![Git Version](https://img.shields.io/github/release/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/releases)
-[![Build Status](https://img.shields.io/circleci/project/github/yonaskolb/Mint.svg?style=for-the-badge)](https://circleci.com/gh/yonaskolb/Mint)
 [![license](https://img.shields.io/github/license/yonaskolb/Mint.svg?style=for-the-badge)](https://github.com/yonaskolb/Mint/blob/master/LICENSE)
 
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/SwiftLint@0.22.0 swiftlint
+$ mint run realm/SwiftLint@0.22.0
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
 
@@ -92,17 +91,21 @@ Run `mint help` to see usage instructions.
 - **install**: Installs a package, so it can be run with `run` later, and also links that version globally
 - **run**: Runs a package. This will install it first if it isn't already installed, though won't link it globally. It's useful for running a certain version.
 - **list**: Lists all currently installed packages and versions.
+- **which**: Print the path to an installed package executable.
 - **uninstall**: Uninstalls a package by name.
 - **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally
 
 **Package reference**
 
-`run` and `install` commands require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`). This will do a lookup of all installed packages.
+`run` and `install` commands require a package reference parameter. This can be a shorthand for a github repo (`mint install realm/SwiftLint`) or a fully qualified git path (`mint install https://github.com/realm/SwiftLint.git`). In the case of `run` you can also just pass the name of the repo if it is already installed (`run swiftlint`) or in the Mintfile.
 An optional version can be specified by appending `@version`, otherwise the newest tag or master will be used. Note that if you don't specify a version, the current tags must be loaded remotely each time.
 
 #### Examples
 ```sh
-$ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # pass some arguments
+$ mint run yonaskolb/XcodeGen@1.2.4 # run the only executable
+$ mint run yonaskolb/XcodeGen@1.2.4 --spec spec.yml # pass some arguments
+$ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # specify a specific executable
+$ mint run --executable xcodegen yonaskolb/XcodeGen@1.2.4 --spec spec.yml # specify a specific executable in case the first argument is the same name as the executable
 $ mint install yonaskolb/XcodeGen@1.2.4 --no-link # installs a certain version but doesn't link it globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint install yonaskolb/XcodeGen@master --force #reinstall the master branch
@@ -203,5 +206,7 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift)
 - mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky)
 - mint install [thii/xcbeautify](https://github.com/thii/xcbeautify)
+- mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
+- mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
 
 Feel free to add your own!

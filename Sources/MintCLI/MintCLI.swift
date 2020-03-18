@@ -6,7 +6,7 @@ import SwiftCLI
 
 public class MintCLI {
 
-    public let version = "0.12.0"
+    public let version = "0.14.1"
 
     let mint: Mint
     let cli: CLI
@@ -31,6 +31,7 @@ public class MintCLI {
             UninstallCommand(mint: mint),
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),
+            WhichCommand(mint: mint),
         ])
     }
 

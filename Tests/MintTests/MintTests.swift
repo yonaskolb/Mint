@@ -4,11 +4,12 @@ import SwiftCLI
 import XCTest
 
 class MintTests: XCTestCase {
-
-    let mint = Mint(path: Path.temporary + "mint",
-                    linkPath: Path.temporary + "mint-installs",
-                    standardOut: WriteStream.null,
-                    standardError: WriteStream.null)
+    let mintPath = Path.temporary + "mint"
+    let linkPath = Path.temporary + "mint-installs"
+    lazy var mint = Mint(path: mintPath,
+                         linkPath: linkPath,
+                         standardOut: WriteStream.null,
+                         standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
     let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = PackageReference.Revision.tag(name: "4.0.0")
@@ -28,7 +29,7 @@ class MintTests: XCTestCase {
     func checkInstalledVersion(package: PackageReference, executable: String, file: StaticString = #file, line: UInt = #line) throws {
         let packagePath = PackagePath(path: mint.packagesPath, package: package, executable: executable)
         XCTAssertTrue(packagePath.executablePath.exists)
-        let output = try capture(packagePath.executablePath.string, "--version")
+        let output = try Task.capture(packagePath.executablePath.string, "--version")
         XCTAssertEqual(output.stdout, package.version.string, file: file, line: line)
     }
 
@@ -50,7 +51,7 @@ class MintTests: XCTestCase {
         // install already installed version globally
         try mint.install(package: PackageReference(repo: testRepo, version: testVersion), link: true)
         XCTAssertTrue(globalPath.exists)
-        let globalOutput = try capture(globalPath.string)
+        let globalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion.string)
 
         XCTAssertEqual(mint.getLinkedPackages(), [testCommand: testVersion.string])
@@ -62,7 +63,7 @@ class MintTests: XCTestCase {
         try checkInstalledVersion(package: latestPackage, executable: testCommand)
         XCTAssertEqual(latestPackage.version, latestVersion)
 
-        let latestGlobalOutput = try capture(globalPath.string)
+        let latestGlobalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion.string)
         XCTAssertEqual(mint.getLinkedPackages(), [testCommand: latestVersion.string])
 
@@ -114,6 +115,14 @@ class MintTests: XCTestCase {
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
+    }
+
+    func testWhichCommand() throws {
+
+        let package = PackageReference(repo: testRepo, version: testVersion)
+        try mint.install(package: package)
+        let executablePath = try mint.getExecutablePath(package: package, executable: nil)
+        XCTAssertEqual(executablePath.string, mintPath.description + "/packages/github.com_yonaskolb_SimplePackage/build/4.0.0/simplepackage")
     }
 
     func testBootstrapCommand() throws {
@@ -180,8 +189,8 @@ class MintTests: XCTestCase {
             try mint.install(package: PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion))
         }
 
-        expectError(MintError.invalidExecutable("invalidCommand")) {
-            try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: ["invalidCommand"])
+        expectError(MintError.invalidExecutable("invalidExecutable")) {
+            try mint.run(package: PackageReference(repo: testRepo, version: testVersion), arguments: [], executable: "invalidExecutable")
         }
 
         expectError(MintError.packageNotFound("invalidPackage")) {
@@ -193,8 +202,12 @@ class MintTests: XCTestCase {
             try mint.bootstrap()
         }
 
-        expectError(MintError.missingExecutable(PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "no_executable")))) {
-            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "no_executable")))
+        expectError(MintError.packageNotInstalled(PackageReference(repo: testRepo, version: "0.0.1"))) {
+            try mint.run(package: PackageReference(repo: testRepo, version: "0.0.1"), noInstall: true)
+        }
+
+        expectError(MintError.missingExecutable(PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))) {
+            try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "no_executable"))
         }
 
         expectError(MintError.packageResolveError(PackageReference(repo: "yonaskolb/simplepackage", version: PackageReference.Revision.branch(name: "invalid_package")))) {

@@ -2,7 +2,6 @@ import Foundation
 import PathKit
 import Rainbow
 import SwiftCLI
-import Utility
 
 public class Mint {
 
@@ -23,29 +22,27 @@ public class Mint {
 
     public var verbose = false
     public var runAsNewProcess = true
-    var inputReader: InputReader
 
     public init(
         path: Path,
         linkPath: Path,
         mintFilePath: Path = "Mintfile",
-        standardOut: WritableStream = WriteStream.stdout,
-        standardError: WritableStream = WriteStream.stderr
+        standardOut: WritableStream = Term.stdout,
+        standardError: WritableStream = Term.stderr
     ) {
         self.standardOut = standardOut
         self.standardError = standardError
         self.path = path.absolute()
         self.linkPath = linkPath.absolute()
         self.mintFilePath = mintFilePath
-        inputReader = InputReader(standardOut: standardOut)
     }
 
     func output(_ string: String) {
-        standardOut.print("🌱  \(string)")
+        standardOut.print("🌱 \(string)")
     }
 
     func errorOutput(_ string: String) {
-        standardError.print("🌱  \(string)")
+        standardError.print("🌱 \(string)")
     }
 
     public func closeStreams() {
@@ -130,7 +127,9 @@ public class Mint {
         return versionsByPackage
     }
 
-    func resolvePackage(_ package: PackageReference) throws {
+    /// return whether the version was resolved remotely
+    @discardableResult
+    func resolvePackage(_ package: PackageReference) throws -> Bool {
 
         // resolve version from MintFile
         if !package.version.isSpecified,
@@ -140,7 +139,9 @@ public class Mint {
             if let mintFilePackage = mintfile.package(for: package.repo), mintFilePackage.version.isSpecified {
                 package.version = mintFilePackage.version
                 package.repo = mintFilePackage.repo
-                output("Using \(package.repo) \(package.version) from Mintfile.")
+                if verbose {
+                    output("Using \(package.repo) \(package.version) from Mintfile.")
+                }
             }
         }
 
@@ -154,19 +155,19 @@ public class Mint {
             }
         }
 
-        // resove latest version from git repo
+        // resolve latest version from git repo
         if !package.version.isSpecified {
             // we don't have a specific version, let's get the latest tag
             output("Finding latest version of \(package.name)")
             do {
-                let tagOutput = try SwiftCLI.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
+                let tagOutput = try Task.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
 
                 let tagReferences = tagOutput.stdout
                 if tagReferences.isEmpty {
                     package.version = .branch(name: "master")
                 } else {
                     let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
-                    let versions = Git.convertTagsToVersionMap(tags)
+                    let versions = convertTagsToVersionMap(tags)
                     if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
                         package.version = .tag(name: tag)
                     } else {
@@ -176,37 +177,24 @@ public class Mint {
             } catch {
                 throw MintError.repoNotFound(package.gitPath)
             }
+            return true
+        } else {
+            return false
         }
     }
 
-    public func run(package: PackageReference, arguments: [String] = []) throws {
+    public func run(package: PackageReference, arguments: [String] = [], executable: String? = nil, noInstall: Bool = false) throws {
 
-        try resolvePackage(package)
+        let resolvedVersionRemotely = try resolvePackage(package)
 
-        // install the package if not installed already
-        try install(package: package, force: false, link: false)
+        let installed = try install(package: package, beforeOtherCommand: true, force: false, link: false, noInstall: noInstall)
 
-        var packagePath = PackagePath(path: packagesPath, package: package)
+        var arguments = arguments
+        let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
 
-        if let packageExecutable = arguments.first {
-            packagePath.executable = packageExecutable
-            if !packagePath.executablePath.exists {
-                throw MintError.invalidExecutable(packageExecutable)
-            }
-        } else {
-            let executables = try packagePath.getExecutables()
-            switch executables.count {
-            case 0:
-                throw MintError.missingExecutable(package)
-            case 1:
-                packagePath.executable = executables[0]
-            default:
-                packagePath.executable = inputReader.ask("There are multiple executables, which one would you like to run?", answers: executables)
-            }
+        if verbose || installed || resolvedVersionRemotely {
+            output("Running \(packagePath.executable ?? "") \(package.version)...")
         }
-        output("Running \(packagePath.executable ?? "") \(package.version)...")
-
-        let arguments = arguments.isEmpty ? [] : Array(arguments.dropFirst())
 
         if runAsNewProcess {
             var env = ProcessInfo.processInfo.environment
@@ -219,15 +207,70 @@ public class Mint {
         }
     }
 
-    public func install(package: PackageReference, executable: String? = nil, force: Bool = false, link: Bool = false) throws {
+    public func getExecutablePath(package: PackageReference, executable: String?) throws -> Path {
+        try resolvePackage(package)
+        var arguments: [String] = []
+        let packagePath = try getPackagePath(for: package, with: &arguments, executable: executable)
+        return packagePath.executablePath
+    }
+
+    func getPackagePath(for package: PackageReference, with arguments: inout [String], executable: String?) throws -> PackagePath {
+        var packagePath = PackagePath(path: packagesPath, package: package)
+
+        if let executable = executable {
+            packagePath.executable = executable
+            if !packagePath.executablePath.exists {
+                throw MintError.invalidExecutable(executable)
+            }
+            return packagePath
+        }
+
+        if !packagePath.installPath.exists {
+            throw MintError.packageNotInstalled(package)
+        }
+
+        let executables = try packagePath.getExecutables()
+        switch executables.count {
+        case 0:
+            throw MintError.missingExecutable(package)
+        case 1:
+            packagePath.executable = executables[0]
+            if let firstArgument = arguments.first,
+                executables[0].lowercased() == firstArgument.lowercased() {
+                // the executable was part of the arguments, so let's drop it
+                arguments = Array(arguments.dropFirst())
+            }
+        default:
+            if let firstArgument = arguments.first?.lowercased(), let executable = executables.first(where: { $0.lowercased() == firstArgument }) {
+                // the first argument matched an executable. Let's use it and drop the first argument
+                packagePath.executable = executable
+                arguments = Array(arguments.dropFirst())
+                return packagePath
+            }
+
+            packagePath.executable = Input.readOption(options: executables, prompt: "There are multiple executables, which one would you like to run? In the future you can use the --executable argument")
+        }
+        return packagePath
+    }
+
+    @discardableResult
+    /// returns if the package was installed
+    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false) throws -> Bool {
 
         try resolvePackage(package)
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
 
-        let alreadyInstalled = packagePath.installPath.exists
-        if !force, alreadyInstalled {
-            output("\(packagePath.commandVersion) already installed".green)
+        let isInstalled = packagePath.installPath.exists
+
+        if !isInstalled, noInstall {
+            throw MintError.packageNotInstalled(package)
+        }
+
+        if !force, isInstalled {
+            if !beforeOtherCommand || verbose {
+                output("\(packagePath.commandVersion) already installed".green)
+            }
             if link {
                 if let executable = executable {
                     try linkPackage(package, executable: executable)
@@ -238,7 +281,7 @@ public class Mint {
                     }
                 }
             }
-            return
+            return false
         }
 
         let checkoutPath = Path.temporary + "mint"
@@ -303,7 +346,7 @@ public class Mint {
                 standardOut.print("Copying \(executablePath.string) to \(destinationPackagePath.executablePath)")
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try SwiftCLI.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
+            try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
         }
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
@@ -318,7 +361,7 @@ public class Mint {
                 if resourcePath.exists {
                     let filename = String(resource.split(separator: "/").last!)
                     let dest = packagePath.installPath + filename
-                    try SwiftCLI.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
+                    try Task.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
                 } else {
                     output("resource \(resource) doesn't exist".yellow)
                 }
@@ -339,15 +382,17 @@ public class Mint {
                 }
             }
         }
+
+        return true
     }
 
     private func runPackageCommand(name: String, command: String, directory: Path, stdOutOnError: Bool = false, error mintError: MintError) throws {
         output(name)
         do {
             if verbose {
-                try SwiftCLI.run(bash: command, directory: directory.string)
+                try Task.run(bash: command, directory: directory.string)
             } else {
-                _ = try SwiftCLI.capture(bash: command, directory: directory.string)
+                _ = try Task.capture(bash: command, directory: directory.string)
             }
         } catch {
             if let error = error as? CaptureError, !verbose {
@@ -375,7 +420,7 @@ public class Mint {
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
         if let warning = installStatus.warning {
-            let ok = inputReader.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
+            let ok = Input.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
             if !ok {
                 return
             }
@@ -385,7 +430,7 @@ public class Mint {
         try? installPath.parent().mkpath()
 
         do {
-            try SwiftCLI.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
+            try Task.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
         } catch {
             errorOutput("Could not link \(packagePath.commandVersion) to \(installPath.string)".red)
             return
@@ -409,11 +454,21 @@ public class Mint {
 
         let packageCount = "\(mintFile.packages.count) \(mintFile.packages.count == 1 ? "package" : "packages")"
 
-        output("Found \(packageCount) in \(mintFilePath.string)")
-        for package in mintFile.packages {
-            try install(package: package, force: false, link: link)
+        if verbose {
+            output("Found \(packageCount) in \(mintFilePath.string)")
         }
-        output("Installed \(packageCount) from \(mintFilePath.string)".green)
+        var installCount = 0
+        for package in mintFile.packages {
+            let installed = try install(package: package, beforeOtherCommand: true, force: false, link: link)
+            if installed {
+                installCount += 1
+            }
+        }
+        if installCount == 0 {
+            output("\(packageCount) up to date".green)
+        } else {
+            output("Installed \(installCount)/\(packageCount)".green)
+        }
     }
 
     public func uninstall(name: String) throws {
@@ -453,7 +508,7 @@ public class Mint {
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
         if let warning = installStatus.warning {
-            let ok = inputReader.confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
+            let ok = Input.confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
             if !ok {
                 return
             }
