@@ -300,6 +300,8 @@ public class Mint {
             cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && cd \(package.repoPath) && git checkout \(hash)"
         case .unspecified:
             cloneCommand = "git clone --depth 1 \(package.gitPath) \(package.repoPath)"
+        case .unknown:
+            fatalError()
         }
 
         try runPackageCommand(name: "Cloning \(package.namedVersion)",

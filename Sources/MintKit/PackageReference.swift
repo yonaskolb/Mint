@@ -12,12 +12,13 @@ public class PackageReference {
         case branch(name: String)
         case commit(hash: String)
         case unspecified
+        case unknown
 
         var string: String {
             switch self {
             case .tag(name: let name), .branch(name: let name), .commit(hash: let name):
                 return name
-            case .unspecified:
+            case .unspecified, .unknown:
                 return ""
             }
         }
@@ -35,7 +36,7 @@ public class PackageReference {
                 case "commit":
                     self = .commit(hash: name)
                 default:
-                    self = .unspecified
+                    self = .unknown
                 }
             } else {
                 self = .unspecified
@@ -124,6 +125,6 @@ public class PackageReference {
 
 extension PackageReference: Equatable {
     public static func == (lhs: PackageReference, rhs: PackageReference) -> Bool {
-        return lhs.repo == rhs.repo && lhs.version.string == rhs.version.string
+        return lhs.repo == rhs.repo && lhs.version == rhs.version
     }
 }
