@@ -2,6 +2,7 @@ import Foundation
 import PathKit
 import Rainbow
 import SwiftCLI
+import Version
 
 public class Mint {
 
@@ -172,7 +173,15 @@ public class Mint {
                     }
                 }
             } catch {
-                throw MintError.repoNotFound(package.gitPath)
+                let repoVersionsPath = packagesPath + package.repoPath + "build"
+                guard let installedVersions = try? repoVersionsPath.children().map({ $0.lastComponent }),
+                    let fallbackVersion = installedVersions.first else {
+                    throw MintError.repoNotFound(package.gitPath)
+                }
+                package.version = installedVersions
+                    .compactMap(Version.init)
+                    .max()?.description ?? fallbackVersion
+                errorOutput( "Failed to find latest version online. Falling back to local version \(package.version)")
             }
             return true
         } else {
