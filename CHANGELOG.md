@@ -2,6 +2,8 @@
 
 ## Master
 
+- Added escaping of paths when linking. Avoids an error, when MINT_LINK_PATH contains spaces. @lutzifer
+
 ## 0.14.1
 
 #### Fixed
