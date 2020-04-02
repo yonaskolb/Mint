@@ -420,7 +420,7 @@ public class Mint {
         try? installPath.parent().mkpath()
 
         do {
-            try Task.run(bash: "ln -s \(packagePath.executablePath.string) \(installPath.string)")
+            try Task.run(bash: "ln -s \"\(packagePath.executablePath.string)\" \"\(installPath.string)\"")
         } catch {
             errorOutput("Could not link \(packagePath.commandVersion) to \(installPath.string)".red)
             return
