@@ -73,25 +73,29 @@ public class Mint {
         try writeMetadata(metadata)
     }
 
-    func getPackageGit(name: String) throws -> String? {
+    func getGitRepos(name: String) throws -> [String] {
         let metadata = try readMetadata()
-        return metadata.packages.first(where: { $0.key.lowercased().contains(name.lowercased()) })?.key
+
+        let gitRepos = metadata.packages
+            .filter { $0.key.lowercased().contains(name.lowercased()) }
+            .map { $0.key }
+
+        return gitRepos
     }
 
-    func getLinkedPackages() -> [String: String] {
+    func getLinkedExecutables() -> [Path] {
         guard linkPath.exists,
             let packages = try? linkPath.children() else {
-            return [:]
+            return []
         }
 
-        return packages.reduce(into: [:]) { result, package in
+        return packages.reduce(into: []) { result, package in
             guard let installStatus = try? InstallStatus(path: package, mintPackagesPath: path),
-                case let .mint(version) = installStatus.status,
+                case .mint = installStatus.status,
                 let symlink = try? package.symlinkDestination() else {
                 return
             }
-            let packageName = symlink.lastComponent
-            result[packageName] = version
+            result.append(symlink)
         }
     }
 
@@ -102,29 +106,13 @@ public class Mint {
             return [:]
         }
 
-        let linkedPackages: [String: String] = getLinkedPackages()
+        let metadata = try readMetadata()
+        let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: getLinkedExecutables())
+        output("Installed mint packages:\n\(cache.list)")
 
-        var versionsByPackage: [String: [String]] = [:]
-        let packages: [String] = try packagesPath.children().filter { $0.isDirectory }.map { packagePath in
-            let versions = try (packagePath + "build")
-                .children()
-                .filter { !$0.lastComponent.hasPrefix(".") }
-                .sorted()
-                .map { $0.lastComponent }
-            let packageName = String(packagePath.lastComponent.split(separator: "_").last!)
-            var package = "  \(packageName)"
-            for version in versions {
-                package += "\n    - \(version)"
-                if linkedPackages[packageName] == version {
-                    package += " *"
-                }
-                versionsByPackage[packageName, default: []].append(version)
-            }
-            return package
-        }.sorted { $0.localizedStandardCompare($1) == .orderedAscending }
-
-        output("Installed mint packages:\n\(packages.joined(separator: "\n"))")
-        return versionsByPackage
+        return cache.packages.reduce(into: [:]) { (result, cache) in
+            result[cache.gitRepo] = cache.versionDirs.map { $0.version }
+        }
     }
 
     /// return whether the version was resolved remotely
@@ -148,11 +136,20 @@ public class Mint {
         // resolve repo from installed packages
         if !package.repo.contains("/") {
             // repo reference by name. Get the full git repo
-            if let existingGit = try getPackageGit(name: package.repo) {
-                package.repo = existingGit
-            } else {
+            let gitRepos = try getGitRepos(name: package.repo)
+
+            let gitRepo: String
+            switch gitRepos.count {
+            case 0:
                 throw MintError.packageNotFound(package.repo)
+
+            case 1:
+                gitRepo = gitRepos[0]
+
+            default:
+                gitRepo = Input.readOption(options: gitRepos, prompt: "There are multiple git repositories matching '\(package.repo)', which one would you like to use?")
             }
+            package.repo = gitRepo
         }
 
         // resolve latest version from git repo
@@ -465,44 +462,33 @@ public class Mint {
 
         // find packages
         var metadata = try readMetadata()
-        let packages = metadata.packages.filter { $0.key.lowercased().contains(name.lowercased()) }
+        let linkedExecutables = getLinkedExecutables()
+        let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: linkedExecutables)
+        let packages = cache.packages.filter { $0.gitRepo.lowercased().contains(name.lowercased()) }
 
         // remove package
+        let package: Cache.PackageInfo
         switch packages.count {
         case 0:
             errorOutput("\(name.quoted) package was not found".red)
+            return
         case 1:
-            let package = packages.first!.value
-            let packagePath = packagesPath + package
-            try? packagePath.delete()
-            output("\(name) was uninstalled")
+            package = packages.first!
         default:
-            // TODO: ask for user input about which to delete
-            for package in packages {
-                let packagePath = packagesPath + package.value
-                try? packagePath.delete()
-            }
-
-            output("\(packages.count) packages that matched the name \(name.quoted) were uninstalled".green)
+            let option = Input.readOption(options: packages.map { $0.gitRepo }, prompt: "There are multiple packages matching '\(name)', which one would you like to uninstall?")
+            package = packages.first { $0.gitRepo == option }!
         }
+        try package.path.delete()
+        output("\(package.name) was uninstalled")
 
         // remove metadata
-        for (key, _) in packages {
-            metadata.packages[key] = nil
-        }
+        metadata.packages[package.gitRepo] = nil
         try writeMetadata(metadata)
 
         // remove link
-        let installPath = linkPath + name
-
-        let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
-
-        if let warning = installStatus.warning {
-            let ok = Input.confirmation("🌱  \(warning)\nDo you still wish to remove it?".yellow)
-            if !ok {
-                return
-            }
+        for executable in Set(package.versionDirs.flatMap({ $0.executables })) where executable.linked {
+            let installPath = linkPath + executable.name
+            try installPath.delete()
         }
-        try? installPath.delete()
     }
 }
