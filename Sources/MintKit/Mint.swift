@@ -297,65 +297,14 @@ public class Mint {
                               directory: checkoutPath,
                               error: .cloneError(package))
 
-        try runPackageCommand(name: "Resolving package",
-                              command: "swift package resolve",
-                              directory: packageCheckoutPath,
-                              error: .packageResolveError(package))
-
-        let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
-
-        let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
-        guard !executables.isEmpty else {
-            throw MintError.missingExecutable(package)
-        }
-
-        var buildCommand = "swift build -c release"
-        #if os(macOS)
-            let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-            let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-            buildCommand += " -Xswiftc -target -Xswiftc \(target)"
-        #endif
-
-        try runPackageCommand(name: "Building package",
-                              command: buildCommand,
-                              directory: packageCheckoutPath,
-                              stdOutOnError: true,
-                              error: .packageBuildError(package))
-
-        // clear the install directory
-        try? packagePath.installPath.delete()
-        try packagePath.installPath.mkpath()
-
-        for executable in executables {
-            let executablePath = packageCheckoutPath + ".build/release/\(executable)"
-            if !executablePath.exists {
-                throw MintError.invalidExecutable(executablePath.lastComponent)
-            }
-            let destinationPackagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-            if verbose {
-                standardOut.print("Copying \(executablePath.string) to \(destinationPackagePath.executablePath)")
-            }
-            // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
-        }
-
-        let resourcesFile = packageCheckoutPath + "Package.resources"
-        if resourcesFile.exists {
-            let resourcesString: String = try resourcesFile.read()
-            let resources = resourcesString.components(separatedBy: "\n")
-                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-                .filter { !$0.isEmpty }
-            output("Copying resources for \(spmPackage.name): \(resources.joined(separator: ", ")) ...")
-            for resource in resources {
-                let resourcePath = packageCheckoutPath + resource
-                if resourcePath.exists {
-                    let filename = String(resource.split(separator: "/").last!)
-                    let dest = packagePath.installPath + filename
-                    try Task.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
-                } else {
-                    output("resource \(resource) doesn't exist".yellow)
-                }
-            }
+        let executables: [String]
+        let files = try packageCheckoutPath.children()
+        if files.contains(where: { $0.lastComponent == "Package.swift" }) {
+            executables = try installSwiftPackage(packagePath: packagePath, packageCheckoutPath: packageCheckoutPath)
+        } else if let gemspec = files.first(where: { $0.extension == "gemspec" }) {
+            executables = try installGem(gemspec: gemspec, packagePath: packagePath, packageCheckoutPath: packageCheckoutPath)
+        } else {
+            throw MintError.repoNotSupported(package.gitPath)
         }
 
         try addPackage(git: package.gitPath, path: packagePath.packagePath)
@@ -375,6 +324,126 @@ public class Mint {
 
         return true
     }
+
+    /// Install a gem globally
+    func installGem(gemspec: Path, packagePath: PackagePath, packageCheckoutPath: Path) throws -> [String] {
+        // Gems will be installed to our own gem install path inside the cache,
+        // so they do not get mixed up the default rubygems install path
+        let gemInstallPath = packagePath.path.parent() + "gems"
+
+        let gemFileName = packagePath.package.name + ".gem"
+        let buildCommand = "gem build \(gemspec.lastComponent) -o \(gemFileName) --verbose"
+        try runPackageCommand(name: "Building gem",
+                              command: buildCommand,
+                              directory: packageCheckoutPath,
+                              stdOutOnError: true,
+                              error: .packageBuildError(packagePath.package, .gem))
+
+        let installCommand = "gem install \(gemFileName) --install-dir \(gemInstallPath) --no-document --verbose"
+        try runPackageCommand(name: "Installing gem",
+                              command: installCommand,
+                              directory: packageCheckoutPath,
+                              stdOutOnError: true,
+                              error: .packageBuildError(packagePath.package, .gem))
+
+        try? packagePath.installPath.delete()
+        try packagePath.installPath.mkpath()
+
+        let gemspecExecutables = try getExecutables(fromGemspecPath: gemspec)
+
+        var executables: [String] = []
+        for executable in try (gemInstallPath + Path("bin")).children() where gemspecExecutables.contains(executable.lastComponent) {
+            let destinationPackagePath = PackagePath(path: packagesPath, package: packagePath.package, executable: executable.lastComponent)
+
+            // The executable is an extremelly simple script that configures the GEM environment with the
+            // custom install path, and selects the required version
+            let executableContent = """
+            export GEM_HOME='\(gemInstallPath)'
+            \(executable) _\(packagePath.package.version)_ $@
+            """
+            try destinationPackagePath.executablePath.write(executableContent)
+            _ = try Task.capture(bash: "chmod +x '\(destinationPackagePath.executablePath)'", directory: packageCheckoutPath.string)
+            executables.append(executable.lastComponent)
+        }
+
+        return executables
+    }
+
+    /// Get the executables specified inside a gemspec
+    func getExecutables(fromGemspecPath gemspecPath: Path) throws -> String {
+        let rubyScript = """
+        require "rubygems"
+        spec = Gem::Specification::load("\(gemspecPath.lastComponent)")
+        puts spec.executables
+        """
+        return try Task.capture(bash: "ruby -e '\(rubyScript)'", directory: gemspecPath.parent().string).stdout
+    }
+
+    /// Install a swift package globally
+    func installSwiftPackage(packagePath: PackagePath, packageCheckoutPath: Path) throws -> [String] {
+         try runPackageCommand(name: "Resolving package",
+                               command: "swift package resolve",
+                               directory: packageCheckoutPath,
+                               error: .packageResolveError(packagePath.package))
+
+         let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
+
+         let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
+         guard !executables.isEmpty else {
+            throw MintError.missingExecutable(packagePath.package)
+         }
+
+         var buildCommand = "swift build -c release"
+         #if os(macOS)
+             let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+             let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+             buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+         #endif
+
+         try runPackageCommand(name: "Building package",
+                               command: buildCommand,
+                               directory: packageCheckoutPath,
+                               stdOutOnError: true,
+                               error: .packageBuildError(packagePath.package, .swift))
+
+         // clear the install directory
+         try? packagePath.installPath.delete()
+         try packagePath.installPath.mkpath()
+
+         for executable in executables {
+             let executablePath = packageCheckoutPath + ".build/release/\(executable)"
+             if !executablePath.exists {
+                 throw MintError.invalidExecutable(executablePath.lastComponent)
+             }
+            let destinationPackagePath = PackagePath(path: packagesPath, package: packagePath.package, executable: executable)
+             if verbose {
+                 standardOut.print("Copying \(executablePath.string) to \(destinationPackagePath.executablePath)")
+             }
+             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
+             try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
+         }
+
+         let resourcesFile = packageCheckoutPath + "Package.resources"
+         if resourcesFile.exists {
+             let resourcesString: String = try resourcesFile.read()
+             let resources = resourcesString.components(separatedBy: "\n")
+                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                 .filter { !$0.isEmpty }
+             output("Copying resources for \(spmPackage.name): \(resources.joined(separator: ", ")) ...")
+             for resource in resources {
+                 let resourcePath = packageCheckoutPath + resource
+                 if resourcePath.exists {
+                     let filename = String(resource.split(separator: "/").last!)
+                     let dest = packagePath.installPath + filename
+                     try Task.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
+                 } else {
+                     output("resource \(resource) doesn't exist".yellow)
+                 }
+             }
+         }
+
+        return executables
+     }
 
     private func runPackageCommand(name: String, command: String, directory: Path, stdOutOnError: Bool = false, error mintError: MintError) throws {
         output(name)

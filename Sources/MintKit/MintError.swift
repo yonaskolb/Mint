@@ -9,9 +9,10 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
     case cloneError(PackageReference)
     case mintfileNotFound(String)
     case packageResolveError(PackageReference)
-    case packageBuildError(PackageReference)
+    case packageBuildError(PackageReference, PackageType)
     case packageReadError(String)
     case packageNotInstalled(PackageReference)
+    case repoNotSupported(String)
 
     public var description: String {
         switch self {
@@ -22,9 +23,10 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .invalidExecutable(executable): return "Couldn't find executable \(executable.quoted)"
         case let .missingExecutable(package): return "Executable product not found in \(package.namedVersion)"
         case let .packageResolveError(package): return "Failed to resolve \(package.namedVersion) with SPM"
-        case let .packageBuildError(package): return "Failed to build \(package.namedVersion) with SPM"
+        case let .packageBuildError(package, type): return "Failed to build \(package.namedVersion) with \(type.packageManager)"
         case let .packageReadError(error): return "Failed to read Package.swift file:\n\(error)"
         case let .packageNotInstalled(package): return "\(package.namedVersion) not installed"
+        case let .repoNotSupported(repo): return "Repository '\(repo)' does not contain a supported package. Supported package types: \(PackageType.allCases.map { $0.rawValue }.joined(separator: " ,"))"
         }
     }
 

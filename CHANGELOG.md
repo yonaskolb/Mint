@@ -4,6 +4,9 @@
 
 - Added escaping of paths when linking. Avoids an error, when MINT_LINK_PATH contains spaces. @lutzifer
 
+#### Added
+- Added support for installing gems. [#171](https://github.com/yonaskolb/Mint/pull/171) @acecilia
+
 ## 0.14.1
 
 #### Fixed

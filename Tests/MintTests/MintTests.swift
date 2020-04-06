@@ -29,8 +29,8 @@ class MintTests: XCTestCase {
     func checkInstalledVersion(package: PackageReference, executable: String, file: StaticString = #file, line: UInt = #line) throws {
         let packagePath = PackagePath(path: mint.packagesPath, package: package, executable: executable)
         XCTAssertTrue(packagePath.executablePath.exists)
-        let output = try Task.capture(packagePath.executablePath.string, "--version")
-        XCTAssertEqual(output.stdout, package.version, file: file, line: line)
+        let output = try Task.capture(bash: "\(packagePath.executablePath.string) --version")
+        XCTAssertTrue(package.version.contains(output.stdout), file: file, line: line)
     }
 
     func testInstallCommand() throws {
@@ -218,8 +218,30 @@ class MintTests: XCTestCase {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "invalid_dependency"))
         }
 
-        expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))) {
+        expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"), .swift)) {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))
         }
+    }
+
+    func testBootstrapCommandWithGems() throws {
+        mint.mintFilePath = mintfileWithGems.absolute()
+
+        try mint.bootstrap(link: true)
+
+        let swiftPackage = (ref: PackageReference(repo: "yonaskolb/SimplePackage", version: "4.0.0"), name: "SimplePackage", executable: "simplepackage")
+        let gemPackage = (ref: PackageReference(repo: "xcpretty/xcpretty", version: "v0.3.0"), name: "xcpretty", executable: "xcpretty")
+        let packages = [gemPackage, swiftPackage]
+
+        // Check that is globally installed
+        XCTAssertTrue((mint.linkPath + swiftPackage.executable).exists)
+        XCTAssertTrue((mint.linkPath + gemPackage.executable).exists)
+        XCTAssertEqual(mint.getLinkedPackages(), packages.reduce(into: [:], { $0[$1.executable] = $1.ref.version }))
+
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages, packages.reduce(into: [:]) { $0[$1.name] = [$1.ref.version] })
+        XCTAssertEqual(installedPackages.count, 2)
+
+        try checkInstalledVersion(package: swiftPackage.ref, executable: swiftPackage.executable)
+        try checkInstalledVersion(package: gemPackage.ref, executable: gemPackage.executable)
     }
 }
