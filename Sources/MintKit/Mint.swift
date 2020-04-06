@@ -291,6 +291,7 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
 
+        let swiftPackagePath = packageCheckoutPath + package.packagePath
         let cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
         try runPackageCommand(name: "Cloning \(package.namedVersion)",
                               command: cloneCommand,
@@ -299,10 +300,11 @@ public class Mint {
 
         try runPackageCommand(name: "Resolving package",
                               command: "swift package resolve",
-                              directory: packageCheckoutPath,
+                              directory: swiftPackagePath,
                               error: .packageResolveError(package))
 
-        let spmPackage = try SwiftPackage(directory: packageCheckoutPath)
+        
+        let spmPackage = try SwiftPackage(directory: swiftPackagePath)
 
         let executables = spmPackage.products.filter { $0.isExecutable }.map { $0.name }
         guard !executables.isEmpty else {
@@ -318,7 +320,7 @@ public class Mint {
 
         try runPackageCommand(name: "Building package",
                               command: buildCommand,
-                              directory: packageCheckoutPath,
+                              directory: swiftPackagePath,
                               stdOutOnError: true,
                               error: .packageBuildError(package))
 
@@ -327,7 +329,7 @@ public class Mint {
         try packagePath.installPath.mkpath()
 
         for executable in executables {
-            let executablePath = packageCheckoutPath + ".build/release/\(executable)"
+            let executablePath = swiftPackagePath + ".build/release/\(executable)"
             if !executablePath.exists {
                 throw MintError.invalidExecutable(executablePath.lastComponent)
             }
@@ -339,7 +341,7 @@ public class Mint {
             try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
         }
 
-        let resourcesFile = packageCheckoutPath + "Package.resources"
+        let resourcesFile = swiftPackagePath + "Package.resources"
         if resourcesFile.exists {
             let resourcesString: String = try resourcesFile.read()
             let resources = resourcesString.components(separatedBy: "\n")
@@ -347,7 +349,7 @@ public class Mint {
                 .filter { !$0.isEmpty }
             output("Copying resources for \(spmPackage.name): \(resources.joined(separator: ", ")) ...")
             for resource in resources {
-                let resourcePath = packageCheckoutPath + resource
+                let resourcePath = swiftPackagePath + resource
                 if resourcePath.exists {
                     let filename = String(resource.split(separator: "/").last!)
                     let dest = packagePath.installPath + filename
@@ -361,7 +363,7 @@ public class Mint {
         try addPackage(git: package.gitPath, path: packagePath.packagePath)
 
         output("Installed \(package.name) \(package.version)".green)
-        try? packageCheckoutPath.delete()
+        try? swiftPackagePath.delete()
 
         if link {
             if let executable = executable {
