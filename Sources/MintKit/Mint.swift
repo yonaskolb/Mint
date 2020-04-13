@@ -110,7 +110,7 @@ public class Mint {
         let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: getLinkedExecutables())
         output("Installed mint packages:\n\(cache.list)")
 
-        return cache.packages.reduce(into: [:]) { (result, cache) in
+        return cache.packages.reduce(into: [:]) { result, cache in
             result[cache.gitRepo] = cache.versionDirs.map { $0.version }
         }
     }
@@ -289,7 +289,7 @@ public class Mint {
         try? packageCheckoutPath.delete()
 
         let cloneCommand: String
-        
+
         if package.versionCouldBeSHA {
             // version is maybe a SHA, so we can't do a shallow clone
             cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && cd \(package.repoPath) && git checkout \(package.version)"
@@ -493,7 +493,7 @@ public class Mint {
         try writeMetadata(metadata)
 
         // remove link
-        for executable in Set(package.versionDirs.flatMap({ $0.executables })) where executable.linked {
+        for executable in Set(package.versionDirs.flatMap { $0.executables }) where executable.linked {
             let installPath = linkPath + executable.name
             try installPath.delete()
         }

@@ -7,6 +7,7 @@ struct Cache: Hashable {
         var name: String {
             return PackageReference(repo: gitRepo).name
         }
+
         let gitRepo: String
         let path: Path
         let versionDirs: [VersionDir]
@@ -27,7 +28,7 @@ struct Cache: Hashable {
     let packages: [PackageInfo]
 
     init(path: Path, metadata: Mint.Metadata, linkedExecutables: [Path]) throws {
-        self.packages = try path.children()
+        packages = try path.children()
             .filter { $0.isDirectory && !$0.lastComponent.hasPrefix(".") }
             .map { originPath in
                 let buildPath = originPath + "build"
@@ -42,7 +43,7 @@ struct Cache: Hashable {
                             .sorted { $0.name < $1.name }
                         return VersionDir(path: versionPath, executables: executables)
                     }
-                .sorted { $0.version < $1.version }
+                    .sorted { $0.version < $1.version }
 
                 let gitRepos = metadata.packages.filter { $0.value == originPath.lastComponent }.map { $0.key }
                 let gitRepo: String
@@ -74,7 +75,7 @@ struct Cache: Hashable {
                 if versionDir.executables.count == 1 {
                     let executable = versionDir.executables[0]
                     if executable.name.lowercased() != package.name.lowercased() {
-                        versionDescription.append("(\(executable.name)")
+                        versionDescription.append("(\(executable.name))")
                     }
                     if executable.linked {
                         versionDescription.append("*")

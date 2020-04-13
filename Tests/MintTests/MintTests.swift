@@ -7,9 +7,9 @@ class MintTests: XCTestCase {
     let mintPath = Path.temporary + "mint"
     let linkPath = Path.temporary + "mint-installs"
     private lazy var mint = Mint(path: mintPath,
-                         linkPath: linkPath,
-                         standardOut: WriteStream.null,
-                         standardError: WriteStream.null)
+                                 linkPath: linkPath,
+                                 standardOut: WriteStream.null,
+                                 standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
     let testVersion = "4.0.0"
     let latestVersion = "5.0.0"
@@ -18,7 +18,7 @@ class MintTests: XCTestCase {
     let testPackageDir = "github.com_yonaskolb_SimplePackage"
     let fullTestRepo = "https://github.com/yonaskolb/SimplePackage.git"
     func expectedExecutablePath(_ version: String) -> Path {
-        return  mintPath.absolute() + "packages" + "github.com_yonaskolb_SimplePackage/build/\(version)/simplepackage"
+        return mintPath.absolute() + "packages" + "github.com_yonaskolb_SimplePackage/build/\(version)/simplepackage"
     }
 
     override func setUp() {
@@ -246,8 +246,7 @@ class MintTests: XCTestCase {
         XCTAssertEqual(cache.list, """
           SimplePackage
             - 4.0.0 *
-        """
-        )
+        """)
     }
 
     func testListComplexMintFile() throws {
@@ -266,8 +265,7 @@ class MintTests: XCTestCase {
           SimplePackage (https://github.com/acecilia/SimplePackage.git)
             - 5.0.0 *
             - 6.0.0 (simplepackage, simplepackage2 *)
-        """
-        )
+        """)
     }
 
     func testUninstallWithPartialMatch() throws {

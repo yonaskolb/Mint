@@ -90,15 +90,15 @@ class PackageTests: XCTestCase {
 
     func testPackageVersions() {
 
-        XCTAssertFalse(PackageReference.init(repo: "", version: "my_branch").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "develop").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "master").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "1.0").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "fgvb45g_").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "fgv/b45g").versionCouldBeSHA)
-        XCTAssertFalse(PackageReference.init(repo: "", version: "fgv.b45g").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "my_branch").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "develop").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "master").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "1.0").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "fgvb45g_").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "fgv/b45g").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "fgv.b45g").versionCouldBeSHA)
 
-        XCTAssertTrue(PackageReference.init(repo: "", version: "fgvb45g").versionCouldBeSHA)
-        XCTAssertTrue(PackageReference.init(repo: "", version: "fgvb45g6g4fgvb45g6g4fgvb45g6g4fgvb45g6g4").versionCouldBeSHA)
+        XCTAssertTrue(PackageReference(repo: "", version: "fgvb45g").versionCouldBeSHA)
+        XCTAssertTrue(PackageReference(repo: "", version: "fgvb45g6g4fgvb45g6g4fgvb45g6g4fgvb45g6g4").versionCouldBeSHA)
     }
 }
