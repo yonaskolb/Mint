@@ -12,6 +12,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
     case packageBuildError(PackageReference)
     case packageReadError(String)
     case packageNotInstalled(PackageReference)
+    case inconsistentCache(String)
 
     public var description: String {
         switch self {
@@ -25,6 +26,7 @@ public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError
         case let .packageBuildError(package): return "Failed to build \(package.namedVersion) with SPM"
         case let .packageReadError(error): return "Failed to read Package.swift file:\n\(error)"
         case let .packageNotInstalled(package): return "\(package.namedVersion) not installed"
+        case let .inconsistentCache(error): return "Inconsistent cache, clear it up.\nError: \(error)"
         }
     }
 

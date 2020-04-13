@@ -6,16 +6,20 @@ import XCTest
 class MintTests: XCTestCase {
     let mintPath = Path.temporary + "mint"
     let linkPath = Path.temporary + "mint-installs"
-    lazy var mint = Mint(path: mintPath,
+    private lazy var mint = Mint(path: mintPath,
                          linkPath: linkPath,
                          standardOut: WriteStream.null,
                          standardError: WriteStream.null)
     let testRepo = "yonaskolb/SimplePackage"
-    let sshTestRepo = "git@github.com:yonaskolb/SimplePackage.git"
     let testVersion = "4.0.0"
     let latestVersion = "5.0.0"
     let testCommand = "simplepackage"
     let testRepoName = "SimplePackage"
+    let testPackageDir = "github.com_yonaskolb_SimplePackage"
+    let fullTestRepo = "https://github.com/yonaskolb/SimplePackage.git"
+    func expectedExecutablePath(_ version: String) -> Path {
+        return  mintPath.absolute() + "packages" + "github.com_yonaskolb_SimplePackage/build/\(version)/simplepackage"
+    }
 
     override func setUp() {
         super.setUp()
@@ -47,14 +51,14 @@ class MintTests: XCTestCase {
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getLinkedPackages(), [:])
+        XCTAssertEqual(mint.getLinkedExecutables(), [])
         // install already installed version globally
         try mint.install(package: PackageReference(repo: testRepo, version: testVersion), link: true)
         XCTAssertTrue(globalPath.exists)
         let globalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(globalOutput.stdout, testVersion)
 
-        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: testVersion])
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(testVersion)])
 
         // install latest version
         let latestPackage = PackageReference(repo: testRepo)
@@ -65,11 +69,11 @@ class MintTests: XCTestCase {
 
         let latestGlobalOutput = try Task.capture(globalPath.string)
         XCTAssertEqual(latestGlobalOutput.stdout, latestVersion)
-        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: latestVersion])
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(latestVersion)])
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages[fullTestRepo, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         // uninstall
@@ -77,7 +81,7 @@ class MintTests: XCTestCase {
 
         // check not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getLinkedPackages(), [:])
+        XCTAssertEqual(mint.getLinkedExecutables(), [])
 
         // check package list is empty
         XCTAssertTrue(try mint.listPackages().isEmpty)
@@ -107,7 +111,7 @@ class MintTests: XCTestCase {
 
         // check package list has installed versions
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[testRepoName, default: []], [testVersion, latestPackage.version])
+        XCTAssertEqual(installedPackages[fullTestRepo, default: []], [testVersion, latestPackage.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         // uninstall
@@ -122,7 +126,7 @@ class MintTests: XCTestCase {
         let package = PackageReference(repo: testRepo, version: testVersion)
         try mint.install(package: package)
         let executablePath = try mint.getExecutablePath(package: package, executable: nil)
-        XCTAssertEqual(executablePath.string, mintPath.description + "/packages/github.com_yonaskolb_SimplePackage/build/4.0.0/simplepackage")
+        XCTAssertEqual(executablePath, expectedExecutablePath(testVersion))
     }
 
     func testBootstrapCommand() throws {
@@ -136,10 +140,10 @@ class MintTests: XCTestCase {
 
         // check that not globally installed
         XCTAssertFalse(globalPath.exists)
-        XCTAssertEqual(mint.getLinkedPackages(), [:])
+        XCTAssertEqual(mint.getLinkedExecutables(), [])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[package.name, default: []], [package.version])
+        XCTAssertEqual(installedPackages[fullTestRepo, default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)
@@ -156,10 +160,10 @@ class MintTests: XCTestCase {
 
         // Check that is globally installed
         XCTAssertTrue(globalPath.exists)
-        XCTAssertEqual(mint.getLinkedPackages(), [testCommand: package.version])
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(testVersion)])
 
         let installedPackages = try mint.listPackages()
-        XCTAssertEqual(installedPackages[package.name, default: []], [package.version])
+        XCTAssertEqual(installedPackages[fullTestRepo, default: []], [package.version])
         XCTAssertEqual(installedPackages.count, 1)
 
         try checkInstalledVersion(package: package, executable: testCommand)
@@ -221,5 +225,65 @@ class MintTests: XCTestCase {
         expectError(MintError.packageBuildError(PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))) {
             try mint.install(package: PackageReference(repo: "yonaskolb/simplepackage", version: "compile_error"))
         }
+    }
+
+    func testListSimpleMintFile() throws {
+        mint.mintFilePath = simpleMintFileFixture.absolute()
+
+        try mint.bootstrap(link: true)
+        let cache = try Cache(
+            path: mint.packagesPath,
+            metadata: mint.readMetadata(),
+            linkedExecutables: mint.getLinkedExecutables()
+        )
+
+        XCTAssertEqual(cache.list, """
+          SimplePackage
+            - 4.0.0 *
+        """
+        )
+    }
+
+    func testListComplexMintFile() throws {
+        mint.mintFilePath = complexMintFileFixture.absolute()
+
+        try mint.bootstrap(link: true)
+        let cache = try Cache(
+            path: mint.packagesPath,
+            metadata: mint.readMetadata(),
+            linkedExecutables: mint.getLinkedExecutables()
+        )
+
+        XCTAssertEqual(cache.list, """
+          SimplePackage (https://github.com/yonaskolb/SimplePackage.git)
+            - 4.0.0
+          SimplePackage (https://github.com/acecilia/SimplePackage.git)
+            - 5.0.0 *
+            - 6.0.0 (simplepackage, simplepackage2 *)
+        """
+        )
+    }
+
+    func testUninstallWithPartialMatch() throws {
+        let globalPath = mint.linkPath + testCommand
+        let specificPackage = PackageReference(repo: testRepo, version: testVersion)
+
+        // install specific version
+        try mint.install(package: specificPackage, link: true)
+
+        // check everything expected is there
+        XCTAssertTrue(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(testVersion)])
+        XCTAssertEqual(try mint.listPackages(), [fullTestRepo: [testVersion]])
+        XCTAssertEqual(try mint.readMetadata().packages, [fullTestRepo: testPackageDir])
+
+        // uninstall
+        try mint.uninstall(name: "simple")
+
+        // check results match with the expected behaviour
+        XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedExecutables(), [])
+        XCTAssertEqual(try mint.listPackages(), [:])
+        XCTAssertEqual(try mint.readMetadata().packages, [:])
     }
 }

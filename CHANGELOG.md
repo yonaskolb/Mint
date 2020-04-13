@@ -4,6 +4,11 @@
 
 - Added escaping of paths when linking. Avoids an error, when MINT_LINK_PATH contains spaces. @lutzifer
 
+#### Fixed
+- Rewrite the `list` option and fix the `run` option, to better support when a package with the same name is installed from different origins (for example: yonaskolb/xcodegen and acecilia/xcodegen). [#170](https://github.com/yonaskolb/Mint/pull/170) @acecilia
+- Rewrite the `list` option, to better support when a package produces multiple executables. [#170](https://github.com/yonaskolb/Mint/pull/170) @acecilia
+- Rewrite and fix the `uninstall` option: previously, the name for the symlink to remove was calculated using the package name passed from command line, which could be partial (for example `simple` instead of `simplepackage`), resulting on the symlink not being removed. [#170](https://github.com/yonaskolb/Mint/pull/170) @acecilia
+
 ## 0.14.1
 
 #### Fixed
