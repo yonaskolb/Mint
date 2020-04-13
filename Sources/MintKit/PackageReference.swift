@@ -61,6 +61,19 @@ public class PackageReference {
         }
     }
 
+    public var versionCouldBeSHA: Bool {
+        switch version {
+        case "master", "develop":
+            return false
+        default:
+            let characterSet = CharacterSet.letters.union(.decimalDigits)
+            if version.rangeOfCharacter(from: characterSet.inverted) != nil {
+                return false
+            }
+            return true
+        }
+    }
+
     var repoPath: String {
         return gitPath
             .components(separatedBy: "://").last!

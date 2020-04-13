@@ -87,6 +87,12 @@ class MintTests: XCTestCase {
         XCTAssertTrue(try mint.listPackages().isEmpty)
     }
 
+    func testShaInstall() throws {
+        // install SHA version
+        let specificPackage = PackageReference(repo: testRepo, version: "c3cf95c")
+        try mint.install(package: specificPackage)
+    }
+
     func testRunCommand() throws {
 
         // run a specific version

@@ -87,4 +87,18 @@ class PackageTests: XCTestCase {
         XCTAssertEqual(PackageReference(package: "ssh://git@server.com/user/project.git"), PackageReference(repo: "ssh://git@server.com/user/project.git"))
         XCTAssertEqual(PackageReference(package: "ssh://git@server.com/user/project.git@0.1"), PackageReference(repo: "ssh://git@server.com/user/project.git", version: "0.1"))
     }
+
+    func testPackageVersions() {
+
+        XCTAssertFalse(PackageReference.init(repo: "", version: "my_branch").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "develop").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "master").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "1.0").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "fgvb45g_").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "fgv/b45g").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference.init(repo: "", version: "fgv.b45g").versionCouldBeSHA)
+
+        XCTAssertTrue(PackageReference.init(repo: "", version: "fgvb45g").versionCouldBeSHA)
+        XCTAssertTrue(PackageReference.init(repo: "", version: "fgvb45g6g4fgvb45g6g4fgvb45g6g4fgvb45g6g4").versionCouldBeSHA)
+    }
 }

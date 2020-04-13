@@ -288,7 +288,14 @@ public class Mint {
 
         try? packageCheckoutPath.delete()
 
-        let cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
+        let cloneCommand: String
+        
+        if package.versionCouldBeSHA {
+            // version is maybe a SHA, so we can't do a shallow clone
+            cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && cd \(package.repoPath) && git checkout \(package.version)"
+        } else {
+            cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
+        }
         try runPackageCommand(name: "Cloning \(package.namedVersion)",
                               command: cloneCommand,
                               directory: checkoutPath,
