@@ -173,8 +173,13 @@ public class Mint {
                     }
                 }
             } catch {
-                let repoVersionsPath = packagesPath + package.repoPath + "build"
-                guard let installedVersions = try? repoVersionsPath.children().map({ $0.lastComponent }),
+                let metadata = try readMetadata()
+                let linkedExecutables = getLinkedExecutables()
+                let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: linkedExecutables)
+                
+                guard let installedVersions = cache.packages
+                        .first(where: { $0.gitRepo == package.repo })?
+                        .versionDirs.map({ $0.version }),
                     let fallbackVersion = installedVersions.first else {
                     throw MintError.repoNotFound(package.gitPath)
                 }
