@@ -180,7 +180,7 @@ public class Mint {
                 guard let installedVersions = cache.packages
                         .first(where: { $0.gitRepo == package.repo })?
                         .versionDirs.map({ $0.version }),
-                    let fallbackVersion = installedVersions.first else {
+                    let fallbackVersion = installedVersions.last else {
                     throw MintError.repoNotFound(package.gitPath)
                 }
                 package.version = installedVersions
