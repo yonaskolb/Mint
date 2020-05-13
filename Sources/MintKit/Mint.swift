@@ -2,6 +2,7 @@ import Foundation
 import PathKit
 import Rainbow
 import SwiftCLI
+import Version
 
 public class Mint {
 
@@ -172,7 +173,20 @@ public class Mint {
                     }
                 }
             } catch {
-                throw MintError.repoNotFound(package.gitPath)
+                let metadata = try readMetadata()
+                let linkedExecutables = getLinkedExecutables()
+                let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: linkedExecutables)
+                
+                guard let installedVersions = cache.packages
+                        .first(where: { $0.gitRepo == package.repo })?
+                        .versionDirs.map({ $0.version }),
+                    let fallbackVersion = installedVersions.last else {
+                    throw MintError.repoNotFound(package.gitPath)
+                }
+                package.version = installedVersions
+                    .compactMap(Version.init)
+                    .max()?.description ?? fallbackVersion
+                errorOutput( "Failed to find latest version online. Falling back to local version \(package.version)")
             }
             return true
         } else {

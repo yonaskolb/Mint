@@ -2,6 +2,9 @@
 
 ## Master
 
+#### Added
+- Running offline without specified version [#164](https://github.com/yonaskolb/Mint/issues/164) [#166](https://github.com/yonaskolb/Mint/pull/166) @vknabel
+
 ## 0.14.2
 
 #### Changed
