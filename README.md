@@ -209,5 +209,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
 - mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
 - mint install [scribd/Weaver](https://github.com/scribd/Weaver)
+- mint install [arthurpalves/coherent-swift](https://github.com/arthurpalves/coherent-swift)
 
 Feel free to add your own!
