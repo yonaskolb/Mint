@@ -151,7 +151,7 @@ mint bootstrap --link
 
 ### Linux
 Mint works on Linux but has some limitations:
-- linux doesn't support building with a statically linked version of Swift. This means when a new version of swift comes out the old installs won't work on linux. A stable ABI in Swift 5 will remove the need for this.
+- linux doesn't support building with a statically linked version of Swift. This means when a new version of swift comes out the old installs won't work on linux.
 - Linux is case sensitive so you must specify the correct case for repo urls as well as executables.
 
 ## Support
