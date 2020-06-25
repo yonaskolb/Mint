@@ -181,6 +181,8 @@ $ mint install github_name/repo_name
 ````
 
 ### Resources
+> Since Swift 5.3 resources are now built into the Swift Package manager, so if you're targetting that version or above the `Package.resources` file is no longer necessary https://github.com/apple/swift-evolution/blob/master/proposals/0271-package-manager-resources.md
+
 The Swift Package Manager doesn't yet have a way of specifying resources directories. If your tool requires access to resources from the repo you require a custom `Package.resources` file. This is a plain text file that lists the resources directories on different lines:
 
 ```
@@ -188,6 +190,7 @@ MyFiles
 MyOtherFiles
 ```
 If this file is found in you repo, then all those directories will be copied into the same path as the executable.
+
 
 
 ## A list of popular Mint compatible packages 🌱
