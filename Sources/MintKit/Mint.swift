@@ -327,12 +327,7 @@ public class Mint {
             throw MintError.missingExecutable(package)
         }
 
-        var buildCommand = "swift build -c release"
-        #if os(macOS)
-            let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-            let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-            buildCommand += " -Xswiftc -target -Xswiftc \(target)"
-        #endif
+        let buildCommand = "swift build -c release"
 
         try runPackageCommand(name: "Building package",
                               command: buildCommand,
