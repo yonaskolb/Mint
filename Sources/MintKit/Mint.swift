@@ -329,9 +329,12 @@ public class Mint {
 
         var buildCommand = "swift build -c release"
         #if os(macOS)
-            let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-            let target = "x86_64-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-            buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+            let processInfo = ProcessInfo.processInfo
+            if let machineHardwareName = processInfo.machineHardwareName {
+                let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+                let target = "\(machineHardwareName)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+                buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+            }
         #endif
 
         try runPackageCommand(name: "Building package",
