@@ -2,19 +2,19 @@
 import XCTest
 
 final class ProcessInfoExtensionTests: XCTestCase {
-    func testMachineHardwareName_Intel() throws {
+    func testMachineHardwareName_Intel() {
         #if !(os(macOS) && arch(x86_64))
-            try XCTSkipIf(true, "Not running tests on Intel based Mac")
+            print("Test can only be run on an Intel based Mac")
+        #else
+            XCTAssertEqual(ProcessInfo.processInfo.machineHardwareName, "x86_64")
         #endif
-
-        XCTAssertEqual(ProcessInfo.processInfo.machineHardwareName, "x86_64")
     }
 
-    func testMachineHardwareName_AppleSilicone() throws {
+    func testMachineHardwareName_AppleSilicone() {
         #if !(os(macOS) && arch(arm64))
-        try XCTSkipIf(true, "Not running tests on Apple Silicone based Mac")
+            print("Test can only be run on an Apple Silicon based Mac")
+        #else
+            XCTAssertEqual(ProcessInfo.processInfo.machineHardwareName, "arm64")
         #endif
-
-        XCTAssertEqual(ProcessInfo.processInfo.machineHardwareName, "arm64")
     }
 }
