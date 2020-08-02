@@ -268,7 +268,7 @@ public class Mint {
 
     @discardableResult
     /// returns if the package was installed
-    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false) throws -> Bool {
+    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false, overwrite: Bool = false) throws -> Bool {
 
         try resolvePackage(package)
 
@@ -286,11 +286,11 @@ public class Mint {
             }
             if link {
                 if let executable = executable {
-                    try linkPackage(package, executable: executable)
+                    try linkPackage(package, executable: executable, overwrite: overwrite)
                 } else {
                     let executables = try packagePath.getExecutables()
                     for executable in executables {
-                        try linkPackage(package, executable: executable)
+                        try linkPackage(package, executable: executable, overwrite: overwrite)
                     }
                 }
             }
@@ -388,10 +388,10 @@ public class Mint {
 
         if link {
             if let executable = executable {
-                try linkPackage(package, executable: executable)
+                try linkPackage(package, executable: executable, overwrite: overwrite)
             } else {
                 for executable in executables {
-                    try linkPackage(package, executable: executable)
+                    try linkPackage(package, executable: executable, overwrite: overwrite)
                 }
             }
         }
@@ -425,14 +425,14 @@ public class Mint {
         }
     }
 
-    func linkPackage(_ package: PackageReference, executable: String) throws {
+    func linkPackage(_ package: PackageReference, executable: String, overwrite: Bool) throws {
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
         let installPath = linkPath + packagePath.executable!
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
-        if let warning = installStatus.warning {
+        if let warning = installStatus.warning, !overwrite {
             let ok = Input.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
             if !ok {
                 return
