@@ -268,7 +268,7 @@ public class Mint {
 
     @discardableResult
     /// returns if the package was installed
-    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false, overwrite: Bool = false) throws -> Bool {
+    public func install(package: PackageReference, executable: String? = nil, beforeOtherCommand: Bool = false, force: Bool = false, link: Bool = false, noInstall: Bool = false, overwrite: Bool? = nil) throws -> Bool {
 
         try resolvePackage(package)
 
@@ -425,17 +425,22 @@ public class Mint {
         }
     }
 
-    func linkPackage(_ package: PackageReference, executable: String, overwrite: Bool) throws {
+    func linkPackage(_ package: PackageReference, executable: String, overwrite: Bool?) throws {
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
         let installPath = linkPath + packagePath.executable!
 
         let installStatus = try InstallStatus(path: installPath, mintPackagesPath: packagesPath)
 
-        if let warning = installStatus.warning, !overwrite {
-            let ok = Input.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
-            if !ok {
+        if let warning = installStatus.warning {
+            if let overwrite = overwrite, !overwrite {
                 return
+            }
+            if overwrite == nil {
+                let ok = Input.confirmation("🌱  \(warning)\nOverwrite it with Mint's symlink?".yellow)
+                if !ok {
+                    return
+                }
             }
         }
 

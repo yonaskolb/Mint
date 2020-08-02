@@ -12,8 +12,8 @@ class InstallCommand: PackageCommand {
     @Flag("-f", "--force", description: "Force a reinstall even if the package is already installed")
     var force: Bool
 
-    @Flag("-o", "--overwrite", description: "Force overwriting a package even if it is already installed globally")
-    var overwrite: Bool
+    @Key("-o", "--overwrite", description: "Overwrite a symlinked executable that is not installed by mint. Either (y/n)")
+    var overwrite: Bool?
 
     init(mint: Mint) {
         super.init(mint: mint,
