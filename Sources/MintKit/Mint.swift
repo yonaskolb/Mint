@@ -327,8 +327,16 @@ public class Mint {
             throw MintError.missingExecutable(package)
         }
 
-        let buildCommand = "swift build -c release"
-
+        var buildCommand = "swift build -c release"
+        
+        let arch = targetArchitecture()
+        
+        #if os(macOS)
+        let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+        let target = "\(arch)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+        buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+        #endif
+        
         try runPackageCommand(name: "Building package",
                               command: buildCommand,
                               directory: packageCheckoutPath,
@@ -387,6 +395,15 @@ public class Mint {
         }
 
         return true
+    }
+    
+    private func targetArchitecture() -> String {
+        var size = 0
+        let name = "hw.machine"
+        sysctlbyname(name, nil, &size, nil, 0)
+        var machine = [CChar](repeating: 0, count: size)
+        sysctlbyname(name, &machine, &size, nil, 0)
+        return String(cString: machine)
     }
 
     private func runPackageCommand(name: String, command: String, directory: Path, stdOutOnError: Bool = false, error mintError: MintError) throws {
