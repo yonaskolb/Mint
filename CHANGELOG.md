@@ -5,6 +5,9 @@
 #### Added
 - Running offline without specified version [#164](https://github.com/yonaskolb/Mint/issues/164) [#166](https://github.com/yonaskolb/Mint/pull/166) @vknabel
 
+#### Changed
+- Allow packages in Mintfile that don't specifiy a version [#181](https://github.com/yonaskolb/Mint/issues/181) @kiyot
+
 #### Fixed
 - Support building for architectures other than x86_64 on macOS (Apple Silicon) [#185](https://github.com/yonaskolb/Mint/pull/185)
 
