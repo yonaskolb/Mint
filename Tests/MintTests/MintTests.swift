@@ -193,6 +193,24 @@ class MintTests: XCTestCase {
         try checkInstalledVersion(package: specificPackage, executable: testCommand)
     }
 
+    func testMintFileWithoutVersionInstall() throws {
+        mint.mintFilePath = mintFileWithoutVersionFixture.absolute()
+
+        let specificPackage = PackageReference(repo: testRepoName)
+        try mint.install(package: specificPackage)
+        XCTAssertEqual(specificPackage.version, latestVersion)
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
+     }
+
+    func testMintFileWithoutVersionRun() throws {
+        mint.mintFilePath = mintFileWithoutVersionFixture.absolute()
+
+        let specificPackage = PackageReference(repo: testRepoName)
+        try mint.run(package: specificPackage)
+        XCTAssertEqual(specificPackage.version, latestVersion)
+        try checkInstalledVersion(package: specificPackage, executable: testCommand)
+     }
+
     func testMintErrors() {
 
         expectError(MintError.cloneError(PackageReference(repo: "http://invaliddomain.com/invalid", version: testVersion))) {

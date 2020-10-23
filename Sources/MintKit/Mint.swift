@@ -120,14 +120,16 @@ public class Mint {
     @discardableResult
     func resolvePackage(_ package: PackageReference) throws -> Bool {
 
-        // resolve version from MintFile
-        if package.version.isEmpty,
-            mintFilePath.exists,
-            let mintfile = try? Mintfile(path: mintFilePath) {
-            // set version to version from mintfile
-            if let mintFilePackage = mintfile.package(for: package.repo), !mintFilePackage.version.isEmpty {
+        // resolve repo and version from MintFile
+        if mintFilePath.exists,
+            let mintfile = try? Mintfile(path: mintFilePath),
+            let mintFilePackage = mintfile.package(for: package.repo) {
+            // set repo to repo from mintfile
+            package.repo = mintFilePackage.repo
+
+            if package.version.isEmpty, !mintFilePackage.version.isEmpty {
+                // set version to version from mintfile
                 package.version = mintFilePackage.version
-                package.repo = mintFilePackage.repo
                 if verbose {
                     output("Using \(package.repo) \(package.version) from Mintfile.")
                 }
