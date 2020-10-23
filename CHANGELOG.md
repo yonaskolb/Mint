@@ -2,6 +2,9 @@
 
 ## Master
 
+#### Added
+- Added `--overwrite` option to `mint install` [#186](https://github.com/yonaskolb/Mint/pull/186) @Econa77
+
 ## 0.15.0
 
 #### Added
