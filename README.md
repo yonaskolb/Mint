@@ -8,9 +8,9 @@
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/SwiftLint@0.22.0
+$ mint run realm/SwiftLint@0.40.3
 ```
-This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.22.0
+This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.40.3
 
 Mint is designed to be used with Swift command line tools that build with the Swift Package Manager. It makes installing, running and distributing these tools much easier.
 
@@ -76,7 +76,7 @@ $ swift run mint
 Add the following to your Package.swift file's dependencies:
 
 ```swift
-.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.10.0"),
+.package(url: "https://github.com/yonaskolb/Mint.git", from: "0.15.0"),
 ```
 
 And then import wherever needed: `import MintKit`
@@ -102,14 +102,14 @@ An optional version can be specified by appending `@version`, otherwise the newe
 
 #### Examples
 ```sh
-$ mint run yonaskolb/XcodeGen@1.2.4 # run the only executable
-$ mint run yonaskolb/XcodeGen@1.2.4 --spec spec.yml # pass some arguments
-$ mint run yonaskolb/XcodeGen@1.2.4 xcodegen --spec spec.yml # specify a specific executable
-$ mint run --executable xcodegen yonaskolb/XcodeGen@1.2.4 --spec spec.yml # specify a specific executable in case the first argument is the same name as the executable
-$ mint install yonaskolb/XcodeGen@1.2.4 --no-link # installs a certain version but doesn't link it globally
+$ mint run yonaskolb/XcodeGen@2.18.0 # run the only executable
+$ mint run yonaskolb/XcodeGen@2.18.0 --spec spec.yml # pass some arguments
+$ mint run yonaskolb/XcodeGen@2.18.0 xcodegen --spec spec.yml # specify a specific executable
+$ mint run --executable xcodegen yonaskolb/XcodeGen@2.18.0 --spec spec.yml # specify a specific executable in case the first argument is the same name as the executable
+$ mint install yonaskolb/XcodeGen@2.18.0 --no-link # installs a certain version but doesn't link it globally
 $ mint install yonaskolb/XcodeGen # install newest tag
 $ mint install yonaskolb/XcodeGen@master --force #reinstall the master branch
-$ mint run yonaskolb/XcodeGen@1.2.4 # run 1.2.4
+$ mint run yonaskolb/XcodeGen@2.18.0 # run 2.18.0
 $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
@@ -122,8 +122,8 @@ A `Mintfile` can specify a list of versioned packages. It makes installing and r
 Simply place this file in the directory you're running Mint in. The format of the `Mintfile` is simply a list of packages in the same form as the usual package parameter:
 
 ```
-yonaskolb/xcodegen@1.10.3
-yonaskolb/genesis@0.2.0
+yonaskolb/xcodegen@2.18.0
+yonaskolb/genesis@0.4.0
 ```
 
 Then you can simply run a package with:
