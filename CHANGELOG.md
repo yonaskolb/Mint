@@ -2,6 +2,8 @@
 
 ## Master
 
+## 0.15.0
+
 #### Added
 - Running offline without specified version [#164](https://github.com/yonaskolb/Mint/issues/164) [#166](https://github.com/yonaskolb/Mint/pull/166) @vknabel
 
@@ -10,6 +12,8 @@
 
 #### Fixed
 - Support building for architectures other than x86_64 on macOS (Apple Silicon) [#185](https://github.com/yonaskolb/Mint/pull/185)
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.14.2...0.15.0)
 
 ## 0.14.2
 
