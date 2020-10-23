@@ -12,7 +12,7 @@ class InstallCommand: PackageCommand {
     @Flag("-f", "--force", description: "Force a reinstall even if the package is already installed")
     var force: Bool
 
-    @Key("-o", "--overwrite", description: "Overwrite a symlinked executable that is not installed by mint. Either (y/n)")
+    @Key("-o", "--overwrite", description: "Automatically overwrite a symlinked executable that is not installed by mint without asking. Either (y/n)")
     var overwrite: Bool?
 
     init(mint: Mint) {
