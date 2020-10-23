@@ -32,7 +32,7 @@ bump_brew:
 	brew bump-formula-pr --url=$(RELEASE_TAR) Mint
 
 zip_binary: build
-	zip -j $(EXECUTABLE_NAME).zip $(BUILD_PATH)
+	zip -jr $(EXECUTABLE_NAME).zip $(BUILD_PATH)
 
 release:
 	sed -i '' 's|\(let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintCLI/MintCLI.swift
