@@ -461,7 +461,7 @@ public class Mint {
         output(confirmation.green)
     }
 
-    public func bootstrap(link: Bool = false) throws {
+    public func bootstrap(link: Bool = false, overwrite: Bool? = nil) throws {
 
         let mintFile = try Mintfile(path: mintFilePath)
 
@@ -477,7 +477,7 @@ public class Mint {
         }
         var installCount = 0
         for package in mintFile.packages {
-            let installed = try install(package: package, beforeOtherCommand: true, force: false, link: link)
+            let installed = try install(package: package, beforeOtherCommand: true, force: false, link: link, overwrite: overwrite)
             if installed {
                 installCount += 1
             }
