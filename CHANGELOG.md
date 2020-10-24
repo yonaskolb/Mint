@@ -4,6 +4,7 @@
 
 #### Added
 - Added `--overwrite` option to `mint install` [#186](https://github.com/yonaskolb/Mint/pull/186) @Econa77
+- Added `--overwrite` option to `mint bootstrap` [#193](https://github.com/yonaskolb/Mint/pull/193) @Econa77
 
 ## 0.15.0
 
