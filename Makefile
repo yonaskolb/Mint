@@ -4,7 +4,7 @@ VERSION = 0.15.0
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(EXECUTABLE_NAME)
-BUILD_PATH = .build/release/$(EXECUTABLE_NAME)
+BUILD_PATH = .build/apple/Products/Release/$(EXECUTABLE_NAME)
 CURRENT_PATH = $(PWD)
 RELEASE_TAR = $(REPO)/archive/$(VERSION).tar.gz
 
