@@ -1,6 +1,7 @@
 import Foundation
 
 extension ProcessInfo {
+    #if os(macOS)
     /// Returns a `String` representing the machine hardware name or nil if there was an error invoking `uname(_:)` or decoding the response.
     ///
     /// Return value is the equivalent to running `$ uname -m` in shell.
@@ -14,4 +15,5 @@ extension ProcessInfo {
         guard let identifier = String(bytes: data, encoding: .ascii) else { return nil }
         return identifier.trimmingCharacters(in: .controlCharacters)
     }
+    #endif
 }
