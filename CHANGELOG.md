@@ -2,9 +2,16 @@
 
 ## Master
 
+## 0.16.0
+
 #### Added
 - Added `--overwrite` option to `mint install` [#186](https://github.com/yonaskolb/Mint/pull/186) @Econa77
 - Added `--overwrite` option to `mint bootstrap` [#193](https://github.com/yonaskolb/Mint/pull/193) @Econa77
+
+### Fixed
+- Fixed installation in Xcode 12 [#195](https://github.com/yonaskolb/Mint/pull/195) @nanashiki
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.15.0...0.16.0)
 
 ## 0.15.0
 
