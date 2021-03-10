@@ -63,7 +63,7 @@ public class PackageReference {
 
     public var versionCouldBeSHA: Bool {
         switch version {
-        case "master", "develop":
+        case "main", "master", "develop":
             return false
         default:
             let characterSet = CharacterSet.letters.union(.decimalDigits)
