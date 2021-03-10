@@ -15,7 +15,7 @@ class PackageCommand: MintfileCommand {
         \(description)
         
         The package can be a shorthand for a github repo \"githubName/repo\", or a fully qualified .git path.
-        An optional version can be specified by appending @version to the repo, otherwise the newest tag will be used (or master if no tags are found.)
+        An optional version can be specified by appending @version to the repo, otherwise the newest tag will be used (or main, then master if no tags are found.)
         """
         if let parameterDescription = parameterDescription {
             longDescription += "\n\n\(parameterDescription)"
