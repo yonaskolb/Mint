@@ -126,11 +126,13 @@ yonaskolb/xcodegen@2.18.0
 yonaskolb/genesis@0.4.0
 ```
 
-Then you can simply run a package with:
+Then you can simply run a package using:
 
 ```sh
 mint run xcodegen
 ```
+
+Note that mint will find the version declared in your Mintfile and run that version, even if you have multiple versions installed.
 
 Or install all the packages (without linking them globally) in one go with:
 
