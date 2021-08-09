@@ -27,7 +27,7 @@ Homebrew is a popular method of distributing Swift executables, but that require
 If your Swift executable package builds with SPM, then it can be run with Mint! See [Support](#support) for details.
 
 ## Why is it called Mint?
-Swift Packager Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
+Swift Package Manager Tools -> SPMT -> Spearmint -> Mint! 🌱😄
 > Mint: a place where something is produced or manufactured
 
 ## Installing
