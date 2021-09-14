@@ -293,6 +293,7 @@ public class Mint {
                         try linkPackage(package, executable: executable, overwrite: overwrite)
                     }
                 }
+                checkLinkPath()
             }
             return false
         }
@@ -394,9 +395,16 @@ public class Mint {
                     try linkPackage(package, executable: executable, overwrite: overwrite)
                 }
             }
+            checkLinkPath()
         }
 
         return true
+    }
+    
+    private func checkLinkPath() {
+        if let path = ProcessInfo.processInfo.environment["PATH"], !path.contains(linkPath.string) {
+            output("\(linkPath) must be added to your $PATH if you wish to run this package outside of mint".yellow)
+        }
     }
 
     private func runPackageCommand(name: String, command: String, directory: Path, stdOutOnError: Bool = false, error mintError: MintError) throws {
