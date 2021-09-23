@@ -114,7 +114,7 @@ $ mint run XcodeGen # use newest tag and find XcodeGen in installed packages
 ```
 
 ### Linking
-By default Mint symlinks your installs into `usr/local/bin` on `mint install`, unless `--no-link` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run package`. Note that only one linked version can be used at a time though. If you need to run a specific older version use `mint run`.
+By default Mint symlinks your installs into `~/.mint/bin` on `mint install`, unless `--no-link` is passed. This means a package will be accessible from anywhere, and you don't have to prepend commands with `mint run package`, as long as you add `~/.mint/bin` to your `$PATH`. Note that only one linked version can be used at a time. If you need to run a specific older version use `mint run`.
 
 ### Mintfile
 A `Mintfile` can specify a list of versioned packages. It makes installing and running these packages easy, as the specific repos and versions are centralized.
@@ -146,7 +146,7 @@ mint bootstrap --link
 
 ### Advanced
 - You can use `--silent` in `mint run` to silence any output from mint itself. Useful if forwarding output somewhere else.
-- You can set `MINT_PATH` and `MINT_LINK_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `/usr/local/lib/mint` and `/usr/local/bin` respectively
+- You can set `MINT_PATH` and `MINT_LINK_PATH` envs to configure where mint caches builds, and where it symlinks global installs. These default to `~/.mint` and `~/.mint/bin` respectively
 - You can use `mint install --force` to reinstall a package even if it's already installed. This shouldn't be required unless you are pointing at a branch and want to update it.
 
 ### Linux

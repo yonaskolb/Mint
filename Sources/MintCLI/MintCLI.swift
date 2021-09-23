@@ -13,8 +13,8 @@ public class MintCLI {
 
     public init() {
 
-        var mintPath: Path = "/usr/local/lib/mint"
-        var linkPath: Path = "/usr/local/bin"
+        var mintPath: Path = "~/.mint"
+        var linkPath: Path = "~/.mint/bin"
 
         if let path = ProcessInfo.processInfo.environment["MINT_PATH"], !path.isEmpty {
             mintPath = Path(path)
