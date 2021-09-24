@@ -9,7 +9,7 @@
 - Fixed building in Xcode 13 [#218](https://github.com/yonaskolb/Mint/pull/218) [#219](https://github.com/yonaskolb/Mint/pull/219) @Armenm
 
 #### Changed
-- The default package install path (`$MINT_PATH`) has changed from `/usr/local/lib/mint` to `~/.mint`, and the global link path (`$MINT_LINK_PATH`) has changed from `/usr/local/bin` to `~/.mint/bin`. This fixes in installation issues on some systems, but in order to run globally installed packages without Mint you'll now need to add `~/.mint/bin` to your `$PATH`. [#216](https://github.com/yonaskolb/Mint/pull/216) @yonaskolb
+- The default package install path (`$MINT_PATH`) has changed from `/usr/local/lib/mint` to `~/.mint`, and the global link path (`$MINT_LINK_PATH`) has changed from `/usr/local/bin` to `~/.mint/bin`. This fixes installation issues on some systems, but in order to run globally installed packages without Mint you'll now need to add `~/.mint/bin` to your `$PATH`. [#216](https://github.com/yonaskolb/Mint/pull/216) @yonaskolb
 
 [Commits](https://github.com/yonaskolb/Mint/compare/0.16.0...0.17.0)
 
