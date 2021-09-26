@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.17.1
+
+#### Fixed
+- Fixed `make install` on some systems
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.17.0...0.17.1)
+
 ## 0.17.0
 
 #### Fixed
