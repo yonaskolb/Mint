@@ -1,10 +1,11 @@
 EXECUTABLE_NAME = mint
 REPO = https://github.com/yonaskolb/Mint
-VERSION = 0.17.0
+VERSION = 0.17.1
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(EXECUTABLE_NAME)
-BUILD_PATH = .build/apple/Products/Release/$(EXECUTABLE_NAME)
+SWIFT_BUILD_FLAGS = --disable-sandbox -c release --arch arm64 --arch x86_64
+EXECUTABLE_PATH = $(shell swift build $(SWIFT_BUILD_FLAGS) --show-bin-path)/$(EXECUTABLE_NAME)
 CURRENT_PATH = $(PWD)
 RELEASE_TAR = $(REPO)/archive/$(VERSION).tar.gz
 
@@ -12,10 +13,10 @@ RELEASE_TAR = $(REPO)/archive/$(VERSION).tar.gz
 
 install: build
 	mkdir -p $(PREFIX)/bin
-	cp -f $(BUILD_PATH) $(INSTALL_PATH)
+	cp -f $(EXECUTABLE_PATH) $(INSTALL_PATH)
 
 build:
-	swift build --disable-sandbox -c release --arch arm64 --arch x86_64
+	swift build $(SWIFT_BUILD_FLAGS)
 
 uninstall:
 	rm -f $(INSTALL_PATH)
