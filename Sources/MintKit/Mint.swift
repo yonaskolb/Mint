@@ -361,6 +361,12 @@ public class Mint {
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
             try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
+
+            // copy SPM Resources
+            if let productTargetNames = spmPackage.products.first(where: { $0.name == executable })?.targetNames {
+                let productTargets = spmPackage.targets.filter { productTargetNames.contains($0.name) }
+                try copySPMResourceBundle(spmPackage: spmPackage, rootTargets: productTargets, packageCheckoutPath: packageCheckoutPath, packagePath: packagePath)
+            }
         }
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
@@ -399,6 +405,29 @@ public class Mint {
         }
 
         return true
+    }
+
+    private func copySPMResourceBundle(spmPackage: SwiftPackage, rootTargets: [SwiftPackage.Target], packageCheckoutPath: Path, packagePath: PackagePath) throws {
+        for target in rootTargets {
+            if !target.resources.isEmpty {
+                #if os(macOS)
+                let resourcePath = packageCheckoutPath + ".build/release/\(spmPackage.name)_\(target.name).bundle"
+                #else
+                let resourcePath = packageCheckoutPath + ".build/release/\(spmPackage.name)_\(target.name).resources"
+                #endif
+                let filename = String(resourcePath.string.split(separator: "/").last!)
+                output("Copying resources for \(spmPackage.name): \(filename) ...")
+                if resourcePath.exists {
+                    let dest = packagePath.installPath + filename
+                    try Task.run(bash: "cp -R \"\(resourcePath)\" \"\(dest)\"")
+                } else {
+                    output("resource \(filename) doesn't exist".yellow)
+                }
+            }
+            let dependencies = target.dependencies.flatMap { $0.byName }
+            let nextTargets = spmPackage.targets.filter { dependencies.contains($0.name) }
+            try copySPMResourceBundle(spmPackage: spmPackage, rootTargets: nextTargets, packageCheckoutPath: packageCheckoutPath, packagePath: packagePath)
+        }
     }
     
     private func checkLinkPath() {
