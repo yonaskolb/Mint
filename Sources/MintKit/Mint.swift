@@ -427,6 +427,19 @@ public class Mint {
             let dependencies = target.dependencies.flatMap { $0.byName }
             let nextTargets = spmPackage.targets.filter { dependencies.contains($0.name) }
             try copySPMResourceBundle(spmPackage: spmPackage, rootTargets: nextTargets, packageCheckoutPath: packageCheckoutPath, packagePath: packagePath)
+
+            // copy external dependency resource bundles
+            let externals = dependencies.filter { dependency in nextTargets.isEmpty || nextTargets.contains(where: { target in target.name != dependency }) }
+            for external in externals {
+                let externalPackagePath = packageCheckoutPath + ".build/checkouts/\(external)"
+                if externalPackagePath.exists {
+                    let externalSpmPackage = try SwiftPackage(directory: externalPackagePath)
+
+                    let productTargetNames = externalSpmPackage.products.flatMap { $0.targetNames }
+                    let productTargets = externalSpmPackage.targets.filter { productTargetNames.contains($0.name) }
+                    try copySPMResourceBundle(spmPackage: externalSpmPackage, rootTargets: productTargets, packageCheckoutPath: packageCheckoutPath, packagePath: packagePath)
+                }
+            }
         }
     }
     
