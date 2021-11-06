@@ -215,5 +215,6 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
 - mint install [scribd/Weaver](https://github.com/scribd/Weaver)
 - mint install [arthurpalves/coherent-swift](https://github.com/arthurpalves/coherent-swift)
+- mint install [swiftyfinch/Rugby](https://github.com/swiftyfinch/Rugby) 🏈
 
 Feel free to add your own!
