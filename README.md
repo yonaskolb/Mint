@@ -8,7 +8,7 @@
 A package manager that installs and runs Swift command line tool packages.
 
 ```sh
-$ mint run realm/SwiftLint@0.40.3
+mint run realm/SwiftLint@0.40.3
 ```
 This would install and run [SwiftLint](https://github.com/realm/SwiftLint) version 0.40.3
 
@@ -36,29 +36,29 @@ Make sure Xcode 10.2 is installed first.
 ### Homebrew
 
 ```sh
-$ brew install mint
+brew install mint
 ```
 
 ### Make
 
 ```sh
-$ git clone https://github.com/yonaskolb/Mint.git
-$ cd Mint
-$ make
+git clone https://github.com/yonaskolb/Mint.git
+cd Mint
+make
 ```
 
 ### Using Mint itself!
 
 ##### Install
 ```sh
-$ git clone https://github.com/yonaskolb/Mint.git
-$ cd Mint
-$ swift run mint install yonaskolb/mint
+git clone https://github.com/yonaskolb/Mint.git
+cd Mint
+swift run mint install yonaskolb/mint
 ```
 
 ##### Update
 ```sh
-$ mint install yonaskolb/mint
+mint install yonaskolb/mint
 ```
 
 ### Swift Package Manager
@@ -66,9 +66,9 @@ $ mint install yonaskolb/mint
 **Use CLI**
 
 ```sh
-$ git clone https://github.com/yonaskolb/Mint.git
-$ cd Mint
-$ swift run mint
+git clone https://github.com/yonaskolb/Mint.git
+cd Mint
+swift run mint
 ```
 
 **Use as dependency**
@@ -178,7 +178,7 @@ You can then add this to the `Installing` section in your readme:
 ````
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
-$ mint install github_name/repo_name
+mint install github_name/repo_name
 ```
 ````
 
