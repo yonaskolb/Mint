@@ -350,15 +350,7 @@ public class Mint {
         try? packagePath.installPath.delete()
         try packagePath.installPath.mkpath()
 
-        let packageReleasePath = packageCheckoutPath + ".build/release"
-        if !packageReleasePath.exists {
-            throw MintError.invalidExecutable(packageReleasePath.string)
-        }
-        if verbose {
-            standardOut.print("Copying \(packageReleasePath.string) to \(packagePath.packagePath)")
-        }
-        // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-        try Task.run(bash: "cp -R \(packageReleasePath.string)/* \(packagePath.packagePath.string)")
+        try copyReleaseProduct(packagePath: packagePath, packageCheckoutPath: packageCheckoutPath)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
@@ -396,6 +388,18 @@ public class Mint {
         }
 
         return true
+    }
+
+    private func copyReleaseProduct(packagePath: PackagePath, packageCheckoutPath: Path) throws {
+        let packageReleasePath = packageCheckoutPath + ".build/release"
+        if !packageReleasePath.exists {
+            throw MintError.invalidExecutable(packageReleasePath.string)
+        }
+        if verbose {
+            standardOut.print("Copying \(packageReleasePath.string) to \(packagePath.installPath)")
+        }
+        // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
+        try Task.run(bash: "cp -R \(packageReleasePath.string)/* \(packagePath.installPath.string)")
     }
     
     private func checkLinkPath() {
