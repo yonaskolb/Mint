@@ -3,6 +3,8 @@
 ## Master
 
 ## 0.17.2
+
+#### Fixed
 - Fix dependencies like bundles and dylibs not getting copied, which fixes some packages like `apple/swift-format` and `swiftgen/swiftgen` [#248](https://github.com/yonaskolb/Mint/pull/248) @fummicc1
 > Run `mint install --force {package}` to fix already installed packages
 
