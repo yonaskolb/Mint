@@ -331,6 +331,9 @@ public class Mint {
         }
 
         var buildCommand = "swift build -c release"
+        for executable in executables {
+            buildCommand += " --product \(executable)"
+        }
         #if os(macOS)
             let processInfo = ProcessInfo.processInfo
             if let machineHardwareName = processInfo.machineHardwareName {
