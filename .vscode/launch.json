@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug mint",
+            "program": "${workspaceFolder:Mint}/.build/debug/mint",
+            "args": [],
+            "cwd": "${workspaceFolder:Mint}",
+            "preLaunchTask": "swift: Build Debug mint"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Release mint",
+            "program": "${workspaceFolder:Mint}/.build/release/mint",
+            "args": [],
+            "cwd": "${workspaceFolder:Mint}",
+            "preLaunchTask": "swift: Build Release mint"
+        }
+    ]
+}

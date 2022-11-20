@@ -2,6 +2,16 @@
 
 ## Master
 
+## 0.17.3
+
+#### Changed
+- Only build executables from the package [#251](https://github.com/yonaskolb/Mint/pull/251) @417-72KI
+
+#### Fixed
+- Fixed some packages like newest version of SwiftlLint building as we're not building tests anymore [#251](https://github.com/yonaskolb/Mint/pull/251) @417-72KI
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.17.2...0.17.3)
+
 ## 0.17.2
 
 #### Fixed
