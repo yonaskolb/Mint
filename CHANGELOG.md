@@ -7,6 +7,8 @@
 ### Fixed
 - Fixed increased package installation sizes since 0.17.2. Mint now only installs required build artifacts like executables, bundles, resources, and dylibs [#253](https://github.com/yonaskolb/Mint/pull/253) @yonaskolb
 
+[Commits](https://github.com/yonaskolb/Mint/compare/0.17.3...0.17.4)
+
 ## 0.17.3
 
 #### Changed
