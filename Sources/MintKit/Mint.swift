@@ -349,11 +349,14 @@ public class Mint {
                               stdOutOnError: true,
                               error: .packageBuildError(package))
 
-        // clear the install directory
-        try? packagePath.installPath.delete()
-        try packagePath.installPath.mkpath()
+        let packageBuildPath = packageCheckoutPath + ".build/release"
+        let packageInstallPath = packagePath.installPath
 
-        try copyReleaseProduct(packagePath: packagePath, packageCheckoutPath: packageCheckoutPath)
+        // clear the install directory
+        try? packageInstallPath.delete()
+        try packageInstallPath.mkpath()
+
+        try copyBuildArtifacts(from: packageBuildPath, to: packagePath.installPath, executables: executables)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
@@ -393,16 +396,31 @@ public class Mint {
         return true
     }
 
-    private func copyReleaseProduct(packagePath: PackagePath, packageCheckoutPath: Path) throws {
-        let packageReleasePath = packageCheckoutPath + ".build/release"
-        if !packageReleasePath.exists {
-            throw MintError.invalidExecutable(packageReleasePath.string)
+    private func copyBuildArtifacts(from buildPath: Path, to installPath: Path, executables: [String]) throws {
+        var pathsToCopy: [Path] = []
+        for executable in executables {
+            let executablePath = buildPath + executable
+            if !executablePath.exists {
+                throw MintError.invalidExecutable(executablePath.lastComponent)
+            }
+            pathsToCopy.append(executablePath)
         }
-        if verbose {
-            standardOut.print("Copying \(packageReleasePath.string) to \(packagePath.installPath)")
+
+        let copiedExtensions: Set = ["bundle", "resources", "dylib"]
+        for path in try buildPath.children() {
+            if let ext = path.extension, copiedExtensions.contains(ext) {
+                pathsToCopy.append(path)
+            }
         }
-        // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-        try Task.run(bash: "cp -R \(packageReleasePath.string)/* \(packagePath.installPath.string)")
+
+        for path in pathsToCopy {
+            let destinationPath = installPath + path.lastComponent
+            if verbose {
+                standardOut.print("Copying \(path) to \(destinationPath)")
+            }
+            // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
+            try Task.run(bash: "cp -R \(path.string) \(destinationPath.string)")
+        }
     }
     
     private func checkLinkPath() {
