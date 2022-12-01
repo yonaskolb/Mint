@@ -1,6 +1,6 @@
 EXECUTABLE_NAME = mint
 REPO = https://github.com/yonaskolb/Mint
-VERSION = 0.17.3
+VERSION = 0.17.4
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(EXECUTABLE_NAME)
