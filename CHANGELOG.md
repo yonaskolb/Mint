@@ -2,6 +2,13 @@
 
 ## Master
 
+## 0.17.5
+
+### Fixed
+- Fixed a regression in 0.17.3 where packages with multiple executables were not being installed properly [#256]
+
+[Commits](https://github.com/yonaskolb/Mint/compare/0.17.4...0.17.5)
+
 ## 0.17.4
 
 ### Fixed
