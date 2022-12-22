@@ -330,24 +330,24 @@ public class Mint {
             throw MintError.missingExecutable(package)
         }
 
-        var buildCommand = "swift build -c release"
         for executable in executables {
-            buildCommand += " --product \(executable)"
-        }
-        #if os(macOS)
-            let processInfo = ProcessInfo.processInfo
-            if let machineHardwareName = processInfo.machineHardwareName {
-                let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-                let target = "\(machineHardwareName)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-                buildCommand += " -Xswiftc -target -Xswiftc \(target)"
-            }
-        #endif
+            var buildCommand = "swift build -c release --product \(executable)"
 
-        try runPackageCommand(name: "Building package",
-                              command: buildCommand,
-                              directory: packageCheckoutPath,
-                              stdOutOnError: true,
-                              error: .packageBuildError(package))
+            #if os(macOS)
+                let processInfo = ProcessInfo.processInfo
+                if let machineHardwareName = processInfo.machineHardwareName {
+                    let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+                    let target = "\(machineHardwareName)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+                    buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+                }
+            #endif
+
+            try runPackageCommand(name: "Building product \(executable)",
+                                  command: buildCommand,
+                                  directory: packageCheckoutPath,
+                                  stdOutOnError: true,
+                                  error: .packageBuildError(package))
+        }
 
         let packageBuildPath = packageCheckoutPath + ".build/release"
         let packageInstallPath = packagePath.installPath
