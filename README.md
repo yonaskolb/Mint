@@ -178,7 +178,7 @@ You can then add this to the `Installing` section in your readme:
 ````
 ### [Mint](https://github.com/yonaskolb/mint)
 ```
-mint install github_name/repo_name
+mint run github_name/repo_name
 ```
 ````
 
