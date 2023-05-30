@@ -293,6 +293,7 @@ public class Mint {
                         try linkPackage(package, executable: executable, overwrite: overwrite)
                     }
                 }
+                try linkResources(package)
                 checkLinkPath()
             }
             return false
@@ -390,6 +391,7 @@ public class Mint {
                     try linkPackage(package, executable: executable, overwrite: overwrite)
                 }
             }
+            try linkResources(package)
             checkLinkPath()
         }
 
@@ -406,12 +408,7 @@ public class Mint {
             pathsToCopy.append(executablePath)
         }
 
-        let copiedExtensions: Set = ["bundle", "resources", "dylib"]
-        for path in try buildPath.children() {
-            if let ext = path.extension, copiedExtensions.contains(ext) {
-                pathsToCopy.append(path)
-            }
-        }
+        try pathsToCopy.append(contentsOf: getResources(from: buildPath))
 
         for path in pathsToCopy {
             let destinationPath = installPath + path.lastComponent
@@ -420,6 +417,18 @@ public class Mint {
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
             try Task.run(bash: "cp -R \(path.string) \(destinationPath.string)")
+        }
+    }
+
+    private func getResources(from path: Path) throws -> [Path] {
+        let extensions: Set = ["bundle", "resources", "dylib"]
+
+        return try path.children().filter {
+            guard let ext = $0.extension, extensions.contains(ext) else {
+                return false
+            }
+
+            return true
         }
     }
     
@@ -489,6 +498,22 @@ public class Mint {
         }
 
         output(confirmation.green)
+    }
+
+    func linkResources(_ package: PackageReference) throws {
+        let packagePath = PackagePath(path: packagesPath, package: package)
+        let resources = try getResources(from: packagePath.installPath)
+
+        for resource in resources {
+            let installPath = linkPath + resource.lastComponent
+
+            do {
+                try Task.run(bash: "ln -s \"\(packagePath.installPath + resource.lastComponent)\" \"\(installPath.string)\"")
+            } catch {
+                errorOutput("Could not link \(resource.lastComponent) to \(installPath.string)".red)
+                return
+            }
+        }
     }
 
     public func bootstrap(link: Bool = false, overwrite: Bool? = nil) throws {
