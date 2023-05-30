@@ -564,6 +564,11 @@ public class Mint {
             let option = Input.readOption(options: packages.map { $0.gitRepo }, prompt: "There are multiple packages matching '\(name)', which one would you like to uninstall?")
             package = packages.first { $0.gitRepo == option }!
         }
+
+        let resources = try package.versionDirs
+            .map { try getResources(from: $0.path) }
+            .flatMap { $0 }
+
         try package.path.delete()
         output("\(package.name) was uninstalled")
 
@@ -574,6 +579,12 @@ public class Mint {
         // remove link
         for executable in Set(package.versionDirs.flatMap { $0.executables }) where executable.linked {
             let installPath = linkPath + executable.name
+            try installPath.delete()
+        }
+
+        // remove resource artifact link
+        for resource in resources {
+            let installPath = linkPath + resource.lastComponent
             try installPath.delete()
         }
     }
