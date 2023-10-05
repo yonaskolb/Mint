@@ -565,6 +565,7 @@ public class Mint {
             package = packages.first { $0.gitRepo == option }!
         }
 
+        // get resources across all installed versions
         let resources = try package.versionDirs
             .map { try getResources(from: $0.path) }
             .flatMap { $0 }
@@ -582,10 +583,13 @@ public class Mint {
             try installPath.delete()
         }
 
-        // remove resource artifact link
+        // remove all resource artifact links
         for resource in resources {
             let installPath = linkPath + resource.lastComponent
-            try installPath.delete()
+
+            /* `try?` to suppress error in console, which will
+            happen when same resource is deleted from multiple versions */
+            try? installPath.delete()
         }
     }
 }
