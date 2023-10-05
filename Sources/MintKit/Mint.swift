@@ -508,7 +508,7 @@ public class Mint {
             let installPath = linkPath + resource.lastComponent
 
             do {
-                try Task.run(bash: "ln -s -f \"\(packagePath.installPath + resource.lastComponent)\" \"\(installPath.string)\"")
+                try Task.run(bash: "ln -s -f -h \"\(packagePath.installPath + resource.lastComponent)\" \"\(installPath.string)\"")
             } catch {
                 errorOutput("Could not link \(resource.lastComponent) to \(installPath.string)".red)
                 return
