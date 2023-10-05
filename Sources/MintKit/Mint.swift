@@ -566,9 +566,11 @@ public class Mint {
         }
 
         // get resources across all installed versions
-        let resources = try package.versionDirs
-            .map { try getResources(from: $0.path) }
-            .flatMap { $0 }
+        let resources = Set(
+            try package.versionDirs
+                .map { try getResources(from: $0.path) }
+                .flatMap { $0 }
+        )
 
         try package.path.delete()
         output("\(package.name) was uninstalled")
@@ -586,10 +588,7 @@ public class Mint {
         // remove all resource artifact links
         for resource in resources {
             let installPath = linkPath + resource.lastComponent
-
-            /* `try?` to suppress error in console, which will
-            happen when same resource is deleted from multiple versions */
-            try? installPath.delete()
+            try installPath.delete()
         }
     }
 }
