@@ -2,10 +2,13 @@
 
 ## Master
 
+### Fixed
+- Fixed binary copying when customized `MINT_PATH` or `MINT_LINK_PATH` contained spaces [#269](https://github.com/yonaskolb/Mint/pull/269) @olejnjak
+
 ## 0.17.5
 
 ### Fixed
-- Fixed a regression in 0.17.3 where packages with multiple executables were not being installed properly [#256]
+- Fixed a regression in 0.17.3 where packages with multiple executables were not being installed properly [#256](https://github.com/yonaskolb/Mint/pull/256)
 
 [Commits](https://github.com/yonaskolb/Mint/compare/0.17.4...0.17.5)
 
