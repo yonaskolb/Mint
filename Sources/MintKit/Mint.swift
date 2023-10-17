@@ -419,7 +419,7 @@ public class Mint {
                 standardOut.print("Copying \(path) to \(destinationPath)")
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try Task.run(bash: "cp -R \(path.string) \(destinationPath.string)")
+            try Task.run(bash: "cp -R \"\(path.string)\" \"\(destinationPath.string)\"")
         }
     }
     
