@@ -5,21 +5,18 @@ on:
   pull_request: {}
 
 jobs:
-  macOS:
-    runs-on: macOS-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Resolve
-      run: swift package resolve
-    - name: Build
-      run: swift build
-    - name: Run tests
-      run: swift test 2>&1 | xcpretty
-  linux:
-    runs-on: ubuntu-latest
-    container: swift:5.2
+  test:
+    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        swift: ["5.9.0"]
     steps:
       - uses: actions/checkout@v2
+      - uses: swift-actions/setup-swift@v1
+        with:
+          swift-version: ${{ matrix.swift }}
       - name: Resolve
         run: swift package resolve
       - name: Build
