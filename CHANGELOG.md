@@ -5,6 +5,9 @@
 ### Fixed
 - Fixed binary copying when customized `MINT_PATH` or `MINT_LINK_PATH` contained spaces [#269](https://github.com/yonaskolb/Mint/pull/269) @olejnjak
 
+### Internal
+- Update the package to Swift 5.9 [#275](https://github.com/yonaskolb/Mint/pull/275) @yonaskolb
+
 ## 0.17.5
 
 ### Fixed
