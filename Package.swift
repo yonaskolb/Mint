@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.9
 
 import PackageDescription
 
@@ -15,7 +15,7 @@ let package = Package(
         .package(url: "https://github.com/mxcl/Version.git", from: "2.0.1")
     ],
     targets: [
-        .target(name: "Mint", dependencies: ["MintCLI"]),
+        .executableTarget(name: "Mint", dependencies: ["MintCLI"]),
         .target(name: "MintCLI", dependencies: ["Rainbow", "SwiftCLI", "MintKit"]),
         .target(name: "MintKit", dependencies: ["Rainbow", "PathKit", "Version", "SwiftCLI"]),
         .testTarget(name: "MintTests", dependencies: ["MintKit"]),

@@ -11,11 +11,11 @@ public class Mint {
     public var mintFilePath: Path
 
     var packagesPath: Path {
-        return path + "packages"
+        path + "packages"
     }
 
     var metadataPath: Path {
-        return path + "metadata.json"
+        path + "metadata.json"
     }
 
     public var standardOut: WritableStream
