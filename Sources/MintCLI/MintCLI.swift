@@ -49,10 +49,8 @@ public class MintCLI {
 extension MintError: ProcessError {
 
     public var message: String? {
-        return "🌱  \(description.red)"
+        "🌱  \(description.red)"
     }
 
-    public var exitStatus: Int32 {
-        return 1
-    }
+    public var exitStatus: Int32 { 1 }
 }
