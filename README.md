@@ -210,7 +210,7 @@ If this file is found in you repo, then all those directories will be copied int
 - mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting)
 - mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift)
 - mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky)
-- mint install [thii/xcbeautify](https://github.com/thii/xcbeautify)
+- mint install [tuist/xcbeautify](https://github.com/tuist/xcbeautify)
 - mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
 - mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
 - mint install [scribd/Weaver](https://github.com/scribd/Weaver)
