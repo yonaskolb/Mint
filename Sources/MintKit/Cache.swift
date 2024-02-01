@@ -5,7 +5,7 @@ import PathKit
 struct Cache: Hashable {
     struct PackageInfo: Hashable {
         var name: String {
-            return PackageReference(repo: gitRepo).name
+            PackageReference(repo: gitRepo).name
         }
 
         let gitRepo: String

@@ -32,9 +32,9 @@ struct InstallStatus {
 
     var warning: String? {
         switch status {
-        case .file: return "An executable that was not installed by mint already exists at \(path)."
-        case let .symlink(symlink): return "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
-        default: return nil
+        case .file: "An executable that was not installed by mint already exists at \(path)."
+        case let .symlink(symlink): "An executable that was not installed by mint already exists at \(path) that is symlinked to \(symlink)."
+        default: nil
         }
     }
 }

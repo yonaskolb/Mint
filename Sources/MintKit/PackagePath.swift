@@ -14,17 +14,17 @@ struct PackagePath {
         self.executable = executable
     }
 
-    var packagePath: Path { return path + package.repoPath }
-    var installPath: Path { return packagePath + "build" + package.version }
-    var executablePath: Path { return installPath + (executable ?? package.name) }
+    var packagePath: Path { path + package.repoPath }
+    var installPath: Path { packagePath + "build" + package.version }
+    var executablePath: Path { installPath + (executable ?? package.name) }
 
     func getExecutables() throws -> [String] {
-        return try installPath.children()
+        try installPath.children()
             .filter { $0.isFile && !$0.lastComponent.hasPrefix(".") && $0.extension == nil }
             .map { $0.lastComponent }
     }
 
     var commandVersion: String {
-        return "\(executable ?? package.name) \(package.version)"
+        "\(executable ?? package.name) \(package.version)"
     }
 }

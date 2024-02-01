@@ -18,7 +18,7 @@ class MintTests: XCTestCase {
     let testPackageDir = "github.com_yonaskolb_SimplePackage"
     let fullTestRepo = "https://github.com/yonaskolb/SimplePackage.git"
     func expectedExecutablePath(_ version: String) -> Path {
-        return mintPath.absolute() + "packages" + "github.com_yonaskolb_SimplePackage/build/\(version)/simplepackage"
+        mintPath.absolute() + "packages" + "github.com_yonaskolb_SimplePackage/build/\(version)/simplepackage"
     }
 
     override func setUp() {

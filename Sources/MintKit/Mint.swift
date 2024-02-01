@@ -11,11 +11,11 @@ public class Mint {
     public var mintFilePath: Path
 
     var packagesPath: Path {
-        return path + "packages"
+        path + "packages"
     }
 
     var metadataPath: Path {
-        return path + "metadata.json"
+        path + "metadata.json"
     }
 
     public var standardOut: WritableStream
@@ -416,7 +416,7 @@ public class Mint {
                 standardOut.print("Copying \(path) to \(destinationPath)")
             }
             // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try Task.run(bash: "cp -R \(path.string) \(destinationPath.string)")
+            try Task.run(bash: "cp -R \"\(path.string)\" \"\(destinationPath.string)\"")
         }
     }
 
