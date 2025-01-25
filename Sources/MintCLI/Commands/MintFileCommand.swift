@@ -1,4 +1,3 @@
-
 import PathKit
 import SwiftCLI
 
