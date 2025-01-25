@@ -1,4 +1,3 @@
-import Foundation
 import PathKit
 
 /// Contains all the paths for packages

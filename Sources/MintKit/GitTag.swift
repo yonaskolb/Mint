@@ -1,4 +1,3 @@
-import Foundation
 import Version
 
 func convertTagsToVersionMap(_ tags: [String]) -> [Version: String] {

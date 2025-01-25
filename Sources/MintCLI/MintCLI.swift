@@ -1,7 +1,6 @@
 import Foundation
 import MintKit
 import PathKit
-import Rainbow
 import SwiftCLI
 
 public class MintCLI {

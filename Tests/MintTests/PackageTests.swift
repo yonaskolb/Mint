@@ -1,6 +1,4 @@
 @testable import MintKit
-import PathKit
-import SwiftCLI
 import XCTest
 
 class PackageTests: XCTestCase {

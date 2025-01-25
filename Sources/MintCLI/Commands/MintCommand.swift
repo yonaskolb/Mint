@@ -1,6 +1,4 @@
-import Foundation
 import MintKit
-import PathKit
 import SwiftCLI
 
 class MintCommand: Command {

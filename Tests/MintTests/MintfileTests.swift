@@ -1,5 +1,4 @@
 @testable import MintKit
-import PathKit
 import XCTest
 
 class MintfileTests: XCTestCase {

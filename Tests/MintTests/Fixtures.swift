@@ -1,4 +1,3 @@
-import Foundation
 import PathKit
 
 let mintFileFixture = Path(#file) + "../../Fixtures/Mintfile"

@@ -1,4 +1,3 @@
-import Foundation
 import PathKit
 
 struct InstallStatus {
