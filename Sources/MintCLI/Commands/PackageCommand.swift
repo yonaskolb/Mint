@@ -3,10 +3,11 @@ import SwiftCLI
 
 class PackageCommand: MintfileCommand {
 
-    @Param var package: String
+    @Param
+    private var package: String
 
     @Flag("-s", "--silent", description: "Silences any output from Mint itself")
-    var silent: Bool
+    private var silent: Bool
 
     init(mint: Mint, name: String, description: String, parameterDescription: String? = nil) {
         var longDescription = """

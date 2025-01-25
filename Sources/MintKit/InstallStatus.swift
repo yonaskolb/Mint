@@ -3,7 +3,7 @@ import PathKit
 struct InstallStatus {
 
     let status: Status
-    let path: Path
+    private let path: Path
 
     init(path: Path, mintPackagesPath: Path) throws {
         self.path = path

@@ -1,18 +1,19 @@
 import MintKit
 import SwiftCLI
 
-class InstallCommand: PackageCommand {
+final class InstallCommand: PackageCommand {
 
-    @Param var executable: String?
+    @Param
+    private var executable: String?
 
     @Flag("-n", "--no-link", description: "Whether to prevent global linkage")
-    var noLink: Bool
+    private var noLink: Bool
 
     @Flag("-f", "--force", description: "Force a reinstall even if the package is already installed")
-    var force: Bool
+    private var force: Bool
 
     @Key("-o", "--overwrite", description: "Automatically overwrite a symlinked executable that is not installed by mint without asking. Either (y/n)")
-    var overwrite: Bool?
+    private var overwrite: Bool?
 
     init(mint: Mint) {
         super.init(mint: mint,
