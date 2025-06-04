@@ -32,6 +32,7 @@ public class MintCLI {
             ListCommand(mint: mint),
             BootstrapCommand(mint: mint),
             WhichCommand(mint: mint),
+            OutdatedCommand(mint: mint),
         ])
     }
 

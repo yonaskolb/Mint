@@ -519,6 +519,46 @@ public class Mint {
         }
     }
 
+    public func outdated() throws {
+        
+        let mintFile = try Mintfile(path: mintFilePath)
+
+        guard !mintFile.packages.isEmpty else {
+            standardOut <<< "🌱  Mintfile is empty"
+            return
+        }
+
+        let packageCount = "\(mintFile.packages.count) \(mintFile.packages.count == 1 ? "package" : "packages")"
+
+        if verbose {
+            output("Found \(packageCount) in \(mintFilePath.string)")
+        }
+        
+        var hasUpdates = false
+        for package in mintFile.packages {
+            
+            let tagOutput = try Task.capture(bash: "git ls-remote --tags --refs \(package.gitPath)")
+            let versions = tagOutput.stdout
+                .split(separator: "\n")
+                .map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
+                .compactMap { Version($0) }
+                .sorted()
+            
+            if let latestVersion = versions.last,
+               let packageVersion = Version(package.version) {
+                
+                if packageVersion < latestVersion {
+                    hasUpdates = true
+                    output("\(package.name) is outdated: \(packageVersion.description) -> \(latestVersion.description)".yellow)
+                }
+            }
+        }
+        
+        if !hasUpdates {
+            output("\(packageCount) up to date".green)
+        }
+    }
+    
     public func uninstall(name: String) throws {
 
         // find packages
