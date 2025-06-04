@@ -5,21 +5,30 @@ on:
   pull_request: {}
 
 jobs:
-  test:
-    name: Swift ${{ matrix.swift }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  test-macos:
+    name: Test Xcode ${{ matrix.xcode }}
+    runs-on: macos-15
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        swift: ["5.9.0"]
+        xcode: ['16.0']
     steps:
-      - uses: actions/checkout@v2
-      - uses: swift-actions/setup-swift@v1
-        with:
-          swift-version: ${{ matrix.swift }}
+      - uses: actions/checkout@v4
+      - name: Select Xcode ${{ matrix.xcode }}
+        run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
       - name: Resolve
         run: swift package resolve
       - name: Build
         run: swift build
       - name: Run tests
+        run: swift test 2>&1
+  test-linux:
+    name: Test Linux
+    strategy:
+      matrix:
+        swift: ['6.0']
+    runs-on: ubuntu-latest
+    container: swift:${{ matrix.swift }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test
         run: swift test 2>&1
