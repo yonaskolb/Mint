@@ -1,8 +1,7 @@
-import Foundation
 import MintKit
 import SwiftCLI
 
-class RunCommand: PackageCommand {
+final class RunCommand: PackageCommand {
 
     @CollectedParam var arguments: [String]
 

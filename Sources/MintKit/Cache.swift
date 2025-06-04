@@ -1,4 +1,3 @@
-import Foundation
 import PathKit
 
 /// A struct used as a representation of the cache

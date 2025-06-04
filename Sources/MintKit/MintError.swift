@@ -1,5 +1,4 @@
 import Foundation
-import SwiftCLI
 
 public enum MintError: Error, CustomStringConvertible, Equatable, LocalizedError {
     case packageNotFound(String)

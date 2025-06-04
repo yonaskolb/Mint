@@ -1,10 +1,10 @@
-import Foundation
 import MintKit
 import SwiftCLI
 
-class WhichCommand: PackageCommand {
+final class WhichCommand: PackageCommand {
 
-    @Param var executable: String?
+    @Param
+    private var executable: String?
 
     init(mint: Mint) {
         super.init(mint: mint,

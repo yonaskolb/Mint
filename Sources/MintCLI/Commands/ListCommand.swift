@@ -1,7 +1,6 @@
-import Foundation
 import MintKit
 
-class ListCommand: MintCommand {
+final class ListCommand: MintCommand {
 
     init(mint: Mint) {
         super.init(mint: mint,

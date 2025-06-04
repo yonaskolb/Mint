@@ -11,10 +11,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        swift: ["5.9.0"]
+        swift: ["6.0.2"]
     steps:
-      - uses: actions/checkout@v2
-      - uses: swift-actions/setup-swift@v1
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
         with:
           swift-version: ${{ matrix.swift }}
       - name: Resolve

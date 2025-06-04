@@ -1,10 +1,10 @@
-import Foundation
 import MintKit
 import SwiftCLI
 
-class UninstallCommand: MintCommand {
+final class UninstallCommand: MintCommand {
 
-    @Param var package: String
+    @Param
+    private var package: String
 
     init(mint: Mint) {
         super.init(mint: mint, name: "uninstall", description: "Uninstall a package by name")

@@ -1,5 +1,4 @@
 import Foundation
-import PathKit
 
 public class PackageReference {
     public var repo: String

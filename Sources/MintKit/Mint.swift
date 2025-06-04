@@ -38,11 +38,11 @@ public class Mint {
         self.mintFilePath = mintFilePath
     }
 
-    func output(_ string: String) {
+    private func output(_ string: String) {
         standardOut.print("🌱 \(string)")
     }
 
-    func errorOutput(_ string: String) {
+    private func errorOutput(_ string: String) {
         standardError.print("🌱 \(string)")
     }
 
@@ -55,7 +55,7 @@ public class Mint {
         var packages: [String: String]
     }
 
-    func writeMetadata(_ metadata: Metadata) throws {
+    private func writeMetadata(_ metadata: Metadata) throws {
         let data = try JSONEncoder().encode(metadata)
         try metadataPath.write(data)
     }
@@ -68,13 +68,13 @@ public class Mint {
         return try JSONDecoder().decode(Metadata.self, from: data)
     }
 
-    func addPackage(git: String, path: Path) throws {
+    private func addPackage(git: String, path: Path) throws {
         var metadata = try readMetadata()
         metadata.packages[git] = path.lastComponent
         try writeMetadata(metadata)
     }
 
-    func getGitRepos(name: String) throws -> [String] {
+    private func getGitRepos(name: String) throws -> [String] {
         let metadata = try readMetadata()
 
         let gitRepos = metadata.packages
@@ -118,7 +118,7 @@ public class Mint {
 
     /// return whether the version was resolved remotely
     @discardableResult
-    func resolvePackage(_ package: PackageReference) throws -> Bool {
+    private func resolvePackage(_ package: PackageReference) throws -> Bool {
 
         // resolve repo and version from MintFile
         if mintFilePath.exists,
@@ -227,7 +227,7 @@ public class Mint {
         return packagePath.executablePath
     }
 
-    func getPackagePath(for package: PackageReference, with arguments: inout [String], executable: String?) throws -> PackagePath {
+    private func getPackagePath(for package: PackageReference, with arguments: inout [String], executable: String?) throws -> PackagePath {
         var packagePath = PackagePath(path: packagesPath, package: package)
 
         if let executable = executable {
@@ -455,7 +455,7 @@ public class Mint {
         }
     }
 
-    func linkPackage(_ package: PackageReference, executable: String, overwrite: Bool?) throws {
+    private func linkPackage(_ package: PackageReference, executable: String, overwrite: Bool?) throws {
 
         let packagePath = PackagePath(path: packagesPath, package: package, executable: executable)
         let installPath = linkPath + packagePath.executable!

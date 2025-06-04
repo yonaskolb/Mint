@@ -1,15 +1,14 @@
 import Foundation
 import MintKit
 import PathKit
-import Rainbow
 import SwiftCLI
 
 public class MintCLI {
 
-    public let version = "0.17.5"
+    private let version = "0.17.5"
 
-    let mint: Mint
-    let cli: CLI
+    private let mint: Mint
+    private let cli: CLI
 
     public init() {
 

@@ -1,13 +1,10 @@
-
-import Foundation
 import MintKit
-import PathKit
 import SwiftCLI
 
-class BootstrapCommand: MintfileCommand {
+final class BootstrapCommand: MintfileCommand {
 
     @Key("-o", "--overwrite", description: "Automatically overwrite a symlinked executable that is not installed by mint without asking. Either (y/n)")
-    var overwrite: Bool?
+    private var overwrite: Bool?
 
     init(mint: Mint) {
         super.init(mint: mint,
