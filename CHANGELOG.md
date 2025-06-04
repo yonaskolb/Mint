@@ -6,6 +6,7 @@
 
 ### Added
 - Added `outdated` command for listing outdated packages in a Mintfile [#237](https://github.com/yonaskolb/Mint/pull/237) @AF-cgi
+- Globally installed packages can now access their own resource artifacts, as they are also linked [#265](https://github.com/yonaskolb/Mint/pull/265) @jagreenwood
 
 ### Fixed
 - Fixed binary copying when customized `MINT_PATH` or `MINT_LINK_PATH` contained spaces [#269](https://github.com/yonaskolb/Mint/pull/269) @olejnjak
