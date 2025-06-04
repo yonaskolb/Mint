@@ -94,7 +94,7 @@ Run `mint help` to see usage instructions.
 - **which**: Print the path to an installed package executable.
 - **uninstall**: Uninstalls a package by name.
 - **bootstrap**: Installs all the packages in your [Mintfile](#mintfile), by default, without linking them globally
-- **outdated**: List all in your [Mintfile](#mintfile), by default, installed and linked packages that are outdated.
+- **outdated**: Lists the outdated packages in your [Mintfile](#mintfile)
 
 **Package reference**
 

@@ -9,7 +9,7 @@ class OutdatedCommand: MintfileCommand {
     init(mint: Mint) {
         super.init(mint: mint,
                    name: "outdated",
-                   description: "List all the currently installed and linked packages that are outdated.")
+                   description: "List all the outdated packages in your Mintfile")
     }
 
     override func execute() throws {
