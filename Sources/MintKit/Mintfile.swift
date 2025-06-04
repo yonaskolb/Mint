@@ -6,7 +6,7 @@ public struct Mintfile {
     let packages: [PackageReference]
 
     public func package(for repo: String) -> PackageReference? {
-        return packages.first { $0.repo.lowercased().contains(repo.lowercased()) }
+        packages.first { $0.repo.lowercased().contains(repo.lowercased()) }
     }
 
     public init(path: Path) throws {

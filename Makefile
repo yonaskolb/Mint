@@ -1,6 +1,6 @@
 EXECUTABLE_NAME = mint
 REPO = https://github.com/yonaskolb/Mint
-VERSION = 0.17.1
+VERSION = 0.17.5
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(EXECUTABLE_NAME)
@@ -33,7 +33,7 @@ bump_brew:
 	brew bump-formula-pr --url=$(RELEASE_TAR) Mint
 
 zip_binary: build
-	zip -jr $(EXECUTABLE_NAME).zip $(BUILD_PATH)
+	zip -jr $(EXECUTABLE_NAME).zip $(EXECUTABLE_PATH)
 
 release:
 	sed -i '' 's|\(let version = "\)\(.*\)\("\)|\1$(VERSION)\3|' Sources/MintCLI/MintCLI.swift

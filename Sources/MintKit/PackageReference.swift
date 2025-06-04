@@ -38,11 +38,11 @@ public class PackageReference {
     }
 
     public var namedVersion: String {
-        return "\(name) \(version)"
+        "\(name) \(version)"
     }
 
     public var name: String {
-        return repo.components(separatedBy: "/").last!.replacingOccurrences(of: ".git", with: "")
+        repo.components(separatedBy: "/").last!.replacingOccurrences(of: ".git", with: "")
     }
 
     public var gitPath: String {
@@ -75,7 +75,7 @@ public class PackageReference {
     }
 
     var repoPath: String {
-        return gitPath
+        gitPath
             .components(separatedBy: "://").last!
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: ".git", with: "")
@@ -86,6 +86,6 @@ public class PackageReference {
 
 extension PackageReference: Equatable {
     public static func == (lhs: PackageReference, rhs: PackageReference) -> Bool {
-        return lhs.repo == rhs.repo && lhs.version == rhs.version
+        lhs.repo == rhs.repo && lhs.version == rhs.version
     }
 }

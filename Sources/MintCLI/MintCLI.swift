@@ -6,7 +6,7 @@ import SwiftCLI
 
 public class MintCLI {
 
-    public let version = "0.17.1"
+    public let version = "0.17.5"
 
     let mint: Mint
     let cli: CLI
@@ -50,10 +50,8 @@ public class MintCLI {
 extension MintError: ProcessError {
 
     public var message: String? {
-        return "🌱  \(description.red)"
+        "🌱  \(description.red)"
     }
 
-    public var exitStatus: Int32 {
-        return 1
-    }
+    public var exitStatus: Int32 { 1 }
 }

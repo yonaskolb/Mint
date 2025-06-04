@@ -28,6 +28,6 @@ extension Input {
     }
 
     static func confirmation(_ question: String) -> Bool {
-        return readBool(prompt: "\(question) (y/n)")
+        readBool(prompt: "\(question) (y/n)")
     }
 }

@@ -11,11 +11,11 @@ public class Mint {
     public var mintFilePath: Path
 
     var packagesPath: Path {
-        return path + "packages"
+        path + "packages"
     }
 
     var metadataPath: Path {
-        return path + "metadata.json"
+        path + "metadata.json"
     }
 
     public var standardOut: WritableStream
@@ -330,38 +330,33 @@ public class Mint {
             throw MintError.missingExecutable(package)
         }
 
-        var buildCommand = "swift build -c release"
-        #if os(macOS)
-            let processInfo = ProcessInfo.processInfo
-            if let machineHardwareName = processInfo.machineHardwareName {
-                let osVersion = ProcessInfo.processInfo.operatingSystemVersion
-                let target = "\(machineHardwareName)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
-                buildCommand += " -Xswiftc -target -Xswiftc \(target)"
-            }
-        #endif
+        for executable in executables {
+            var buildCommand = "swift build -c release --product \(executable)"
 
-        try runPackageCommand(name: "Building package",
-                              command: buildCommand,
-                              directory: packageCheckoutPath,
-                              stdOutOnError: true,
-                              error: .packageBuildError(package))
+            #if os(macOS)
+                let processInfo = ProcessInfo.processInfo
+                if let machineHardwareName = processInfo.machineHardwareName {
+                    let osVersion = ProcessInfo.processInfo.operatingSystemVersion
+                    let target = "\(machineHardwareName)-apple-macosx\(osVersion.majorVersion).\(osVersion.minorVersion)"
+                    buildCommand += " -Xswiftc -target -Xswiftc \(target)"
+                }
+            #endif
+
+            try runPackageCommand(name: "Building product \(executable)",
+                                  command: buildCommand,
+                                  directory: packageCheckoutPath,
+                                  stdOutOnError: true,
+                                  error: .packageBuildError(package))
+        }
+
+        let packageBuildPath = packageCheckoutPath + ".build/release"
+        let packageInstallPath = packagePath.installPath
 
         // clear the install directory
-        try? packagePath.installPath.delete()
-        try packagePath.installPath.mkpath()
+        try? packageInstallPath.delete()
+        try packageInstallPath.mkpath()
 
-        for executable in executables {
-            let executablePath = packageCheckoutPath + ".build/release/\(executable)"
-            if !executablePath.exists {
-                throw MintError.invalidExecutable(executablePath.lastComponent)
-            }
-            let destinationPackagePath = PackagePath(path: packagesPath, package: package, executable: executable)
-            if verbose {
-                standardOut.print("Copying \(executablePath.string) to \(destinationPackagePath.executablePath)")
-            }
-            // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
-            try Task.run("cp", executablePath.string, destinationPackagePath.executablePath.string)
-        }
+        try copyBuildArtifacts(from: packageBuildPath, to: packagePath.installPath, executables: executables)
 
         let resourcesFile = packageCheckoutPath + "Package.resources"
         if resourcesFile.exists {
@@ -399,6 +394,33 @@ public class Mint {
         }
 
         return true
+    }
+
+    private func copyBuildArtifacts(from buildPath: Path, to installPath: Path, executables: [String]) throws {
+        var pathsToCopy: [Path] = []
+        for executable in executables {
+            let executablePath = buildPath + executable
+            if !executablePath.exists {
+                throw MintError.invalidExecutable(executablePath.lastComponent)
+            }
+            pathsToCopy.append(executablePath)
+        }
+
+        let copiedExtensions: Set = ["bundle", "resources", "dylib"]
+        for path in try buildPath.children() {
+            if let ext = path.extension, copiedExtensions.contains(ext) {
+                pathsToCopy.append(path)
+            }
+        }
+
+        for path in pathsToCopy {
+            let destinationPath = installPath + path.lastComponent
+            if verbose {
+                standardOut.print("Copying \(path) to \(destinationPath)")
+            }
+            // copy using shell instead of FileManager via PathKit because it removes executable permissions on Linux
+            try Task.run(bash: "cp -R \"\(path.string)\" \"\(destinationPath.string)\"")
+        }
     }
     
     private func checkLinkPath() {
