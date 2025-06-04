@@ -2,6 +2,11 @@
 
 ## Master
 
+## 0.18.0
+
+### Added
+- Added `outdated` command for listing outdated packages in a Mintfile [#237](https://github.com/yonaskolb/Mint/pull/237) @AF-cgi
+
 ### Fixed
 - Fixed binary copying when customized `MINT_PATH` or `MINT_LINK_PATH` contained spaces [#269](https://github.com/yonaskolb/Mint/pull/269) @olejnjak
 
