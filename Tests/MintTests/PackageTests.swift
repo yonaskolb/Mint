@@ -92,6 +92,7 @@ class PackageTests: XCTestCase {
 
         XCTAssertFalse(PackageReference(repo: "", version: "my_branch").versionCouldBeSHA)
         XCTAssertFalse(PackageReference(repo: "", version: "develop").versionCouldBeSHA)
+        XCTAssertFalse(PackageReference(repo: "", version: "main").versionCouldBeSHA)
         XCTAssertFalse(PackageReference(repo: "", version: "master").versionCouldBeSHA)
         XCTAssertFalse(PackageReference(repo: "", version: "1.0").versionCouldBeSHA)
         XCTAssertFalse(PackageReference(repo: "", version: "fgvb45g_").versionCouldBeSHA)
