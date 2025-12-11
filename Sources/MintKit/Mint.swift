@@ -310,9 +310,9 @@ public class Mint {
 
         if package.versionCouldBeSHA {
             // version is maybe a SHA, so we can't do a shallow clone
-            cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && cd \(package.repoPath) && git checkout \(package.version)"
+            cloneCommand = "git clone \(package.gitPath) \(package.repoPath) && cd \(package.repoPath) && git checkout \(package.version) && git submodule update --init --recursive"
         } else {
-            cloneCommand = "git clone --depth 1 -b \(package.version) \(package.gitPath) \(package.repoPath)"
+            cloneCommand = "git clone --depth 1 --recurse-submodules -b \(package.version) \(package.gitPath) \(package.repoPath)"
         }
         try runPackageCommand(name: "Cloning \(package.namedVersion)",
                               command: cloneCommand,
