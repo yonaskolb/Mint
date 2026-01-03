@@ -84,6 +84,11 @@ public class Mint {
         return gitRepos
     }
 
+    func getDefaultGitBranch() throws -> String {
+        let refsOutput = try Task.capture(bash: "git ls-remote --heads --quiet | cut -f2 | cut -d'/' -f3")
+        return refsOutput.stdout
+    }
+
     func getLinkedExecutables() -> [Path] {
         guard linkPath.exists,
             let packages = try? linkPath.children() else {
@@ -164,14 +169,14 @@ public class Mint {
 
                 let tagReferences = tagOutput.stdout
                 if tagReferences.isEmpty {
-                    package.version = "master"
+                    package.version = try getDefaultGitBranch()
                 } else {
                     let tags = tagReferences.split(separator: "\n").map { String($0.split(separator: "\t").last!.split(separator: "/").last!) }
                     let versions = convertTagsToVersionMap(tags)
                     if let latestVersion = versions.keys.sorted().last, let tag = versions[latestVersion] {
                         package.version = tag
                     } else {
-                        package.version = "master"
+                        package.version = try getDefaultGitBranch()
                     }
                 }
             } catch {
