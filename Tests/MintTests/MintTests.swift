@@ -308,4 +308,162 @@ class MintTests: XCTestCase {
         XCTAssertEqual(try mint.listPackages(), [:])
         XCTAssertEqual(try mint.readMetadata().packages, [:])
     }
+    
+    func testUninstallSpecificVersionRemovesOnlyThatVersionAndLinks() throws {
+        let globalPath = mint.linkPath + testCommand
+        // Use versions that exist in the test fixtures/repo
+        let packageOne = PackageReference(repo: testRepo, version: testVersion)
+        let packageTwo = PackageReference(repo: testRepo, version: latestVersion)
+
+        // install two versions
+        try mint.install(package: packageOne, link: true)
+        try mint.install(package: packageTwo, link: true)
+
+        // check everything expected is there
+        // installing and linking the newer version should update the symlink
+        XCTAssertTrue(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(latestVersion)])
+        XCTAssertEqual(try mint.listPackages(), [fullTestRepo: [testVersion, latestVersion]])
+        XCTAssertEqual(try mint.readMetadata().packages, [fullTestRepo: testPackageDir])
+
+        // Perform uninstall for specific version
+        try mint.uninstall(name: testRepo, version: testVersion)
+
+        // Assert: older version removed, newer version still present
+        XCTAssertFalse((mintPath + "packages" + testPackageDir + "build" + testVersion).exists, "Requested version should be removed")
+        XCTAssertTrue((mintPath + "packages" + testPackageDir + "build" + latestVersion).exists, "Other versions should remain")
+
+        // Symlink should still exist and point to the remaining (newer) version
+        XCTAssertTrue(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedExecutables(), [expectedExecutablePath(latestVersion)])
+
+        // Metadata should still contain the package because a version remains
+        XCTAssertEqual(try mint.readMetadata().packages, [fullTestRepo: testPackageDir])
+        
+        // Verify package list is updated correctly after uninstalling specific version
+        XCTAssertEqual(try mint.listPackages(), [fullTestRepo: [latestVersion]])
+    }
+    
+    func testUninstallSpecificVersionRemovesLastVersion() throws {
+        let globalPath = mint.linkPath + testCommand
+        let package = PackageReference(repo: testRepo, version: testVersion)
+
+        // install version
+        try mint.install(package: package, link: true)
+
+        // verify installed
+        XCTAssertTrue(globalPath.exists)
+        XCTAssertEqual(try mint.listPackages(), [fullTestRepo: [testVersion]])
+        XCTAssertEqual(try mint.readMetadata().packages, [fullTestRepo: testPackageDir])
+
+        // uninstall the only version
+        try mint.uninstall(name: testRepo, version: testVersion)
+
+        // verify package is completely removed
+        XCTAssertFalse(globalPath.exists)
+        XCTAssertEqual(mint.getLinkedExecutables(), [])
+        XCTAssertEqual(try mint.listPackages(), [:])
+        XCTAssertEqual(try mint.readMetadata().packages, [:])
+    }
+    
+    func testUninstallShaVersion() throws {
+        let shaVersion = "c3cf95c"
+        let package = PackageReference(repo: testRepo, version: shaVersion)
+        
+        // install SHA version (only this version)
+        try mint.install(package: package)
+        
+        // verify installed
+        XCTAssertTrue((mintPath + "packages" + testPackageDir + "build" + shaVersion).exists)
+        let installedPackages = try mint.listPackages()
+        XCTAssertEqual(installedPackages[fullTestRepo], [shaVersion])
+        
+        // uninstall using SHA prefix (removes the only version, so package should be completely removed)
+        try mint.uninstall(name: testRepo, version: shaVersion)
+        
+        // verify package is completely removed
+        XCTAssertFalse((mintPath + "packages" + testPackageDir + "build" + shaVersion).exists)
+        let remainingPackages = try mint.listPackages()
+        XCTAssertEqual(remainingPackages, [:])
+    }
+    
+    func testUninstallInvalidVersion() throws {
+        let package = PackageReference(repo: testRepo, version: testVersion)
+        
+        // install a version
+        try mint.install(package: package)
+        
+        // verify installed
+        let packagesBefore = try mint.listPackages()
+        XCTAssertEqual(packagesBefore[fullTestRepo], [testVersion])
+        
+        // try to uninstall non-existent version
+        try mint.uninstall(name: testRepo, version: "99.99.99")
+        
+        // verify nothing was removed (error should have prevented deletion)
+        let packagesAfter = try mint.listPackages()
+        XCTAssertEqual(packagesAfter[fullTestRepo], [testVersion])
+        XCTAssertTrue((mintPath + "packages" + testPackageDir + "build" + testVersion).exists)
+    }
+    
+    func testUninstallInvalidSha() throws {
+        let package = PackageReference(repo: testRepo, version: testVersion)
+        
+        // install a version
+        try mint.install(package: package)
+        
+        // verify installed
+        let packagesBefore = try mint.listPackages()
+        XCTAssertEqual(packagesBefore[fullTestRepo], [testVersion])
+        
+        // try to uninstall non-existent SHA
+        try mint.uninstall(name: testRepo, version: "abc1234")
+        
+        // verify nothing was removed (error should have prevented deletion)
+        let packagesAfter = try mint.listPackages()
+        XCTAssertEqual(packagesAfter[fullTestRepo], [testVersion])
+        XCTAssertTrue((mintPath + "packages" + testPackageDir + "build" + testVersion).exists)
+    }
+    
+    func testUninstallWhenNoVersionsInstalled() throws {
+        // try to uninstall a version when package is not installed at all
+        try mint.uninstall(name: testRepo, version: testVersion)
+        
+        // verify no error state (function should return gracefully)
+        XCTAssertEqual(try mint.listPackages(), [:])
+    }
+    
+    func testUninstallAmbiguousShaPrefix() throws {
+        // Install a SHA version
+        let shaVersion1 = "c3cf95c"
+        try mint.install(package: PackageReference(repo: testRepo, version: shaVersion1))
+        
+        // Create setup: two versions with same SHA prefix (neither exact match for the prefix)
+        let buildPath = mintPath + "packages" + testPackageDir + "build"
+        let firstVersionPath = buildPath + shaVersion1
+        let longerShaVersion1 = "c3cf95c0"
+        let longerFirstVersionPath = buildPath + longerShaVersion1
+        let shaVersion2 = "c3cf95c1234567890abcdef"
+        let secondVersionPath = buildPath + shaVersion2
+        
+        // Rename first version to be longer (so prefix isn't exact match)
+        try firstVersionPath.move(longerFirstVersionPath)
+        
+        // Create second version with same prefix
+        try secondVersionPath.mkpath()
+        let executable = try longerFirstVersionPath.children().first(where: { $0.isFile && $0.extension == nil })
+        if let executable = executable {
+            try executable.copy(secondVersionPath + executable.lastComponent)
+        }
+        
+        // Try to uninstall with prefix that matches both versions
+        try mint.uninstall(name: testRepo, version: "c3cf95c")
+        
+        // Verify no versions were deleted (ambiguous prefix should prevent deletion)
+        XCTAssertTrue(longerFirstVersionPath.exists)
+        XCTAssertTrue(secondVersionPath.exists)
+        
+        // Cleanup
+        try? secondVersionPath.delete()
+    }
 }

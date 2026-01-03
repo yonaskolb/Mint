@@ -28,6 +28,10 @@ struct Cache: Hashable {
     let packages: [PackageInfo]
 
     init(path: Path, metadata: Mint.Metadata, linkedExecutables: [Path]) throws {
+        guard path.exists else {
+            packages = []
+            return
+        }
         packages = try path.children()
             .filter { $0.isDirectory && !$0.lastComponent.hasPrefix(".") }
             .map { originPath in

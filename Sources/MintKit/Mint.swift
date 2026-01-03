@@ -515,6 +515,16 @@ public class Mint {
             }
         }
     }
+    
+    /// Checks if a string is likely a Git SHA commit hash (heuristic: at least 7 hex characters).
+    /// - Parameter value: The string to check
+    /// - Returns: `true` if the string appears to be a SHA, `false` otherwise
+    private func isLikelySHA(_ value: String) -> Bool {
+        let minSHALength = 7
+        let hexSet = CharacterSet(charactersIn: "0123456789abcdefABCDEF")
+        return value.count >= minSHALength &&
+               value.unicodeScalars.allSatisfy { hexSet.contains($0) }
+    }
 
     public func bootstrap(link: Bool = false, overwrite: Bool? = nil) throws {
 
@@ -584,7 +594,11 @@ public class Mint {
         }
     }
     
-    public func uninstall(name: String) throws {
+    /// Uninstall a package entirely or a specific installed version.
+    /// - Parameters:
+    ///   - name: The package name (or a case-insensitive substring of the git repo)
+    ///   - version: Optional specific version to uninstall. If nil, all installed versions are removed.
+    public func uninstall(name: String, version: String? = nil) throws {
 
         // find packages
         var metadata = try readMetadata()
@@ -592,7 +606,7 @@ public class Mint {
         let cache = try Cache(path: packagesPath, metadata: metadata, linkedExecutables: linkedExecutables)
         let packages = cache.packages.filter { $0.gitRepo.lowercased().contains(name.lowercased()) }
 
-        // remove package
+        // select package to operate on
         let package: Cache.PackageInfo
         switch packages.count {
         case 0:
@@ -605,30 +619,101 @@ public class Mint {
             package = packages.first { $0.gitRepo == option }!
         }
 
-        // get resources across all installed versions
+        // determine which version dirs to delete
+        let versionDirsToDelete: [Cache.VersionDir]
+        if let version = version {
+            let exactMatches = package.versionDirs.filter { $0.version == version }
+
+            if !exactMatches.isEmpty {
+                versionDirsToDelete = exactMatches
+            } else if isLikelySHA(version) {
+                let shaMatches = package.versionDirs.filter { $0.version.hasPrefix(version) }
+
+                if shaMatches.isEmpty {
+                    errorOutput("SHA version '\(version)' for package \(package.name) was not found".red)
+                    return
+                }
+
+                // Warn if multiple versions match the SHA prefix to prevent accidental deletion
+                if shaMatches.count > 1 {
+                    let matchingVersions = shaMatches.map { $0.version }.joined(separator: ", ")
+                    errorOutput("SHA prefix '\(version)' matches multiple versions: \(matchingVersions)".yellow)
+                    errorOutput("Please provide a longer SHA prefix or the full SHA to uniquely identify the version.".yellow)
+                    return
+                }
+
+                versionDirsToDelete = shaMatches
+            } else {
+                errorOutput("Version '\(version)' for package \(package.name) was not found".red)
+                return
+            }
+        } else {
+            // no version specified → uninstall all versions
+            versionDirsToDelete = package.versionDirs
+        }
+
+        // get resources for the versions we will remove
         let resources = Set(
-            try package.versionDirs
+            try versionDirsToDelete
                 .map { try getResources(from: $0.path) }
                 .flatMap { $0 }
         )
 
-        try package.path.delete()
-        output("\(package.name) was uninstalled")
+        // check if any version directories will remain after deletion (before deleting)
+        let buildPath = package.path + "build"
+        var remainingVersionDirs: [String] = []
+        let versionsToDelete = Set(versionDirsToDelete.map { $0.version })
+        if buildPath.exists {
+            do {
+                remainingVersionDirs = try buildPath.children()
+                    .filter { $0.isDirectory && !$0.lastComponent.hasPrefix(".") }
+                    .map { $0.lastComponent }
+                    .filter { !versionsToDelete.contains($0) }
+            } catch {
+                errorOutput("Failed to read build path '\(buildPath)': \(error)".red)
+                return
+            }
+        }
+        let removedAllVersions = remainingVersionDirs.isEmpty
 
-        // remove metadata
-        metadata.packages[package.gitRepo] = nil
-        try writeMetadata(metadata)
+        // delete the selected version directories
+        for vd in versionDirsToDelete {
+            try vd.path.delete()
+        }
 
-        // remove link
-        for executable in Set(package.versionDirs.flatMap { $0.executables }) where executable.linked {
+        if removedAllVersions {
+            // fully removed package; ensure package path cleanup and metadata update
+            try package.path.delete()
+            output("\(package.name) was uninstalled")
+            // remove metadata entry
+            metadata.packages[package.gitRepo] = nil
+            try writeMetadata(metadata)
+        } else {
+            // only specific version(s) removed
+            // metadata remains unchanged because package still has installed versions
+            let removedVersionsList = versionDirsToDelete.map { $0.version }.joined(separator: ", ")
+            output("\(package.name) (\(removedVersionsList)) was uninstalled")
+        }
+
+        // remove links for executables belonging to removed versions
+        for executable in Set(versionDirsToDelete.flatMap { $0.executables }) where executable.linked {
             let installPath = linkPath + executable.name
             try installPath.delete()
         }
 
-        // remove all resource artifact links
+        // remove resource artifact links related only to removed versions
         for resource in resources {
-            let installPath = linkPath + resource.lastComponent
-            try installPath.delete()
+            let resourceName = resource.lastComponent
+
+            let stillUsed = remainingVersionDirs.contains { versionDir in
+                let candidatePath = buildPath + versionDir + resourceName
+                return candidatePath.exists
+            }
+
+            if !stillUsed {
+                let installPath = linkPath + resourceName
+                try installPath.delete()
+            }
         }
     }
 }
