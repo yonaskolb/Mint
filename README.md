@@ -103,6 +103,7 @@ An optional version can be specified by appending `@version`, otherwise the newe
 
 #### Examples
 ```sh
+$ mint run kibotu/caliper --ipa-path MyApp.ipa # analyze iOS app size
 $ mint run yonaskolb/XcodeGen@2.18.0 # run the only executable
 $ mint run yonaskolb/XcodeGen@2.18.0 --spec spec.yml # pass some arguments
 $ mint run yonaskolb/XcodeGen@2.18.0 xcodegen --spec spec.yml # specify a specific executable
@@ -198,23 +199,24 @@ If this file is found in you repo, then all those directories will be copied int
 
 ## A list of popular Mint compatible packages 🌱
 
-- mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer)
-- mint install [Carthage/Carthage](https://github.com/Carthage/Carthage)
-- mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon)
-- mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets)
-- mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery)
-- mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen)
-- mint install [nicklockwood/SwiftFormat](https://github.com/nicklockwood/SwiftFormat)
-- mint install [SwiftGen/SwiftGen](https://github.com/SwiftGen/SwiftGen)
-- mint install [realm/SwiftLint](https://github.com/realm/SwiftLint)
-- mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen)
-- mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting)
-- mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift)
-- mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky)
-- mint install [thii/xcbeautify](https://github.com/thii/xcbeautify)
-- mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist)
-- mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse)
-- mint install [scribd/Weaver](https://github.com/scribd/Weaver)
-- mint install [arthurpalves/coherent-swift](https://github.com/arthurpalves/coherent-swift)
+- mint install [kibotu/caliper](https://github.com/kibotu/caliper) - Analyze iOS app size with module-level breakdowns and team ownership tracking
+- mint install [jkmathew/Assetizer](https://github.com/jkmathew/Assetizer) - Generate image assets from SVG files
+- mint install [Carthage/Carthage](https://github.com/Carthage/Carthage) - Decentralized dependency manager for Cocoa
+- mint install [JohnSundell/Marathon](https://github.com/JohnSundell/Marathon) - Run and manage Swift scripts (DEPRECATED)
+- mint install [LinusU/RasterizeXCAssets](https://github.com/LinusU/RasterizeXCAssets) - Rasterize vector assets in Xcode asset catalogs
+- mint install [krzysztofzablocki/Sourcery](https://github.com/krzysztofzablocki/Sourcery) - Meta-programming and code generation for Swift
+- mint install [yonaskolb/SwagGen](https://github.com/yonaskolb/SwagGen) - Generate Swift API client from OpenAPI/Swagger specs
+- mint install [nicklockwood/SwiftFormat](https://github.com/nicklockwood/SwiftFormat) - Format Swift code according to style rules
+- mint install [SwiftGen/SwiftGen](https://github.com/SwiftGen/SwiftGen) - Generate Swift code for assets, strings, and more
+- mint install [realm/SwiftLint](https://github.com/realm/SwiftLint) - Enforce Swift style and conventions
+- mint install [yonaskolb/XcodeGen](https://github.com/yonaskolb/XcodeGen) - Generate Xcode projects from YAML spec
+- mint install [artemnovichkov/Carting](https://github.com/artemnovichkov/Carting) - Update Carthage dependencies and generate Xcode project
+- mint install [num42/icon-resizer-swift](https://github.com/num42/icon-resizer-swift) - Resize app icons to all required sizes
+- mint install [MakeAWishFoundation/SwiftyMocky](https://github.com/MakeAWishFoundation/SwiftyMocky) - Generate mock objects for testing
+- mint install [thii/xcbeautify](https://github.com/thii/xcbeautify) - Beautify Xcode build output
+- mint install [mono0926/LicensePlist](https://github.com/mono0926/LicensePlist) - Generate license list from CocoaPods and Carthage dependencies
+- mint install [ChargePoint/xcparse](https://github.com/ChargePoint/xcparse) - Extract data from Xcode 11+ xcresult bundles
+- mint install [scribd/Weaver](https://github.com/scribd/Weaver) - Declarative dependency injection framework
+- mint install [arthurpalves/coherent-swift](https://github.com/arthurpalves/coherent-swift) - Generate coherent Swift code structure
 
 Feel free to add your own!
